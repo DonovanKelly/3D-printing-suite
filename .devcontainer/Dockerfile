@@ -11,7 +11,7 @@ USER root
 
 RUN rm -f /etc/apt/sources.list.d/yarn.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends cron jq ripgrep vim libcairo2 xz-utils supervisor \
+    && apt-get install -y --no-install-recommends cron jq ripgrep vim libcairo2 xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Use the same Node major for frontend builds on either supported workstation architecture.

@@ -20,7 +20,7 @@ install -d -m 700 "$state_dir"
 exec 9>"$state_dir/control.lock"
 flock -w 30 9
 
-control() { supervisorctl -c "$config" "$@"; }
+control() { "$repo_root/.venv/bin/supervisorctl" -c "$config" "$@"; }
 running() { [[ -f "$config" ]] && control pid >/dev/null 2>&1; }
 
 stop() {
@@ -40,8 +40,7 @@ stop() {
 }
 
 start() {
-  command -v supervisord >/dev/null
-  [[ -x .venv/bin/relief && -f src/relief_studio/static/index.html ]] || {
+  [[ -x .venv/bin/supervisord && -x .venv/bin/relief && -f src/relief_studio/static/index.html ]] || {
     printf 'Run bash scripts/workspace-preview.sh setup first.\n' >&2
     return 1
   }
@@ -92,7 +91,7 @@ stdout_logfile_maxbytes=2MB
 stdout_logfile_backups=2
 EOF
     # Close the controller lock in the daemon so later stop/start calls can run.
-    supervisord -c "$config" 9>&-
+    .venv/bin/supervisord -c "$config" 9>&-
   else
     control start all >/dev/null
   fi

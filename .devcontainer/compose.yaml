@@ -10,7 +10,8 @@ services:
         WORKSPACE_HOME: "${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}"
         WORKSPACE_FOLDER: "${AGENT_MANAGER_WORKSPACE_FOLDER:?Dioikeo must set AGENT_MANAGER_WORKSPACE_FOLDER}"
     init: true
-    command: sleep infinity
+    # Keep SSH available if first-creation dependency setup has not run yet.
+    command: ["bash", "-lc", "bash scripts/workspace-preview.sh start; exec sleep infinity"]
     environment:
       HOME: "${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}"
     labels:

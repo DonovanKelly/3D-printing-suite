@@ -38,7 +38,8 @@ from the Python package, so a wheel built after the frontend includes the UI.
 ### Managed workspace development site
 
 The Dev Container installs dependencies on creation and starts a supervised
-preview on port 8000 whenever DevPod starts the workspace. Dioikeo registers the
+preview on port 8000 whenever the container starts. The Compose command and
+DevPod startup hook both use the same idempotent service controller. Dioikeo registers the
 workspace's friendly `.local` HTTPS address; use the URL shown by its connections
 view. The preview serves the UI and API together, rebuilds frontend assets after
 edits (reload the browser to see them), and restarts a failed server automatically.
@@ -57,9 +58,10 @@ under `~/.local/state/relief-preview-*`, and exports go to
 use this checkout's `output/projects`. `RELIEF_PREVIEW_PORT` and
 `RELIEF_OUTPUT_ROOT` can override these defaults before the first start. Keep
 this unauthenticated development service on the trusted local OrbStack network.
-For an existing container that predates the startup hook, install the image's
-`supervisor` package and run `setup` once if its dependencies are missing, then
-run `start`.
+The supervisor is pinned in the project virtual environment, so service startup
+does not depend on a package installed in a container's replaceable filesystem.
+For an existing workspace, run `setup` once if its dependencies are missing,
+then run `start`.
 
 `requirements-dev.lock` records the tested Python environment; use
 `pip install -r requirements-dev.lock` then `pip install -e . --no-deps` for those
