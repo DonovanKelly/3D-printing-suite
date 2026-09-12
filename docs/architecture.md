@@ -17,6 +17,8 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   meshes. Manifold performs necessary solid unions
   and rear mounting recess subtraction. Every exported solid must be closed
   and have positive volume.
+  A 0.01 mm artwork inset separates point-only contacts. Validation also checks
+  a vertex-welded copy, matching the normalization performed by common importers.
 - A base occupies z=0..base thickness. Artwork and border occupy separate
   non-overlapping volumes above it. Each tile is a grouped, two-material 3MF
   with preserved relative coordinates, plus aligned STL parts. A single merged
