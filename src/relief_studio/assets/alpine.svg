@@ -24,11 +24,11 @@
     <path d="M234 392q78-12 178 8l-97 7 39 12-121 10 176 15-79 17 41 9-148 29 232 48 73 45H159l52-52-79-27 122-39-92-21 115-30-45-13 81-12Z"/>
   </g>
   <g fill="black">
-    <use href="#pine" transform="translate(64 267) scale(1.28)"/>
-    <use href="#pine" transform="translate(131 329) scale(.76)"/>
-    <use href="#pine" transform="translate(31 359) scale(.92)"/>
-    <use href="#pine" transform="translate(534 325) scale(1.17)"/>
-    <use href="#pine" transform="translate(463 406) scale(.83)"/>
+    <use href="#pine" transform="translate(64 267) scale(1.28)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+    <use href="#pine" transform="translate(131 329) scale(.76)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+    <use href="#pine" transform="translate(31 359) scale(.92)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+    <use href="#pine" transform="translate(534 325) scale(1.17)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+    <use href="#pine" transform="translate(463 406) scale(.83)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
     <use href="#pine" transform="translate(199 425) scale(.51)"/>
     <use href="#pine" transform="translate(372 508) scale(.49)"/>
     <use href="#pine" transform="translate(330 528) scale(.36)"/>

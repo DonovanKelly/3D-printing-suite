@@ -43,6 +43,10 @@ def vector_svg(project: Project, assembly: bool = False) -> str:
             )
             art = project.raised.intersection(piece.tile.shape)
             paths.append(f'<path d="{path_data(art)}" fill="{settings.artwork_color}"/>')
+            paths.append(
+                f'<path d="{path_data(piece.tile.shape)}" fill="none" '
+                'stroke="#859184" stroke-width="0.25"/>'
+            )
     else:
         paths.append(f'<rect width="{width}" height="{settings.height_mm}" fill="white"/>')
         paths.append(f'<path d="{path_data(project.vector)}" fill="black"/>')
@@ -52,14 +56,19 @@ def vector_svg(project: Project, assembly: bool = False) -> str:
         for piece in project.pieces:
             x, y = piece.tile.shape.representative_point().coords[0]
             labels.append(
+                f'<rect x="{x - font_size * 2.5:.3f}" y="{height - y - font_size:.3f}" '
+                f'width="{font_size * 5:.3f}" height="{font_size * 1.5:.3f}" '
+                f'rx="{font_size * 0.25:.3f}" fill="#fcfcfa" stroke="#859184" '
+                f'stroke-width="{font_size * 0.04:.3f}"/>'
                 f'<text x="{x:.3f}" y="{height - y:.3f}" text-anchor="middle" '
                 f'font-family="sans-serif" font-size="{font_size:.2f}" '
-                f'fill="#285f49" stroke="white" stroke-width="{font_size / 6:.3f}" '
-                f'paint-order="stroke">{piece.tile.name}</text>'
+                f'fill="#285f49">{piece.tile.name}</text>'
             )
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}mm" height="{height}mm" '
-        f'viewBox="0 0 {width} {height}"><g fill-rule="evenodd" '
+        f'viewBox="0 0 {width} {height}">'
+        f'<rect width="{width}" height="{height}" fill="#f5f4f0"/>'
+        f'<g fill-rule="evenodd" '
         f'transform="translate(0 {height}) scale(1 -1)">{"".join(paths)}</g>'
         f"{''.join(labels)}</svg>"
     )

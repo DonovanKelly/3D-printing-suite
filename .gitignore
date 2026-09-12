@@ -8,6 +8,8 @@ build/
 dist/
 web/node_modules/
 web/dist/
+src/relief_studio/static/
+web/*.tsbuildinfo
 output/
 .playwright-cli/
 .env
