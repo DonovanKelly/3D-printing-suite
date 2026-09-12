@@ -63,6 +63,29 @@ def test_only_exported_known_files_can_be_downloaded(client):
     assert client.get(f"/api/files/{identifier}/print-pack.zip").status_code == 404
 
 
+def test_explicit_public_origin_supports_proxy_preview_and_export(tmp_path):
+    origin = "https://sample-api-ws1.local"
+    client = TestClient(create_app(tmp_path / "exports", public_origin=origin))
+    headers = {"Origin": origin}
+    preview = client.post("/api/preview", headers=headers, data={"settings": "{}"})
+    assert preview.status_code == 200, preview.text
+    exported = client.post(f"/api/export/{preview.json()['id']}", headers=headers)
+    assert exported.status_code == 200
+    for other in ("https://other.local", "http://sample-api-ws1.local", origin + ":9999"):
+        rejected = client.post(
+            "/api/preview", headers={"Origin": other, "X-Forwarded-Host": "sample-api-ws1.local"}
+        )
+        assert rejected.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "origin", ["*", "https://sample.local/path", "https://user@sample.local", "https://sample.local#x"]
+)
+def test_public_origin_must_be_explicit_origin(origin):
+    with pytest.raises(ValueError, match="Public origin"):
+        create_app(public_origin=origin)
+
+
 def test_server_exposes_defaults_and_health(client):
     assert client.get("/api/health").json()["processing"] == "local"
     assert client.get("/api/defaults").json()["bed_width_mm"] == 230

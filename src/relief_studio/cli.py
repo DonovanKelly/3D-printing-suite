@@ -41,13 +41,20 @@ def main() -> None:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
     serve.add_argument("--output-root", type=Path, default=Path("output/projects"))
+    serve.add_argument(
+        "--public-origin", help="Trusted browser origin behind a local reverse proxy"
+    )
     arguments = parser.parse_args()
     if arguments.command == "serve":
         import uvicorn
 
         from .server import create_app
 
-        uvicorn.run(create_app(arguments.output_root), host=arguments.host, port=arguments.port)
+        uvicorn.run(
+            create_app(arguments.output_root, arguments.public_origin),
+            host=arguments.host,
+            port=arguments.port,
+        )
         return
     try:
         config = json.loads(arguments.settings.read_text()) if arguments.settings else {}

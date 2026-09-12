@@ -4,6 +4,8 @@ Preview computation is serialized and retained in a four-entry memory cache.
 Only explicit export writes a durable print pack. Upload bodies are bounded
 before multipart parsing; file routes serve generated artifacts, never inputs.
 The service is for trusted local use, with no remote authentication layer.
+An explicitly configured public origin supports local proxies that rewrite Host;
+forwarding headers alone never authorize another browser origin.
 """
 
 import logging
@@ -30,7 +32,21 @@ from .settings import Settings
 logger = logging.getLogger(__name__)
 
 
-def create_app(output_root: Path | None = None) -> FastAPI:
+def create_app(output_root: Path | None = None, public_origin: str | None = None) -> FastAPI:
+    if public_origin is not None:
+        parsed = urlparse(public_origin)
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.hostname
+            or parsed.username is not None
+            or parsed.path not in {"", "/"}
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ValueError(
+                "Public origin must be an HTTP(S) origin without credentials or a path."
+            )
+        public_origin = f"{parsed.scheme}://{parsed.netloc}"
     app = FastAPI(title="Relief Studio", version="0.1.0")
     root = (output_root or Path("output/projects")).resolve()
     lock = Lock()
@@ -40,7 +56,11 @@ def create_app(output_root: Path | None = None) -> FastAPI:
     async def local_request_boundary(request: Request, call_next):
         if request.method == "POST":
             origin = request.headers.get("origin")
-            if origin and urlparse(origin).hostname != request.url.hostname:
+            if (
+                origin
+                and origin != public_origin
+                and urlparse(origin).hostname != request.url.hostname
+            ):
                 return JSONResponse({"detail": "Cross-origin generation is not allowed."}, 403)
             # Bounded pre-read avoids spilling arbitrary upload bodies to multipart temp files.
             chunks, length = [], 0

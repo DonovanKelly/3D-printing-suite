@@ -56,7 +56,10 @@ The service runs as the workspace user. Its control socket and bounded logs live
 under `~/.local/state/relief-preview-*`, and exports go to
 `/shared/relief-studio/projects` when shared storage is mounted. Otherwise they
 use this checkout's `output/projects`. `RELIEF_PREVIEW_PORT` and
-`RELIEF_OUTPUT_ROOT` can override these defaults before the first start. Keep
+`RELIEF_OUTPUT_ROOT` can override these defaults before the first start.
+`RELIEF_PUBLIC_ORIGIN` defaults to the managed user's friendly HTTPS `.local`
+URL; it permits browser generation through the proxy while rejecting other
+origins. Set it explicitly if your workspace uses a different URL. Keep
 this unauthenticated development service on the trusted local OrbStack network.
 The supervisor is pinned in the project virtual environment, so service startup
 does not depend on a package installed in a container's replaceable filesystem.

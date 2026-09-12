@@ -10,6 +10,7 @@ repo_key="$(printf '%s' "$repo_root" | sha256sum | cut -c1-10)"
 state_dir="$HOME/.local/state/relief-preview-$repo_key"
 config="$state_dir/supervisor.conf"
 port="${RELIEF_PREVIEW_PORT:-8000}"
+public_origin="${RELIEF_PUBLIC_ORIGIN:-https://$(id -un).local}"
 output_root="${RELIEF_OUTPUT_ROOT:-$repo_root/output/projects}"
 if [[ -z "${RELIEF_OUTPUT_ROOT:-}" && -d /shared && -w /shared ]]; then
   output_root=/shared/relief-studio/projects
@@ -66,7 +67,7 @@ serverurl=unix://$state_dir/control.sock
 
 [program:relief]
 directory=$repo_root
-command="$repo_root/.venv/bin/relief" serve --host 0.0.0.0 --port $port --output-root "$output_root"
+command="$repo_root/.venv/bin/relief" serve --host 0.0.0.0 --port $port --output-root "$output_root" --public-origin "$public_origin"
 autostart=true
 autorestart=true
 startsecs=2
