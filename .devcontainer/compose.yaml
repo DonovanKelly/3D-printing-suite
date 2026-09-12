@@ -13,6 +13,8 @@ services:
     command: sleep infinity
     environment:
       HOME: "${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}"
+    labels:
+      dev.orbstack.http-port: "8000"
     volumes:
       - "..:${AGENT_MANAGER_WORKSPACE_FOLDER:?Dioikeo must set AGENT_MANAGER_WORKSPACE_FOLDER}:cached"
       - "codex-home:${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}/.codex"

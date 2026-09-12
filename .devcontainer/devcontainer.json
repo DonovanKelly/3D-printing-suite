@@ -4,6 +4,8 @@
   "service": "workspace",
   "workspaceFolder": "${localEnv:AGENT_MANAGER_WORKSPACE_FOLDER}",
   "remoteUser": "${localEnv:AGENT_MANAGER_WORKSPACE_USER}",
+  "postCreateCommand": "bash scripts/workspace-preview.sh setup",
+  "postStartCommand": "bash scripts/workspace-preview.sh start",
   "hostRequirements": {
     "cpus": 2,
     "memory": "4gb",
