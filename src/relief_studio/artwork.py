@@ -159,7 +159,11 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
         notes.append(
             f"Removed {len(parts) - len(kept)} tiny artwork regions below the area filter."
         )
-    result = unary_union(kept)
+    # A 0.01 mm inset separates point-only contacts that importers would weld
+    # into non-manifold edges. It is below the trace tolerance and nozzle scale.
+    result = unary_union(kept).buffer(-0.01, join_style="mitre")
+    if result.is_empty:
+        raise ValueError("Artwork is too thin after contact cleanup. Increase its line weight.")
     narrow = result.difference(result.buffer(-0.2).buffer(0.2))
     if narrow.area > max(result.area * 0.03, 1):
         notes.append(

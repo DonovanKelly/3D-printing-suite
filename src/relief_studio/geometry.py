@@ -67,6 +67,7 @@ def check_mesh(mesh: trimesh.Trimesh) -> None:
         and mesh.is_volume
         and np.isfinite(mesh.vertices).all()
         and mesh.volume > 0
+        and mesh.copy().process().is_volume
     ):
         raise ValueError(
             "Generated geometry is not a closed positive-volume solid. "
@@ -74,8 +75,14 @@ def check_mesh(mesh: trimesh.Trimesh) -> None:
         )
 
 
-def keyhole_cutters(tile: Tile, settings: Settings) -> list[trimesh.Trimesh]:
-    left, bottom, right, top = tile.shape.bounds
+def keyhole_cutters(
+    tile: Tile, settings: Settings, columns: int, rows: int
+) -> list[trimesh.Trimesh]:
+    # Anchor to the nominal cell, not its tab-expanded bounds; otherwise a top
+    # tab could move the keyholes above the solid body of a puzzle piece.
+    cell_width = settings.width_mm / columns
+    left, right = tile.column * cell_width, (tile.column + 1) * cell_width
+    top = settings.height_mm * (1 - tile.row / rows)
     cutters = []
     for x in (left + (right - left) * 0.3, left + (right - left) * 0.7):
         y = top - 16
@@ -105,7 +112,7 @@ def build_project(data: bytes, settings: Settings) -> Project:
         base = extrude(tile.shape, settings.base_mm)
         if settings.hanging == "keyholes":
             base = trimesh.boolean.difference(
-                [base, *keyhole_cutters(tile, settings)], engine="manifold"
+                [base, *keyhole_cutters(tile, settings, columns, rows)], engine="manifold"
             )
         art = extrude(vector.intersection(tile.shape), settings.relief_mm, settings.base_mm)
         border = extrude(frame.intersection(tile.shape), settings.frame_height_mm, settings.base_mm)

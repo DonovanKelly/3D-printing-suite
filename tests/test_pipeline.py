@@ -3,6 +3,7 @@
 import io
 import json
 from itertools import combinations
+from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
@@ -118,6 +119,10 @@ def test_export_contains_grouped_materials_and_valid_meshes(tmp_path):
     assert json.loads((output / "manifest.json").read_text())["units"] == "mm"
     assert manifest["piece_count"] == 2
     for record in manifest["pieces"]:
+        scene = trimesh.load_scene(output / record["files"]["3mf"])
+        assert scene.units == "millimeter"
+        assert len(scene.geometry) == 2
+        assert all(mesh.is_volume for mesh in scene.geometry.values())
         for key in ("background", "artwork", "combined"):
             mesh = trimesh.load_mesh(output / record["files"][key])
             assert mesh.is_volume
@@ -197,3 +202,27 @@ def test_puzzle_assembly_origins_recover_global_coordinates():
         assert np.max(restored[:, :2], axis=0) == pytest.approx(
             piece.tile.shape.bounds[2:], abs=1e-5
         )
+
+
+@pytest.mark.parametrize("example", ["wall-puzzle", "wall-tiles"])
+def test_large_materials_survive_importer_vertex_welding(tmp_path, example):
+    settings = Settings.model_validate_json(
+        (Path(__file__).parents[1] / "examples" / f"{example}.json").read_text()
+    )
+    data = sample_bytes()
+    output = tmp_path / example
+    manifest = export_project(build_project(data, settings), output, data)
+    for piece in manifest["pieces"]:
+        scene = trimesh.load_scene(output / piece["files"]["3mf"])
+        assert all(mesh.is_volume for mesh in scene.geometry.values())
+        combined = trimesh.load_mesh(output / piece["files"]["combined"])
+        assert combined.is_volume and combined.body_count == 1
+
+
+def test_rear_keyholes_stay_in_puzzle_cell_bodies():
+    settings = Settings(width_mm=540, height_mm=540, layout="puzzle", hanging="keyholes", base_mm=5)
+    project = build_project(sample_bytes(), settings)
+    assert len(project.pieces) > 1
+    for piece in project.pieces:
+        assert piece.base.is_volume
+        assert piece.base.volume < piece.tile.shape.area * settings.base_mm

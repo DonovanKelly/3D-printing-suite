@@ -1,0 +1,7 @@
+{
+  "width_mm": 540,
+  "height_mm": 360,
+  "layout": "tiles",
+  "clearance_mm": 0.25,
+  "base_mm": 3
+}
