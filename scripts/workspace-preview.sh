@@ -23,6 +23,22 @@ flock -w 30 9
 control() { supervisorctl -c "$config" "$@"; }
 running() { [[ -f "$config" ]] && control pid >/dev/null 2>&1; }
 
+stop() {
+  if running; then
+    control shutdown
+    # Shutdown acknowledges before children and the control socket are gone.
+    # Wait for cleanup so an immediate start cannot race the old daemon.
+    for _ in {1..30}; do
+      if [[ ! -e "$state_dir/supervisor.pid" && ! -S "$state_dir/control.sock" ]]; then
+        return
+      fi
+      sleep 1
+    done
+    printf 'Preview shutdown has not completed; inspect %s\n' "$state_dir" >&2
+    return 1
+  fi
+}
+
 start() {
   command -v supervisord >/dev/null
   [[ -x .venv/bin/relief && -f src/relief_studio/static/index.html ]] || {
@@ -102,13 +118,8 @@ case "${1:-start}" in
     npm --prefix web run build
     ;;
   start) start ;;
-  stop) if running; then control shutdown; fi ;;
-  restart)
-    if running; then
-      control restart all
-    fi
-    start
-    ;;
+  stop) stop ;;
+  restart) stop; start ;;
   status) control status ;;
   *) printf 'Usage: %s {setup|start|stop|restart|status}\n' "$0" >&2; exit 2 ;;
 esac
