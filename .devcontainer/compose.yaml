@@ -1,0 +1,23 @@
+# Defines the portable development service and keeps persistent state in named volumes.
+services:
+  workspace:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+      args:
+        CODEX_VERSION: "0.154.0"
+        WORKSPACE_USER: "${AGENT_MANAGER_WORKSPACE_USER:?Dioikeo must set AGENT_MANAGER_WORKSPACE_USER}"
+        WORKSPACE_HOME: "${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}"
+        WORKSPACE_FOLDER: "${AGENT_MANAGER_WORKSPACE_FOLDER:?Dioikeo must set AGENT_MANAGER_WORKSPACE_FOLDER}"
+    init: true
+    command: sleep infinity
+    environment:
+      HOME: "${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}"
+    volumes:
+      - "..:${AGENT_MANAGER_WORKSPACE_FOLDER:?Dioikeo must set AGENT_MANAGER_WORKSPACE_FOLDER}:cached"
+      - "codex-home:${AGENT_MANAGER_WORKSPACE_HOME:?Dioikeo must set AGENT_MANAGER_WORKSPACE_HOME}/.codex"
+      - "${AGENT_MANAGER_SHARED_SOURCE:-dioikeo-workspace-shared}:/shared:rw"
+
+volumes:
+  codex-home:
+  dioikeo-workspace-shared:

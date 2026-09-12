@@ -1,0 +1,12 @@
+{
+  "name": "3D Printing Suite",
+  "dockerComposeFile": "compose.yaml",
+  "service": "workspace",
+  "workspaceFolder": "${localEnv:AGENT_MANAGER_WORKSPACE_FOLDER}",
+  "remoteUser": "${localEnv:AGENT_MANAGER_WORKSPACE_USER}",
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "16gb"
+  }
+}
