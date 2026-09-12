@@ -1,0 +1,199 @@
+"""Exercise fabrication invariants across tracing, partitions, material solids, and exports."""
+
+import io
+import json
+from itertools import combinations
+from xml.etree import ElementTree as ET
+from zipfile import ZipFile
+
+import numpy as np
+import pytest
+import trimesh
+from PIL import Image, ImageDraw
+from pydantic import ValidationError
+from shapely.geometry import Point, box
+from shapely.ops import unary_union
+
+from relief_studio.artwork import load_image, trace_image
+from relief_studio.cli import sample_bytes
+from relief_studio.exports import CORE, export_project
+from relief_studio.geometry import build_project
+from relief_studio.layout import choose_layout, partition
+from relief_studio.settings import Settings
+
+
+def ring_image() -> bytes:
+    image = Image.new("RGBA", (200, 200), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((20, 20, 180, 180), fill="black")
+    draw.rectangle((60, 60, 140, 140), fill="white")
+    draw.rectangle((85, 85, 115, 115), fill="black")
+    output = io.BytesIO()
+    image.save(output, format="PNG")
+    return output.getvalue()
+
+
+def test_nested_negative_space_and_island_are_preserved():
+    region, _ = trace_image(
+        ring_image(), Settings(width_mm=200, height_mm=200, frame=False, margin_mm=0)
+    )
+    assert region.covers(Point(30, 100))
+    assert not region.covers(Point(70, 100))
+    assert region.covers(Point(100, 100))
+    assert not region.covers(Point(10, 10))
+
+
+def test_inversion_changes_foreground_and_transparency_composites_white():
+    normal, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0))
+    inverted, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0, invert=True))
+    assert normal.intersection(inverted).area < 1e-5
+    assert inverted.covers(Point(3, 3))
+
+
+@pytest.mark.parametrize("layout", ["tiles", "puzzle"])
+def test_partitions_cover_rectangle_without_overlap(layout):
+    settings = Settings(width_mm=450, height_mm=300, layout=layout, clearance_mm=0)
+    tiles = partition(settings, 3, 2)
+    union = unary_union([t.shape for t in tiles])
+    assert union.symmetric_difference(box(0, 0, 450, 300)).area < 1e-6
+    for a, b in combinations(tiles, 2):
+        assert a.shape.intersection(b.shape).area < 1e-6
+
+
+def test_puzzle_clearance_and_outer_dimensions():
+    settings = Settings(width_mm=80, height_mm=40, layout="puzzle", clearance_mm=0.3)
+    left, right = partition(settings, 2, 1)
+    assert left.shape.distance(right.shape) == pytest.approx(0.3, abs=0.002)
+    assert unary_union([left.shape, right.shape]).bounds == pytest.approx((0, 0, 80, 40))
+    assert left.shape.bounds[2] > 40
+    assert left.shape.is_valid and right.shape.is_valid
+
+
+def test_auto_layout_measures_tabs_and_loops():
+    settings = Settings(width_mm=440, height_mm=220, layout="puzzle", hanging="loops")
+    tiles, columns, rows = choose_layout(settings)
+    assert columns * rows > 2  # Two plain cells fit; the protruding tab does not.
+    for tile in tiles:
+        x0, y0, x1, y1 = tile.shape.bounds
+        assert x1 - x0 <= 230 and y1 - y0 <= 230
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        {"width_mm": 250},
+        {"width_mm": 230, "height_mm": 230, "hanging": "loops"},
+        {"layout": "puzzle", "width_mm": 460, "columns": 2, "rows": 1},
+    ],
+)
+def test_oversize_layouts_fail(config):
+    with pytest.raises(ValueError, match="exceeds"):
+        choose_layout(Settings(**config))
+
+
+@pytest.mark.parametrize("hanging", ["none", "loops", "keyholes"])
+def test_materials_are_closed_nonoverlapping_and_combined_volume_adds(hanging):
+    project = build_project(ring_image(), Settings(hanging=hanging, base_mm=5))
+    piece = project.pieces[0]
+    assert piece.base.is_volume and piece.artwork.is_volume and piece.combined.is_volume
+    assert piece.base.bounds[1, 2] == pytest.approx(5)
+    assert piece.artwork.bounds[0, 2] == pytest.approx(5)
+    assert piece.combined.volume == pytest.approx(
+        piece.base.volume + piece.artwork.volume, rel=1e-6
+    )
+    assert piece.combined.body_count == 1
+    if hanging == "keyholes":
+        assert piece.base.volume < 180 * 180 * 5
+        assert piece.base.volume > 180 * 180 * 5 - 2000
+    if hanging == "loops":
+        assert piece.combined.extents[1] == pytest.approx(189)
+
+
+def test_export_contains_grouped_materials_and_valid_meshes(tmp_path):
+    settings = Settings(width_mm=80, height_mm=40, layout="puzzle", columns=2, rows=1)
+    data = sample_bytes()
+    project = build_project(data, settings)
+    output = tmp_path / "pack"
+    manifest = export_project(project, output, data)
+    assert json.loads((output / "manifest.json").read_text())["units"] == "mm"
+    assert manifest["piece_count"] == 2
+    for record in manifest["pieces"]:
+        for key in ("background", "artwork", "combined"):
+            mesh = trimesh.load_mesh(output / record["files"][key])
+            assert mesh.is_volume
+        with ZipFile(output / record["files"]["3mf"]) as archive:
+            root = ET.fromstring(archive.read("3D/3dmodel.model"))
+            assert root.attrib["unit"] == "millimeter"
+            ns = {"c": CORE}
+            assert len(root.findall(".//c:component", ns)) == 2
+            assert root.find("c:build/c:item", ns).attrib["objectid"] == "4"
+            for obj in root.findall("c:resources/c:object", ns)[:2]:
+                vertices = [
+                    [float(v.attrib[c]) for c in "xyz"]
+                    for v in obj.findall("c:mesh/c:vertices/c:vertex", ns)
+                ]
+                faces = [
+                    [int(t.attrib[f"v{i}"]) for i in (1, 2, 3)]
+                    for t in obj.findall("c:mesh/c:triangles/c:triangle", ns)
+                ]
+                assert trimesh.Trimesh(vertices=vertices, faces=faces).is_volume
+    with ZipFile(output / "print-pack.zip") as archive:
+        assert "PRINTING.md" in archive.namelist()
+        assert "print-pack.zip" not in archive.namelist()
+    with pytest.raises(FileExistsError):
+        export_project(project, output, data)
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        b"not an image",
+        b"",
+        b'<svg width="100" height="100"><image href="file:///etc/passwd"/></svg>',
+        b'<svg width="100" height="100"><use href="https://example.invalid/a.svg"/></svg>',
+        b'<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>'
+        b'<svg width="100" height="100">&xxe;</svg>',
+        b'<svg width="100" height="100"><style>'
+        b'@import url("https://example.invalid/style.css");</style></svg>',
+    ],
+)
+def test_invalid_or_external_input_fails(data):
+    with pytest.raises(ValueError):
+        load_image(data, Settings())
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        {"width_mm": float("nan")},
+        {"columns": 2},
+        {"hanging": "keyholes", "base_mm": 2.4},
+        {"background_color": '"/><script>'},
+        {"width_mm": 30, "frame_width_mm": 20},
+        {"unexpected": 1},
+    ],
+)
+def test_invalid_settings_fail(config):
+    with pytest.raises(ValidationError):
+        Settings(**config)
+
+
+def test_empty_threshold_has_actionable_error():
+    data = io.BytesIO()
+    Image.new("RGB", (32, 32), "white").save(data, format="PNG")
+    with pytest.raises(ValueError, match="No artwork"):
+        trace_image(data.getvalue(), Settings())
+
+
+def test_puzzle_assembly_origins_recover_global_coordinates():
+    project = build_project(
+        sample_bytes(), Settings(width_mm=120, height_mm=120, layout="puzzle", columns=2, rows=2)
+    )
+    for piece in project.pieces:
+        restored = piece.base.vertices + np.array(piece.origin)
+        assert np.min(restored[:, :2], axis=0) == pytest.approx(
+            piece.tile.shape.bounds[:2], abs=1e-5
+        )
+        assert np.max(restored[:, :2], axis=0) == pytest.approx(
+            piece.tile.shape.bounds[2:], abs=1e-5
+        )

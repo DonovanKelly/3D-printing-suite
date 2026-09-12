@@ -13,7 +13,8 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   trace so colors, strokes, and transforms work consistently. Analytic SVG
   curve preservation is a future improvement.
 - Shapely owns polygon topology, clipping, frames, and complementary puzzle
-  edges. Trimesh triangulates/extrudes; Manifold performs necessary solid unions
+  edges. Manifold normalizes and extrudes contours; Trimesh validates and exports
+  meshes. Manifold performs necessary solid unions
   and rear mounting recess subtraction. Every exported solid must be closed
   and have positive volume.
 - A base occupies z=0..base thickness. Artwork and border occupy separate
