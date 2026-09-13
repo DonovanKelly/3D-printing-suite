@@ -36,7 +36,8 @@ def ring_image() -> bytes:
 
 def test_nested_negative_space_and_island_are_preserved():
     region, _ = trace_image(
-        ring_image(), Settings(width_mm=200, height_mm=200, frame=False, margin_mm=0)
+        ring_image(),
+        Settings(width_mm=200, height_mm=200, frame=False, margin_mm=0, crop_to_artwork=False),
     )
     assert region.covers(Point(30, 100))
     assert not region.covers(Point(70, 100))
@@ -51,7 +52,9 @@ def test_transparent_svg_extrudes_filled_shapes_regardless_of_color(fill):
         f'<path fill="{fill}" fill-rule="evenodd" '
         'd="M10 10H90V90H10Z M30 30H70V70H30Z M45 45H55V55H45Z"/></svg>'
     ).encode()
-    settings = Settings(width_mm=100, height_mm=100, frame=False, margin_mm=0)
+    settings = Settings(
+        width_mm=100, height_mm=100, frame=False, margin_mm=0, crop_to_artwork=False
+    )
     project = build_project(data, settings)
     assert project.vector.covers(Point(20, 50))
     assert not project.vector.covers(Point(35, 50))
@@ -80,11 +83,18 @@ def test_svg_brightness_selection_remains_available():
     )
     with pytest.raises(ValueError, match="No artwork"):
         trace_image(data, Settings(foreground="dark"))
+    light, _ = trace_image(data, Settings(foreground="light", frame=False, margin_mm=0))
+    assert light.covers(Point(90, 90))
+    assert not light.covers(Point(10, 10))
 
 
 def test_inversion_changes_foreground_and_transparency_composites_white():
-    normal, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0))
-    inverted, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0, invert=True))
+    normal, _ = trace_image(
+        ring_image(), Settings(frame=False, margin_mm=0, crop_to_artwork=False)
+    )
+    inverted, _ = trace_image(
+        ring_image(), Settings(frame=False, margin_mm=0, invert=True, crop_to_artwork=False)
+    )
     assert normal.intersection(inverted).area < 1e-5
     assert inverted.covers(Point(3, 3))
 
@@ -264,3 +274,86 @@ def test_rear_keyholes_stay_in_puzzle_cell_bodies():
     for piece in project.pieces:
         assert piece.base.is_volume
         assert piece.base.volume < piece.tile.shape.area * settings.base_mm
+
+
+def test_padding_trims_empty_canvas_and_preserves_artwork_proportions():
+    data = (
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        b'<rect x="10" y="30" width="80" height="40" fill="gold"/></svg>'
+    )
+    settings = Settings(width_mm=100, height_mm=100, margin_mm=10)
+    cropped, _ = trace_image(data, settings)
+    x0, y0, x1, y1 = cropped.bounds
+    assert x0 == pytest.approx(14.01, abs=0.02)
+    assert x1 == pytest.approx(85.99, abs=0.02)
+    assert (x1 - x0) / (y1 - y0) == pytest.approx(2, abs=0.01)
+    preserved, _ = trace_image(data, settings.model_copy(update={"crop_to_artwork": False}))
+    assert preserved.area < cropped.area
+    padded, _ = trace_image(data, settings.model_copy(update={"margin_mm": 20}))
+    assert padded.bounds[0] == pytest.approx(24.01, abs=0.02)
+
+
+@pytest.mark.parametrize("layout", ["plaque", "tiles", "puzzle"])
+@pytest.mark.parametrize("profile", ["flat", "rounded"])
+def test_rounded_designs_preserve_closed_materials_and_piece_alignment(tmp_path, layout, profile):
+    settings = Settings(
+        width_mm=120, height_mm=90, layout=layout,
+        columns=1 if layout == "plaque" else 2,
+        rows=1 if layout == "plaque" else 2,
+        corner_radius_mm=12, frame_profile=profile,
+        base_mm=3, relief_mm=1.2, frame_height_mm=2.4,
+    )
+    project = build_project(sample_bytes(), settings)
+    output = tmp_path / "rounded"
+    manifest = export_project(project, output, sample_bytes())
+    for piece, record in zip(project.pieces, manifest["pieces"], strict=True):
+        assert piece.combined.body_count == 1
+        assert piece.base.bounds[1, 2] == pytest.approx(3)
+        assert piece.artwork.bounds[0, 2] == pytest.approx(3)
+        assert piece.combined.extents[2] == pytest.approx(5.4)
+        assert piece.combined.volume == pytest.approx(
+            piece.base.volume + piece.artwork.volume, rel=1e-6
+        )
+        scene = trimesh.load_scene(output / record["files"]["3mf"])
+        assert len(scene.geometry) == 2
+        assert all(mesh.is_volume for mesh in scene.geometry.values())
+        assert trimesh.load_mesh(output / record["files"]["combined"]).is_volume
+    assert not project.pieces[-1].tile.shape.covers(Point(0, 0))
+
+
+@pytest.mark.parametrize("radius", [0, 2, 20])
+def test_rounded_border_has_curved_height_sections_and_retains_its_dimensions(radius):
+    from relief_studio.geometry import check_mesh
+    from relief_studio.profiles import outline, rounded_border
+
+    settings = Settings(corner_radius_mm=radius, frame_profile="rounded")
+    border = rounded_border(settings)
+    check_mesh(border)
+    assert len(np.unique(border.vertices[:, 2])) > 10
+    assert border.bounds[:, 2] == pytest.approx([settings.base_mm, 4])
+    assert border.extents[:2] == pytest.approx([180, 180])
+    flat_volume = (
+        outline(settings).area - outline(settings, settings.frame_width_mm).area
+    ) * settings.frame_height_mm
+    assert 0.8 * flat_volume < border.volume < flat_volume
+
+
+@pytest.mark.parametrize("hanging", ["none", "loops", "keyholes"])
+def test_rounded_background_without_border_supports_optional_hanging(hanging):
+    project = build_project(sample_bytes(), Settings(
+        frame=False, corner_radius_mm=15, hanging=hanging, base_mm=5,
+    ))
+    piece = project.pieces[0]
+    assert piece.base.is_volume and piece.combined.body_count == 1
+    assert piece.combined.extents[2] == pytest.approx(5.8)
+    assert piece.tile.shape.area < 180 * 180
+
+
+def test_corner_radius_must_fit_the_background():
+    with pytest.raises(ValidationError, match="Corner radius"):
+        Settings(width_mm=40, corner_radius_mm=25)
+    with pytest.raises(ValueError, match="Layout disconnected"):
+        choose_layout(Settings(
+            width_mm=192, height_mm=192, corner_radius_mm=96,
+            layout="tiles", columns=8, rows=8,
+        ))

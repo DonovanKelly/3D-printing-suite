@@ -100,7 +100,9 @@ def load_image(data: bytes, settings: Settings) -> Image.Image:
             background_rgb = np.median(edge, axis=0)
             contrast = np.max(np.abs(rgb - background_rgb), axis=2)
             return Image.fromarray((255 - contrast).astype(np.uint8))
-        background = Image.new("RGBA", rgba.size, "white")
+        background = Image.new(
+            "RGBA", rgba.size, "black" if settings.foreground == "light" else "white"
+        )
         return Image.alpha_composite(background, rgba).convert("L")
     except ValueError:
         raise
@@ -146,9 +148,14 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
     if not regions:
         raise ValueError("Artwork is too thin to trace. Increase its resolution or line weight.")
     region = unary_union(regions)
-    inset = settings.margin_mm + (settings.frame_width_mm if settings.frame else 0)
+    inset = settings.artwork_inset
     height, width = gray.shape
-    scale = min((settings.width_mm - 2 * inset) / width, (settings.height_mm - 2 * inset) / height)
+    x0, y0, x1, y1 = region.bounds if settings.crop_to_artwork else (0, 0, width, height)
+    span_x, span_y = x1 - x0, y1 - y0
+    scale = min(
+        (settings.width_mm - 2 * inset) / span_x,
+        (settings.height_mm - 2 * inset) / span_y,
+    )
     # Image y points down; model y points toward the top of the finished plaque.
     region = affinity.affine_transform(
         region,
@@ -157,8 +164,8 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
             0,
             0,
             -scale,
-            (settings.width_mm - width * scale) / 2 + scale / 2,
-            (settings.height_mm + height * scale) / 2 - scale / 2,
+            settings.width_mm / 2 - (x0 + x1) * scale / 2,
+            settings.height_mm / 2 + (y0 + y1) * scale / 2,
         ],
     )
     simplified = make_valid(region.simplify(settings.simplify_mm, preserve_topology=True))

@@ -90,3 +90,57 @@ def test_server_exposes_defaults_and_health(client):
     assert client.get("/api/health").json()["processing"] == "local"
     assert client.get("/api/defaults").json()["bed_width_mm"] == 230
     assert client.get("/api/sample").content == sample_bytes()
+
+
+def test_colored_svg_controls_and_direct_two_material_3mf(client):
+    from xml.etree import ElementTree as ET
+
+    import numpy as np
+    import trimesh
+
+    from relief_studio.exports import CORE
+
+    svg = (
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        b'<path fill="#D4A62A" fill-rule="evenodd" '
+        b'd="M10 10H90V90H10Z M30 30H70V70H30Z"/></svg>'
+    )
+    config = {
+        "base_mm": 4, "relief_mm": 1.6, "margin_mm": 9,
+        "frame": False, "corner_radius_mm": 10,
+        "background_color": "#123456", "artwork_color": "#D4A62A",
+    }
+    response = client.post('/api/preview', data={"settings": json.dumps(config)},
+                           files={"image": ("colored.svg", svg, "image/svg+xml")})
+    assert response.status_code == 200, response.text
+    preview = response.json()
+    assert len(preview["meshes"]) == 2
+    for key, value in config.items():
+        assert preview["manifest"]["settings"][key] == value
+    result = client.post(f"/api/export/{preview['id']}").json()
+    download = client.get(result["model_url"])
+    assert download.status_code == 200
+    assert download.headers["content-type"] == "model/3mf"
+    scene = trimesh.load_scene(io.BytesIO(download.content), file_type="3mf")
+    meshes = sorted(scene.geometry.values(), key=lambda m: m.bounds[0, 2])
+    assert len(meshes) == 2 and all(m.is_volume for m in meshes)
+    assert meshes[0].bounds[:, 2] == pytest.approx([0, 4])
+    assert meshes[1].bounds[:, 2] == pytest.approx([4, 5.6])
+    assert np.all(meshes[1].bounds[:, :2] >= 0)
+    with ZipFile(io.BytesIO(download.content)) as archive:
+        root = ET.fromstring(archive.read("3D/3dmodel.model"))
+        ns = {"c": CORE}
+        assert len(root.findall(".//c:component", ns)) == 2
+        colors = [e.attrib["displaycolor"] for e in root.findall(".//c:base", ns)]
+        assert colors == ["#123456", "#D4A62A"]
+
+
+def test_multi_piece_export_uses_pack_and_piece_downloads_are_bounded(client):
+    preview = client.post('/api/preview', data={"settings": json.dumps({
+        "layout": "puzzle", "columns": 2, "rows": 1,
+    })}).json()
+    result = client.post(f"/api/export/{preview['id']}").json()
+    assert result["model_url"] is None
+    assert client.get(result["download_url"]).status_code == 200
+    for filename in ("anything.env", "r99-c99.3mf", "r01-c01.stl"):
+        assert client.get(f"/api/files/{preview['id']}/pieces/{filename}").status_code == 404

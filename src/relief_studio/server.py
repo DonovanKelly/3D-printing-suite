@@ -9,6 +9,7 @@ forwarding headers alone never authorize another browser origin.
 """
 
 import logging
+import re
 from collections import OrderedDict
 from importlib.resources import files
 from pathlib import Path
@@ -158,7 +159,15 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
             if not (destination / "print-pack.zip").is_file():
                 project, data = cached
                 await run_in_threadpool(export_project, project, destination, data)
-            return {"download_url": f"/api/files/{key}/print-pack.zip"}
+            project, _ = cached
+            return {
+                "download_url": f"/api/files/{key}/print-pack.zip",
+                "model_url": (
+                    f"/api/files/{key}/pieces/{project.pieces[0].tile.name}.3mf"
+                    if len(project.pieces) == 1
+                    else None
+                ),
+            }
         except Exception as exc:
             logger.exception("Export failed")
             raise HTTPException(
@@ -175,6 +184,15 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
         if not path.is_file():
             raise HTTPException(404)
         return FileResponse(path, filename=filename)
+
+    @app.get("/api/files/{identifier}/pieces/{filename}")
+    def download_piece(identifier: UUID, filename: str):
+        if not re.fullmatch(r"r\d{2}-c\d{2}\.3mf", filename):
+            raise HTTPException(404)
+        path = root / str(identifier) / "pieces" / filename[:-4] / filename
+        if not path.is_file():
+            raise HTTPException(404)
+        return FileResponse(path, filename=filename, media_type="model/3mf")
 
     static = Path(str(files("relief_studio").joinpath("static")))
     if static.is_dir():

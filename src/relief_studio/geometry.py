@@ -16,6 +16,7 @@ from shapely.ops import unary_union
 
 from .artwork import polygons, trace_image
 from .layout import Tile, choose_layout
+from .profiles import outline, rounded_border
 from .settings import Settings
 
 
@@ -100,13 +101,18 @@ def keyhole_cutters(
 def build_project(data: bytes, settings: Settings) -> Project:
     vector, notes = trace_image(data, settings)
     tiles, columns, rows = choose_layout(settings)
-    outer = box(0, 0, settings.width_mm, settings.height_mm)
+    outer = outline(settings)
     frame = (
-        outer.difference(outer.buffer(-settings.frame_width_mm))
+        outer.difference(outline(settings, settings.frame_width_mm))
         if settings.frame
         else GeometryCollection()
     )
     raised = unary_union([vector, frame])
+    curved_border = (
+        rounded_border(settings) if settings.frame and settings.frame_profile == "rounded" else None
+    )
+    if curved_border is not None:
+        check_mesh(curved_border)
     pieces = []
     for tile in tiles:
         base = extrude(tile.shape, settings.base_mm)
@@ -115,7 +121,24 @@ def build_project(data: bytes, settings: Settings) -> Project:
                 [base, *keyhole_cutters(tile, settings, columns, rows)], engine="manifold"
             )
         art = extrude(vector.intersection(tile.shape), settings.relief_mm, settings.base_mm)
-        border = extrude(frame.intersection(tile.shape), settings.frame_height_mm, settings.base_mm)
+        if curved_border is not None and frame.intersects(tile.shape):
+            border = (
+                trimesh.boolean.intersection(
+                    [
+                        curved_border,
+                        extrude(tile.shape, settings.frame_height_mm, settings.base_mm),
+                    ],
+                    engine="manifold",
+                )
+                if len(tiles) > 1
+                else curved_border.copy()
+            )
+            if border.is_empty:
+                border = None
+        else:
+            border = extrude(
+                frame.intersection(tile.shape), settings.frame_height_mm, settings.base_mm
+            )
         colored = [m for m in (art, border) if m is not None]
         artwork = (
             trimesh.boolean.union(colored, engine="manifold")
@@ -131,6 +154,13 @@ def build_project(data: bytes, settings: Settings) -> Project:
         )
         for mesh in (base, artwork, combined):
             if mesh is not None:
+                # Float32 booleans can collapse a seam triangle to zero area.
+                # Weld and remove those faces before checking the exported solid.
+                if not mesh.copy().process().is_volume:
+                    mesh.merge_vertices()
+                    a, b, c = mesh.faces.T
+                    mesh.update_faces((a != b) & (b != c) & (a != c))
+                    mesh.remove_unreferenced_vertices()
                 check_mesh(mesh)
         origin = [float(combined.bounds[0][0]), float(combined.bounds[0][1]), 0.0]
         for mesh in (base, artwork, combined):

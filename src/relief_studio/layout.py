@@ -12,6 +12,7 @@ from shapely import Geometry
 from shapely.geometry import Point, Polygon, box
 from shapely.ops import unary_union
 
+from .profiles import outline
 from .settings import Settings
 
 
@@ -70,6 +71,7 @@ def partition(settings: Settings, columns: int, rows: int) -> list[Tile]:
                     cells[neighbor].difference(tab),
                 )
     outer = box(0, 0, settings.width_mm, settings.height_mm)
+    footprint = outline(settings)
     tiles = []
     for r in range(rows):
         for c in range(columns):
@@ -77,9 +79,10 @@ def partition(settings: Settings, columns: int, rows: int) -> list[Tile]:
             if settings.clearance_mm and len(cells) > 1:
                 seam = shape.boundary.difference(outer.boundary)
                 shape = shape.difference(seam.buffer(settings.clearance_mm / 2))
+            shape = shape.intersection(footprint)
             if settings.hanging == "loops" and r == rows - 1:
                 shape = add_loops(shape, settings, c * cw, (c + 1) * cw)
-            if shape.geom_type != "Polygon" or not shape.is_valid:
+            if shape.is_empty or shape.geom_type != "Polygon" or not shape.is_valid:
                 raise ValueError(
                     "Layout disconnected a piece. Reduce clearance or use larger pieces."
                 )

@@ -1,5 +1,6 @@
 """Validated millimeter-based project settings shared by every entrypoint."""
 
+from math import sqrt
 from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -15,7 +16,10 @@ class Settings(BaseModel):
     frame: bool = True
     frame_width_mm: float = Field(default=4, ge=1, le=30)
     frame_height_mm: float = Field(default=1.6, ge=0.4, le=12)
+    frame_profile: Literal["flat", "rounded"] = "flat"
+    corner_radius_mm: float = Field(default=0, ge=0, le=100)
     margin_mm: float = Field(default=3, ge=0, le=30)
+    crop_to_artwork: bool = True
     threshold: int = Field(default=128, ge=1, le=254)
     foreground: Literal["auto", "dark", "light"] = "auto"
     invert: bool = False
@@ -33,7 +37,9 @@ class Settings(BaseModel):
 
     @model_validator(mode="after")
     def compatible_dimensions(self) -> Self:
-        inset = (self.frame_width_mm if self.frame else 0) + self.margin_mm
+        if self.corner_radius_mm > min(self.width_mm, self.height_mm) / 2:
+            raise ValueError("Corner radius cannot exceed half the shorter side.")
+        inset = self.artwork_inset
         if min(self.width_mm, self.height_mm) - 2 * inset < 10:
             raise ValueError("Frame and margin must leave at least 10 mm for the artwork.")
         if bool(self.columns) != bool(self.rows):
@@ -45,6 +51,12 @@ class Settings(BaseModel):
         if self.hanging == "keyholes" and self.base_mm < 5:
             raise ValueError("Rear keyholes need a backing at least 5 mm thick.")
         return self
+
+    @property
+    def artwork_inset(self) -> float:
+        inset = (self.frame_width_mm if self.frame else 0) + self.margin_mm
+        # Keep the whole artwork rectangle inside rounded corners, without clipping it.
+        return inset + max(0, self.corner_radius_mm - inset) * (1 - 1 / sqrt(2))
 
     @property
     def trace_resolution(self) -> int:
