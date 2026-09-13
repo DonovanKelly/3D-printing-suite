@@ -33,6 +33,31 @@ from .settings import Settings
 logger = logging.getLogger(__name__)
 
 
+def settings_error(exc: ValidationError) -> str:
+    labels = {
+        "base_mm": "Background thickness (mm)",
+        "relief_mm": "Image thickness (mm)",
+        "frame_width_mm": "Border width (mm)",
+        "frame_height_mm": "Border height (mm)",
+        "margin_mm": "Padding (mm)",
+        "bed_width_mm": "Usable bed width (mm)",
+        "bed_height_mm": "Usable bed height (mm)",
+        "piece_size_mm": "Max piece size (mm)",
+        "puzzle_seed": "Pattern seed",
+    }
+    messages = []
+    for error in exc.errors():
+        message = error["msg"].removeprefix("Value error, ")
+        if error["loc"]:
+            field = str(error["loc"][0])
+            label = labels.get(field, field.removesuffix("_mm").replace("_", " ").capitalize())
+            if field.endswith("_mm") and field not in labels:
+                label += " (mm)"
+            message = f"{label}: {message}"
+        messages.append(message)
+    return "; ".join(messages)
+
+
 def create_app(output_root: Path | None = None, public_origin: str | None = None) -> FastAPI:
     if public_origin is not None:
         parsed = urlparse(public_origin)
@@ -132,7 +157,7 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
                 "separated_svg": vector_svg(project, True, True),
             }
         except ValidationError as exc:
-            raise HTTPException(422, "; ".join(error["msg"] for error in exc.errors())) from exc
+            raise HTTPException(422, settings_error(exc)) from exc
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
         except HTTPException:

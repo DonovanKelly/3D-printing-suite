@@ -84,15 +84,24 @@ versions. `web/package-lock.json` locks the frontend dependencies.
    minimum space inside the border). **Trim empty image space** starts enabled;
    disable it to retain the source canvas margins. Aspect ratio is preserved,
    so two sides may have extra space. Rounded corners can add more inset to
-   keep the complete artwork inside the backing.
+   keep the complete artwork inside the backing. Numeric edits apply on Enter
+   or when you leave the field; Escape cancels. Clearing a field temporarily
+   is allowed, and leaving it empty restores its previous value. Downloads
+   wait until the edit is applied and the new preview is ready.
 3. Choose the two **Filament colors**. Background and Image + border remain
    separate aligned material parts in the 3MF.
 4. Optionally choose no border, a raised flat border, or a raised border with
-   rounded top edges. Width and height are independent; border height is above
-   the background. **Corner radius** rounds the outside corners of the design,
+   rounded top edges. **Border width** stays visible: 0 removes the border,
+   and 0.5–30 mm adds or adjusts its rim. Width and height are independent;
+   border height is above the background. Padding controls the gap inside the
+   rim. **Corner radius** rounds the outside corners of the design,
    including its backing. Set it to 0 for square corners.
-5. Choose **None**, **Top loops**, or **Rear keyholes** for hanging. Rear
-   keyholes automatically raise backing thickness to 5 mm when necessary.
+5. Choose **None**, **Top loop · centered**, or **Rear keyholes** for hanging.
+   A plaque has one centered loop with a 5 mm opening. Tiles/puzzles have one
+   loop on each top-row panel, attached to that panel's actual upper edge even
+   with rounded corners. A loop adds up to 9 mm above the backing; allow for it
+   within the usable bed height. Rear keyholes automatically raise backing
+   thickness to 5 mm when necessary.
    **Print format** chooses a single plaque, tiles, or a puzzle; a multi-piece
    layout clips the same outside border across its panels.
 6. When the pieces fit on one plate, click **Download 3MF**. For multiple plates,

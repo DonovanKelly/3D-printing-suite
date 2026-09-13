@@ -14,7 +14,7 @@ class Settings(BaseModel):
     base_mm: float = Field(default=2.4, ge=1.2, le=12)
     relief_mm: float = Field(default=0.8, ge=0.4, le=8)
     frame: bool = True
-    frame_width_mm: float = Field(default=4, ge=1, le=30)
+    frame_width_mm: float = Field(default=4, ge=0.5, le=30)
     frame_height_mm: float = Field(default=1.6, ge=0.4, le=12)
     frame_profile: Literal["flat", "rounded"] = "flat"
     corner_radius_mm: float = Field(default=0, ge=0, le=100)
@@ -45,7 +45,7 @@ class Settings(BaseModel):
             raise ValueError("Corner radius cannot exceed half the shorter side.")
         inset = self.artwork_inset
         if min(self.width_mm, self.height_mm) - 2 * inset < 10:
-            raise ValueError("Frame and margin must leave at least 10 mm for the artwork.")
+            raise ValueError("Border width and padding must leave at least 10 mm for the artwork.")
         if bool(self.columns) != bool(self.rows):
             raise ValueError("Set both rows and columns, or use 0 for both to split automatically.")
         if self.columns * self.rows > 64:

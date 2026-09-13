@@ -31,6 +31,10 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   border tops loft matching corner samples through quarter-circle height
   sections, then clip the closed border solid to the selected layout. Padding
   accounts for the curved corners so fitting never clips the source artwork.
+- Top hanging uses one loop centered on each top-row panel. A vertical section
+  finds the panel's actual upper edge before adding its ring; attaching paired
+  loops at the design's global top could disconnect them on large corner radii.
+  The opening is cut after union so sloping backing cannot fill its 5 mm hole.
 - A base occupies z=0..base thickness. Artwork and border occupy separate
   non-overlapping volumes above it. Each tile is a grouped, two-material 3MF
   with preserved relative coordinates, plus aligned STL parts. A single merged
@@ -58,6 +62,11 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
 - Local API requests are bounded and serialized during generation. No cloud
   uploads, credentials, paid calls, or printer commands are implicit. The
   service binds to loopback by default and is intended for a trusted local user.
+- Numeric fields retain a local draft until blur or Enter, with Escape/empty
+  blur restoring the applied value. An unapplied draft disables downloads.
+  This avoids sending incomplete numbers (for example the first `1` in `180`)
+  through geometry validation. Committed invalid settings still fail at the
+  shared Python boundary, with the affected control named in the response.
 - Completed exports are self-contained, with settings, SVG, assembly map,
   geometry checks, and print instructions. CLI output uses a new directory;
   browser generation uses unique directories with failed work cleaned up.

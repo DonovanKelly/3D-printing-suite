@@ -11,14 +11,16 @@ import { Controls } from "./Controls";
 import { PrintPlan } from "./PrintPlan";
 import { useProject } from "./useProject";
 import { Viewer } from "./Viewer";
+import { NumericEditing } from "./Numeric";
 import type { View } from "./types";
 
 export default function App() {
   const project = useProject();
   const [view, setView] = useState<View>("relief");
+  const [editing, setEditing] = useState(false);
   const { settings, preview, file, status, error, exporting, download } =
     project;
-  const ready = status === "ready";
+  const ready = status === "ready" && !editing;
   const singlePlate = preview?.manifest.plate_count === 1;
   useEffect(() => {
     if (settings) setView(settings.layout === "plaque" ? "relief" : "pieces");
@@ -75,13 +77,15 @@ export default function App() {
       </div>
       <main className="workbench">
         {settings ? (
-          <Controls
-            settings={settings}
-            update={project.update}
-            file={file}
-            chooseFile={project.chooseFile}
-            disabled={exporting}
-          />
+          <NumericEditing.Provider value={setEditing}>
+            <Controls
+              settings={settings}
+              update={project.update}
+              file={file}
+              chooseFile={project.chooseFile}
+              disabled={exporting}
+            />
+          </NumericEditing.Provider>
         ) : (
           <aside />
         )}
@@ -113,7 +117,12 @@ export default function App() {
               <p>Building your first relief…</p>
             </div>
           )}
-          {status === "building" && preview && (
+          {editing && preview && (
+            <div className="building-state" role="status">
+              Press Enter or leave the field to apply your edit.
+            </div>
+          )}
+          {!editing && status === "building" && preview && (
             <div className="building-state" role="status">
               <LoaderCircle size={15} className="spin" /> Updating preview…
             </div>
@@ -147,8 +156,8 @@ export default function App() {
             update={project.update}
             ready={ready}
             busy={status === "building"}
-            download={download}
-            plateDownloads={project.plateDownloads}
+            download={editing ? "" : download}
+            plateDownloads={editing ? [] : project.plateDownloads}
             disabled={exporting}
             exportPack={() => project.exportPack("pack")}
           />

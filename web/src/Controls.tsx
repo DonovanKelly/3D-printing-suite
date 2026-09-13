@@ -9,39 +9,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import type { Settings, Update } from "./types";
-
-function Numeric({
-  label,
-  value,
-  onChange,
-  min,
-  max,
-  step = 1,
-}: {
-  label: string;
-  value: number;
-  onChange: (value: number) => void;
-  min?: number;
-  max?: number;
-  step?: number;
-}) {
-  return (
-    <label className="field-row">
-      <span>{label}</span>
-      <input
-        type="number"
-        value={value}
-        min={min}
-        max={max}
-        step={step}
-        onChange={(event) => {
-          const next = event.target.valueAsNumber;
-          if (Number.isFinite(next)) onChange(next);
-        }}
-      />
-    </label>
-  );
-}
+import { Numeric } from "./Numeric";
 
 export function Controls({
   settings: s,
@@ -173,6 +141,9 @@ export function Controls({
           <h2>
             <span>02</span> Image &amp; background
           </h2>
+          <p className="hint control-hint">
+            Type a value, then press Enter or leave the field to apply.
+          </p>
           <div className="size-fields">
             <Numeric
               label="Width (mm)"
@@ -256,16 +227,23 @@ export function Controls({
               <option value="rounded">Raised · rounded</option>
             </select>
           </label>
+          <Numeric
+            label="Border width (mm)"
+            value={s.frame ? s.frame_width_mm : 0}
+            min={0}
+            max={30}
+            step={0.5}
+            onChange={(value) => {
+              update("frame", value !== 0);
+              if (value !== 0) update("frame_width_mm", value);
+            }}
+          />
+          <p className="hint control-hint">
+            Width is the raised rim around the artwork. 0 removes the border;
+            Padding controls the gap inside it.
+          </p>
           {s.frame && (
             <>
-              <Numeric
-                label="Border width (mm)"
-                value={s.frame_width_mm}
-                min={1}
-                max={30}
-                step={0.5}
-                onChange={(value) => update("frame_width_mm", value)}
-              />
               <Numeric
                 label="Border height (mm)"
                 value={s.frame_height_mm}
@@ -305,10 +283,17 @@ export function Controls({
               }}
             >
               <option value="none">None</option>
-              <option value="loops">Top loops</option>
+              <option value="loops">Top loop · centered</option>
               <option value="keyholes">Rear keyholes</option>
             </select>
           </label>
+          {s.hanging === "loops" && (
+            <p className="hint control-hint">
+              {s.layout === "plaque"
+                ? "One centered loop with a 5 mm opening. Adds up to 9 mm above the backing."
+                : "One centered loop on each top-row panel, following its upper edge."}
+            </p>
+          )}
           {s.hanging === "keyholes" && (
             <p className="hint control-hint">
               Recesses on the back for screw heads. Requires a background at

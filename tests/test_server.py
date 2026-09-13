@@ -95,6 +95,21 @@ def test_server_exposes_defaults_and_health(client):
     assert client.get("/api/sample").content == sample_bytes()
 
 
+@pytest.mark.parametrize(
+    ("setting", "value", "label"),
+    [
+        ("width_mm", 1, "Width (mm)"),
+        ("frame_width_mm", 0.1, "Border width (mm)"),
+        ("relief_mm", 0.1, "Image thickness (mm)"),
+        ("margin_mm", 50, "Padding (mm)"),
+    ],
+)
+def test_setting_errors_identify_the_control_to_fix(client, setting, value, label):
+    response = client.post("/api/preview", data={"settings": json.dumps({setting: value})})
+    assert response.status_code == 422
+    assert response.json()["detail"].startswith(f"{label}:")
+
+
 def test_colored_svg_controls_and_direct_two_material_3mf(client):
     from xml.etree import ElementTree as ET
 

@@ -166,3 +166,41 @@ default sample regression, bounded piece sizes, seeded seam topology/clearance,
 reproducibility, measured packing gaps, aligned material transforms, and bounded
 plate-download routes. The Bambu Studio and physical-print checks remain pending
 on the target machine; a valid 3MF roundtrip does not establish physical fit.
+
+## Relief border controls and one centered loop
+
+Numeric inputs previously restored their old value when cleared and submitted
+incomplete replacements during typing. They now retain a local draft and apply
+on Enter or blur. Escape cancels; empty blur restores the applied value.
+Downloads are disabled while an edit is pending, and the canvas explains how
+to apply it. Invalid committed values still fail, with the affected control
+named in the error. Border width stays visible, including with No border; zero
+removes the rim and a positive width restores it. The supported minimum raised
+width is 0.5 mm. Border width and the inside padding have distinct helper text.
+
+Top loop · centered replaces the paired top loops. It produces one loop on a
+plaque and one on each top-row panel of a split layout. Loops follow the actual
+upper edge, fixing detached rings on large rounded corners. The 5 mm opening
+stays clear, and each backing remains one connected solid.
+
+The [desktop](centered-loop-workbench.png) and
+[mobile](centered-loop-mobile.png) captures use the original repository sample.
+Both were inspected with view_image against the original concept. The new
+helpers and singular hanging label follow the existing controls and spacing;
+palette, typography, canvas, and responsive structure are retained. No material
+visual mismatch remains within this update's scope. Private artwork screenshots
+and print packs stay in shared storage outside Git.
+
+Playwright verified clear/slow typing without preview requests, Enter and blur
+commit, Escape/empty cancellation, invalid-value export blocking and recovery,
+zero/narrow/wide border edits, rounded corners, centered hanging, color changes,
+and actual SVG downloads. Desktop 1536×1024, tablet 820×1180, and mobile 390×844
+were checked without horizontal overflow. An actual downloaded 160×220 mm SVG
+relief has one loop, two aligned material parts, and 160×229×4 mm total extents.
+Independent 3MF/STL reloads confirmed positive closed volumes, one connected
+combined solid, and one through-hole in the backing.
+
+100 Python tests, Ruff, and the frontend build pass. New regression cases cover
+centered-loop topology on rounded plaques/panels, narrow/wide border dimensions,
+padding/material alignment, and useful validation labels. Physical mounting
+strength and target-machine Bambu Studio import remain untested.
