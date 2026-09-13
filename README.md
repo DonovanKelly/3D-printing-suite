@@ -7,9 +7,10 @@ CLI share the same geometry engine.
 
 Implemented: threshold/inversion, preserved negative-space holes, configurable
 dimensions and colors, raised borders, top hanging loops, rear keyhole recesses,
-automatic or manual tiling, adjustable puzzle clearance, orbitable 3D preview,
-assembly map, vector preview, rounded corners and border edges, and grouped
-3MF/aligned STL export. The web app is the primary interface.
+size-controlled tiling, repeatable random puzzles, adjustable puzzle clearance,
+orbitable assembled/separated 3D previews, assembly map, vector preview, rounded
+corners and border edges, and arranged plate 3MF/aligned STL export. The web app
+is the primary interface.
 
 ## Run locally
 
@@ -94,11 +95,39 @@ versions. `web/package-lock.json` locks the frontend dependencies.
    keyholes automatically raise backing thickness to 5 mm when necessary.
    **Print format** chooses a single plaque, tiles, or a puzzle; a multi-piece
    layout clips the same outside border across its panels.
-6. For one piece, click **Download 3MF**. For multiple pieces, **Export print
-   pack** downloads a ZIP containing a 3MF for each piece. **Download full
-   print pack** is always available and includes STLs, settings, and an
-   assembly map. Assign the named parts to your chosen AMS slots in Bambu
+6. When the pieces fit on one plate, click **Download 3MF**. For multiple plates,
+   **Download N plates (ZIP)** contains a 3MF for each arranged plate, plus each
+   individual piece. **Download full print pack** is always available and
+   includes STLs, settings, and an assembly map. Assign the named parts to your
+   chosen AMS slots in Bambu
    Studio; the file's display colors do not automatically select slots.
+
+## Make tiles or a random puzzle
+
+Choose **Tiles** or **Puzzle** under **Print format**. Both now split even artwork
+that already fits the printer: the 180 mm sample defaults to four tiles or nine
+puzzle pieces. **Pieces** opens automatically and shows the cuts with visible
+gaps; **Relief** and **Assembly** show how the finished artwork fits together.
+
+- **By piece size** sets a maximum width and height in millimeters, including
+  puzzle tabs and hanging loops. The default is 90 mm; choosing 60 mm makes a
+  16-piece sample puzzle. Actual pieces can be smaller, especially at corners.
+- **Largest panels** makes the fewest panels that fit your usable build plate,
+  with at least two pieces. Use this for large wall art and fewer assembly steps.
+- **Custom grid** sets the row/column count and overrides Max piece size.
+  Actual pieces must still fit the usable bed. A 1 × 1 grid is rejected; use
+  Plaque for a single object.
+- **Random** varies the tab direction, position, size, and curved seams of a
+  jigsaw grid. **Shuffle pattern** changes the seed; the same seed, artwork, and
+  settings reproduce the cuts. **Regular** uses alternating tabs on straight
+  grid seams. **Clearance** controls the joint gap, independently of piece size.
+
+The print plan reports both pieces and plates. Plate exports place pieces with
+a 3 mm gap between their bounding boxes. Every piece is a separate 3MF object,
+with aligned background/artwork parts inside it. Open `plates/plate-01.3mf` from
+the pack to see its pieces together on a plate. An individual file under
+`pieces/` intentionally contains only that one piece. `pieces.svg` labels the
+separated set; `assembly.svg` labels their final positions.
 
 ## Generate files without a browser
 
@@ -107,7 +136,10 @@ versions. `web/package-lock.json` locks the frontend dependencies.
 relief generate --output output/plaque
 
 relief generate photo.png --width 540 --height 540 --layout puzzle \
-  --output output/my-wall-art
+  --split-mode bed --output output/my-wall-art
+
+relief generate --layout puzzle --piece-size 90 --puzzle-style random \
+  --puzzle-seed 1 --output output/random-puzzle
 
 relief generate drawing.svg --settings examples/rear-keyholes.json \
   --output output/keyhole-plaque
@@ -129,13 +161,17 @@ which can be opened directly on another computer, plus a ZIP of the collection.
 
 ## Print with Bambu Studio and AMS
 
-Every piece includes a grouped **3MF**, **background.stl**, **artwork.stl** when
-present, and a boolean-unioned **combined.stl**. The pack also includes traced
-SVG, assembly SVG/PNG, project settings, a manifest, and `PRINTING.md`.
+Every pack includes arranged **plate 3MFs** and a grouped **3MF** for each piece,
+plus **background.stl**, **artwork.stl** when present, and a boolean-unioned
+**combined.stl** per piece. The pack also includes traced SVG, separated and
+assembly maps, project settings, a manifest, and `PRINTING.md`.
 
-1. Import a piece's 3MF as a model. Assign **Background** and **Artwork + frame**
-   to your chosen AMS filaments. Display colors are hints; automatic AMS slot
-   selection is not embedded.
+1. Import a plate's 3MF as models. Keep each named `rNN-cNN` puzzle piece as a
+   separate object; do not merge the entire plate into one object. Within each
+   piece, assign **Background** and **Artwork + frame** to your chosen AMS
+   filaments. Display colors are hints; automatic AMS slot selection is not
+   embedded. Open additional plate files separately when the pack has more
+   than one. The app also offers individual plate links after export.
 2. If your slicer loses the grouping, import its background and artwork STLs
    **together as one object with multiple parts**. Keep their coordinates;
    moving the artwork to the bed independently destroys the height alignment.

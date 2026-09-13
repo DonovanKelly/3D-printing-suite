@@ -352,17 +352,43 @@ export function Controls({
                 <span>Split</span>
                 <select
                   aria-label="Split"
-                  value={s.columns ? "manual" : "auto"}
+                  value={s.columns ? "manual" : s.split_mode}
                   onChange={(event) => {
-                    const n = event.target.value === "auto" ? 0 : 2;
+                    const n = event.target.value === "manual" ? 2 : 0;
                     update("columns", n);
                     update("rows", n);
+                    if (!n)
+                      update(
+                        "split_mode",
+                        event.target.value as Settings["split_mode"],
+                      );
                   }}
                 >
-                  <option value="auto">Automatic</option>
+                  <option value="size">By piece size</option>
+                  <option value="bed">Largest panels</option>
                   <option value="manual">Custom grid</option>
                 </select>
               </label>
+              {!s.columns && s.split_mode === "size" && (
+                <>
+                  <Numeric
+                    label="Max piece size (mm)"
+                    value={s.piece_size_mm}
+                    min={30}
+                    max={256}
+                    onChange={(value) => update("piece_size_mm", value)}
+                  />
+                  <p className="hint control-hint">
+                    Includes tabs and loops. Smaller sizes make more pieces.
+                  </p>
+                </>
+              )}
+              {!s.columns && s.split_mode === "bed" && (
+                <p className="hint control-hint">
+                  Make the fewest panels that fit your bed, with at least two
+                  pieces.
+                </p>
+              )}
               {!!s.columns && (
                 <div className="size-fields">
                   <Numeric
@@ -380,6 +406,51 @@ export function Controls({
                     onChange={(value) => update("rows", value)}
                   />
                 </div>
+              )}
+              {s.layout === "puzzle" && (
+                <>
+                  <label className="field-row">
+                    <span>Cut pattern</span>
+                    <select
+                      aria-label="Cut pattern"
+                      value={s.puzzle_style}
+                      onChange={(event) =>
+                        update(
+                          "puzzle_style",
+                          event.target.value as Settings["puzzle_style"],
+                        )
+                      }
+                    >
+                      <option value="random">Random</option>
+                      <option value="regular">Regular</option>
+                    </select>
+                  </label>
+                  {s.puzzle_style === "random" && (
+                    <>
+                      <Numeric
+                        label="Pattern seed"
+                        value={s.puzzle_seed}
+                        min={0}
+                        max={2147483647}
+                        onChange={(value) => update("puzzle_seed", value)}
+                      />
+                      <button
+                        className="secondary-button"
+                        onClick={() =>
+                          update(
+                            "puzzle_seed",
+                            (s.puzzle_seed + 1) % 2147483648,
+                          )
+                        }
+                      >
+                        Shuffle pattern
+                      </button>
+                      <p className="hint">
+                        Same seed and settings recreate the same cuts.
+                      </p>
+                    </>
+                  )}
+                </>
               )}
               <Numeric
                 label="Clearance (mm)"

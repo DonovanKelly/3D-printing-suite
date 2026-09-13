@@ -9,6 +9,7 @@ export function PrintPlan({
   ready,
   busy,
   download,
+  plateDownloads,
   disabled,
   exportPack,
 }: {
@@ -18,6 +19,7 @@ export function PrintPlan({
   ready: boolean;
   busy: boolean;
   download: string;
+  plateDownloads: string[];
   disabled: boolean;
   exportPack: () => void;
 }) {
@@ -37,6 +39,10 @@ export function PrintPlan({
           <div>
             <dt>Pieces</dt>
             <dd>{manifest?.piece_count ?? "—"}</dd>
+          </div>
+          <div>
+            <dt>Print plates</dt>
+            <dd>{manifest?.plate_count ?? "—"}</dd>
           </div>
           <div>
             <dt>Materials</dt>
@@ -62,7 +68,7 @@ export function PrintPlan({
         {manifest && manifest.piece_count > 1 && (
           <p className="hint grid-summary">
             {manifest.grid.columns} columns × {manifest.grid.rows} rows · view
-            the Assembly tab for piece labels.
+            the Pieces tab to see the cuts separately.
           </p>
         )}
       </section>
@@ -95,7 +101,8 @@ export function PrintPlan({
       </section>
       <div className="plan-bottom">
         <p className="hint export-hint">
-          3MF keeps the image and background as separate, aligned color parts.
+          Each piece is a separate object with aligned background and image
+          parts. Open the plate 3MFs in Bambu Studio.
         </p>
         <button
           className="secondary-button"
@@ -110,6 +117,13 @@ export function PrintPlan({
             {download.endsWith(".3mf") ? "3MF" : "print pack"} again
           </a>
         )}
+        {plateDownloads.length > 1 &&
+          plateDownloads.map((url, i) => (
+            <a key={url} className="download-again" href={url} download>
+              <Download size={16} /> Plate {i + 1} ·{" "}
+              {manifest?.plates[i]?.pieces.length} pieces
+            </a>
+          ))}
         <div className={`fit-status ${ready ? "" : "pending"}`}>
           {ready ? (
             <Check size={21} />

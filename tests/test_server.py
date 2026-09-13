@@ -3,12 +3,14 @@
 import io
 import json
 from uuid import uuid4
+from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
 import pytest
 from fastapi.testclient import TestClient
 
 from relief_studio.cli import sample_bytes
+from relief_studio.exports import CORE
 from relief_studio.server import create_app
 
 
@@ -79,7 +81,8 @@ def test_explicit_public_origin_supports_proxy_preview_and_export(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "origin", ["*", "https://sample.local/path", "https://user@sample.local", "https://sample.local#x"]
+    "origin",
+    ["*", "https://sample.local/path", "https://user@sample.local", "https://sample.local#x"],
 )
 def test_public_origin_must_be_explicit_origin(origin):
     with pytest.raises(ValueError, match="Public origin"):
@@ -106,12 +109,19 @@ def test_colored_svg_controls_and_direct_two_material_3mf(client):
         b'd="M10 10H90V90H10Z M30 30H70V70H30Z"/></svg>'
     )
     config = {
-        "base_mm": 4, "relief_mm": 1.6, "margin_mm": 9,
-        "frame": False, "corner_radius_mm": 10,
-        "background_color": "#123456", "artwork_color": "#D4A62A",
+        "base_mm": 4,
+        "relief_mm": 1.6,
+        "margin_mm": 9,
+        "frame": False,
+        "corner_radius_mm": 10,
+        "background_color": "#123456",
+        "artwork_color": "#D4A62A",
     }
-    response = client.post('/api/preview', data={"settings": json.dumps(config)},
-                           files={"image": ("colored.svg", svg, "image/svg+xml")})
+    response = client.post(
+        "/api/preview",
+        data={"settings": json.dumps(config)},
+        files={"image": ("colored.svg", svg, "image/svg+xml")},
+    )
     assert response.status_code == 200, response.text
     preview = response.json()
     assert len(preview["meshes"]) == 2
@@ -136,12 +146,58 @@ def test_colored_svg_controls_and_direct_two_material_3mf(client):
 
 
 def test_multi_piece_export_uses_pack_and_piece_downloads_are_bounded(client):
-    preview = client.post('/api/preview', data={"settings": json.dumps({
-        "layout": "puzzle", "columns": 2, "rows": 1,
-    })}).json()
+    preview = client.post(
+        "/api/preview",
+        data={
+            "settings": json.dumps(
+                {
+                    "layout": "puzzle",
+                    "columns": 2,
+                    "rows": 1,
+                }
+            )
+        },
+    ).json()
     result = client.post(f"/api/export/{preview['id']}").json()
     assert result["model_url"].endswith("/plates/plate-01.3mf")
     assert len(result["plate_urls"]) == 1
     assert client.get(result["download_url"]).status_code == 200
     for filename in ("anything.env", "r99-c99.3mf", "r01-c01.stl"):
         assert client.get(f"/api/files/{preview['id']}/pieces/{filename}").status_code == 404
+
+
+def test_multiple_plate_downloads_include_each_piece_once(client):
+    preview = client.post(
+        "/api/preview",
+        data={
+            "settings": json.dumps(
+                {
+                    "layout": "puzzle",
+                    "width_mm": 360,
+                    "piece_size_mm": 60,
+                }
+            )
+        },
+    ).json()
+    manifest = preview["manifest"]
+    assert manifest["piece_count"] > 16
+    assert manifest["plate_count"] > 1
+    result = client.post(f"/api/export/{preview['id']}").json()
+    assert result["model_url"] is None
+    assert len(result["plate_urls"]) == manifest["plate_count"]
+    piece_names = []
+    for url in result["plate_urls"]:
+        downloaded = client.get(url)
+        assert downloaded.status_code == 200
+        with ZipFile(io.BytesIO(downloaded.content)) as archive:
+            assert archive.testzip() is None
+            root = ET.fromstring(archive.read("3D/3dmodel.model"))
+            ns = {"c": CORE}
+            objects = {o.attrib["id"]: o for o in root.findall("c:resources/c:object", ns)}
+            piece_names.extend(
+                objects[item.attrib["objectid"]].attrib["name"]
+                for item in root.findall("c:build/c:item", ns)
+            )
+    assert sorted(piece_names) == sorted(piece["id"] for piece in manifest["pieces"])
+    assert client.get(f"/api/files/{preview['id']}/plates/plate-99.3mf").status_code == 404
+    assert client.get(f"/api/files/{preview['id']}/plates/project.json").status_code == 404

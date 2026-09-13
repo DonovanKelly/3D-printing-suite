@@ -128,3 +128,41 @@ SVG fill colors, negative-space holes and islands, padding with/without source
 margins, rounded border surfaces, rounded tiled/puzzle geometry, optional
 mounting, bounded direct 3MF downloads, and material heights/colors. The physical
 printing and slicer-validation limits above still apply.
+
+## Size-controlled puzzles and arranged plates
+
+The original Automatic splitter minimized build-plate count, so the 180 mm
+sample stayed as one piece even when Tiles or Puzzle was selected. Earlier
+browser checks selected a custom grid and did not catch that default-path bug.
+Tiles and Puzzle now always split, defaulting to a 90 mm maximum piece size.
+The sample produces four tiles or nine random puzzle pieces.
+
+Print format now exposes By piece size, Largest panels, and Custom grid.
+Puzzle adds Random/Regular patterns, a reproducible seed, and Shuffle pattern.
+The new Pieces tab opens automatically for multi-piece formats and shows actual
+meshes with visible separation. The print plan distinguishes piece count from
+plate count. One plate downloads directly as a 3MF containing separate objects;
+multiple plates download as a ZIP, with individual plate links available after
+export. These requested additions supersede the earlier export labels above.
+
+The [puzzle desktop](puzzle-workbench.png) and [mobile](puzzle-mobile.png)
+screenshots were inspected with view_image against the original concept.
+They retain its typography, palette, dominant live canvas, and inspector
+structure. Four preview tabs and the longer multiple-plate download label fit
+390 px mobile and 820 px tablet viewports without horizontal overflow. Desktop
+inspectors scroll independently, including long plate-download lists.
+
+Playwright drove the sample through default tiles/puzzles, 90 → 60 mm piece
+size, seed shuffle, Regular mode, Largest panels, rejected 1 × 1 custom grid,
+and recovery to Plaque. Actual UI downloads contained four tiles, nine puzzle
+pieces, sixteen smaller puzzle pieces, and a 360 × 180 mm puzzle with 36 pieces
+on three plates. Independent XML inspection and Trimesh reload verified separate
+build objects, closed positive-volume material meshes, bed bounds, and exactly
+one occurrence of every piece across each pack's plate files. The single invalid
+grid request produced the expected HTTP 422 console error.
+
+82 Python tests, Ruff, and the TypeScript/Vite build pass. New tests cover the
+default sample regression, bounded piece sizes, seeded seam topology/clearance,
+reproducibility, measured packing gaps, aligned material transforms, and bounded
+plate-download routes. The Bambu Studio and physical-print checks remain pending
+on the target machine; a valid 3MF roundtrip does not establish physical fit.

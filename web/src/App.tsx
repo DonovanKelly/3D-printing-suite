@@ -1,5 +1,5 @@
 /** Compose the local maker workbench, including valid-preview and export states. */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Download,
   Layers,
@@ -19,7 +19,10 @@ export default function App() {
   const { settings, preview, file, status, error, exporting, download } =
     project;
   const ready = status === "ready";
-  const singlePiece = preview?.manifest.piece_count === 1;
+  const singlePlate = preview?.manifest.plate_count === 1;
+  useEffect(() => {
+    if (settings) setView(settings.layout === "plaque" ? "relief" : "pieces");
+  }, [settings?.layout]);
   const title = file ? file.name.replace(/\.[^.]+$/, "") : "Alpine study";
   return (
     <div className="app-shell">
@@ -36,7 +39,7 @@ export default function App() {
           <button
             className="primary-button"
             disabled={!ready || exporting}
-            onClick={() => project.exportPack(singlePiece ? "3mf" : "pack")}
+            onClick={() => project.exportPack(singlePlate ? "3mf" : "pack")}
           >
             {exporting ? (
               <LoaderCircle size={19} className="spin" />
@@ -46,9 +49,9 @@ export default function App() {
             <span>
               {exporting
                 ? "Preparing download…"
-                : singlePiece
+                : singlePlate
                   ? "Download 3MF"
-                  : "Export print pack"}
+                  : `Download ${preview?.manifest.plate_count ?? "print"} plates (ZIP)`}
             </span>
           </button>
         </div>
@@ -59,7 +62,7 @@ export default function App() {
           <span>Image to two-color relief</span>
         </div>
         <nav className="view-tabs" aria-label="Preview mode">
-          {(["relief", "assembly", "vector"] as const).map((tab) => (
+          {(["relief", "pieces", "assembly", "vector"] as const).map((tab) => (
             <button
               key={tab}
               aria-pressed={view === tab}
@@ -91,9 +94,11 @@ export default function App() {
             <span>
               {view === "relief"
                 ? "3D preview"
-                : view === "assembly"
-                  ? "Assembly map"
-                  : "Vector preview"}
+                : view === "pieces"
+                  ? "Separate pieces · gaps for viewing"
+                  : view === "assembly"
+                    ? "Assembly map"
+                    : "Vector preview"}
             </span>
             <span>
               {preview
@@ -143,6 +148,7 @@ export default function App() {
             ready={ready}
             busy={status === "building"}
             download={download}
+            plateDownloads={project.plateDownloads}
             disabled={exporting}
             exportPack={() => project.exportPack("pack")}
           />

@@ -19,6 +19,10 @@ export type Settings = {
   layout: "plaque" | "tiles" | "puzzle";
   columns: number;
   rows: number;
+  split_mode: "size" | "bed";
+  piece_size_mm: number;
+  puzzle_style: "random" | "regular";
+  puzzle_seed: number;
   clearance_mm: number;
   bed_width_mm: number;
   bed_height_mm: number;
@@ -31,6 +35,7 @@ export type Piece = {
   row: number;
   column: number;
   assembly_origin_mm: number[];
+  separated_origin_mm: number[];
   extents_mm: number[];
   material_parts: number;
   volume_mm3: number;
@@ -39,6 +44,13 @@ export type Manifest = {
   settings: Settings;
   grid: { columns: number; rows: number };
   piece_count: number;
+  plate_count: number;
+  separated_extents_mm: number[];
+  plates: {
+    id: string;
+    file: string;
+    pieces: { id: string; origin_mm: number[] }[];
+  }[];
   pieces: Piece[];
   warnings: string[];
 };
@@ -47,6 +59,7 @@ export type Preview = {
   manifest: Manifest;
   vector_svg: string;
   assembly_svg: string;
+  separated_svg: string;
   meshes: {
     piece: string;
     material: string;
@@ -55,7 +68,7 @@ export type Preview = {
     faces: number[];
   }[];
 };
-export type View = "relief" | "assembly" | "vector";
+export type View = "relief" | "pieces" | "assembly" | "vector";
 export type Update = <K extends keyof Settings>(
   key: K,
   value: Settings[K],

@@ -35,18 +35,36 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   non-overlapping volumes above it. Each tile is a grouped, two-material 3MF
   with preserved relative coordinates, plus aligned STL parts. A single merged
   STL is also available for a height-based color change.
-- Automatic tiling tries grids from fewest pieces upward and checks actual
-  extents including tabs and hanging features. A user-selected usable footprint
-  defaults to 230 mm square; it is not a guarantee of slicer placement with
-  brims, exclusion zones, and prime towers.
+- Tiles and puzzles always require at least two pieces. Automatic splitting
+  tries grids from fewest pieces upward and checks actual extents including
+  tabs and hanging features. By piece size uses the smaller of the requested
+  maximum (90 mm by default) and the usable bed; Largest panels uses the bed.
+  Explicit grids override piece size but retain the bed check. Nominal cells
+  must be at least 24 mm, and all layouts are limited to 64 pieces.
+- Random puzzle seams transfer a shared curved strip and tab between neighbors,
+  preserving total coverage and avoiding overlaps before clearance is applied.
+  A local seeded generator varies tab direction, location, radius, and seam
+  curvature; settings record the seed for reproduction. Regular mode retains
+  alternating circular tabs. Rear keyhole placement searches within each
+  nominal cell for sufficient material, away from random edge sockets.
+- A shared packing module separates actual piece bounding boxes by 3 mm. It
+  retains assembly row/column order when that fits one plate; otherwise stable
+  height-sorted shelves distribute every piece exactly once across plates.
+  One 3MF build item references each piece's component group, so the file has
+  separate movable objects while each object's material parts stay aligned.
+  Translations are shared by both materials; plates do not change Z placement.
+  The usable footprint defaults to 230 mm square; packing is not a guarantee
+  of slicer placement with brims, exclusion zones, and prime towers.
 - Local API requests are bounded and serialized during generation. No cloud
   uploads, credentials, paid calls, or printer commands are implicit. The
   service binds to loopback by default and is intended for a trusted local user.
 - Completed exports are self-contained, with settings, SVG, assembly map,
   geometry checks, and print instructions. CLI output uses a new directory;
   browser generation uses unique directories with failed work cleaned up.
-  Single-piece export also returns a direct 3MF URL. Piece downloads validate
-  both the export UUID and a bounded piece filename and serve only saved files.
+  Single-plate export returns a direct 3MF URL, including multi-piece plates.
+  Larger jobs return one URL per plate and a full ZIP. Piece/plate downloads
+  validate the export UUID and a bounded filename and serve only saved files.
+  The separate-pieces preview and labeled SVG share the same layout calculation.
 
 ## Scope and validation
 
@@ -73,6 +91,7 @@ on slicer bridging. The suite exports geometry, not sliced printer jobs.
 References: [Trimesh extrusion](https://trimesh.org/trimesh.creation.html),
 [Manifold booleans](https://trimesh.org/trimesh.boolean.html),
 [3MF core specification](https://github.com/3MFConsortium/spec_core),
+[Bambu Studio 3MF importer](https://github.com/bambulab/BambuStudio/blob/master/src/libslic3r/Format/bbs_3mf.cpp),
 [P1 series specifications](https://bambulab.com/en-us/p1p),
 [Bambu print-volume limitations](https://wiki.bambulab.com/en/knowledge-sharing/print-volume-limitations),
 [Replicate API](https://replicate.com/docs/reference/http).

@@ -21,7 +21,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
   const [rotating, setRotating] = useState(false);
 
   useEffect(() => {
-    if (!host.current || view !== "relief") return;
+    if (!host.current || (view !== "relief" && view !== "pieces")) return;
     const target = host.current;
     let renderer: THREE.WebGLRenderer;
     try {
@@ -43,8 +43,13 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
     );
     const scene = new THREE.Scene();
     const settings = preview.manifest.settings;
-    const width = settings.width_mm,
-      height = settings.height_mm;
+    const separated = view === "pieces";
+    const width = separated
+      ? preview.manifest.separated_extents_mm[0]
+      : settings.width_mm;
+    const height = separated
+      ? preview.manifest.separated_extents_mm[1]
+      : settings.height_mm;
     const size = Math.max(width, height);
     const camera = new THREE.OrthographicCamera(
       -size,
@@ -86,11 +91,11 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         flatShading: true,
       });
       const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(
-        data.origin[0] - width / 2,
-        data.origin[1] - height / 2,
-        0,
-      );
+      const origin = separated
+        ? preview.manifest.pieces.find((piece) => piece.id === data.piece)!
+            .separated_origin_mm
+        : data.origin;
+      mesh.position.set(origin[0] - width / 2, origin[1] - height / 2, 0);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);
@@ -190,17 +195,25 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
 
   return (
     <>
-      {view === "relief" && <div className="webgl-host" ref={host} />}
-      {(view !== "relief" || fallback) && (
+      {(view === "relief" || view === "pieces") && (
+        <div className="webgl-host" ref={host} />
+      )}
+      {((view !== "relief" && view !== "pieces") || fallback) && (
         <div className="flat-preview">
           <img
             src={svgUrl(
-              view === "vector" ? preview.vector_svg : preview.assembly_svg,
+              view === "vector"
+                ? preview.vector_svg
+                : view === "pieces"
+                  ? preview.separated_svg
+                  : preview.assembly_svg,
             )}
             alt={
               view === "vector"
                 ? "Traced black-and-white vector artwork"
-                : "Front-view assembly map with piece labels"
+                : view === "pieces"
+                  ? "Separated pieces with assembly labels"
+                  : "Front-view assembly map with piece labels"
             }
           />
           {fallback && view === "relief" && (
@@ -211,7 +224,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
           )}
         </div>
       )}
-      {view === "relief" && !fallback && (
+      {(view === "relief" || view === "pieces") && !fallback && (
         <div className="canvas-tools">
           <div className="tool-strip">
             <button
@@ -252,7 +265,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
           <p>Drag to orbit · Scroll to zoom</p>
         </div>
       )}
-      {view !== "relief" && (
+      {view !== "relief" && view !== "pieces" && (
         <div className="flat-caption">
           {view === "assembly"
             ? "Front view · Row 01 is the top"

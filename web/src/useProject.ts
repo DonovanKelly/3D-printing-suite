@@ -23,6 +23,7 @@ export function useProject() {
   const [error, setError] = useState("");
   const [exporting, setExporting] = useState(false);
   const [download, setDownload] = useState("");
+  const [plateDownloads, setPlateDownloads] = useState<string[]>([]);
   const [revision, setRevision] = useState(0);
   const source = useRef(0);
 
@@ -45,6 +46,7 @@ export function useProject() {
     setStatus("building");
     setError("");
     setDownload("");
+    setPlateDownloads([]);
     const timer = window.setTimeout(async () => {
       const form = new FormData();
       form.set("settings", JSON.stringify(settings));
@@ -90,6 +92,7 @@ export function useProject() {
     source.current += 1;
     setStatus("building");
     setDownload("");
+    setPlateDownloads([]);
     setSettings((current) =>
       current ? { ...current, [key]: value } : current,
     );
@@ -105,6 +108,7 @@ export function useProject() {
     setRevision((value) => value + 1);
     setStatus("building");
     setDownload("");
+    setPlateDownloads([]);
   }
 
   async function exportPack(format: "3mf" | "pack" = "pack") {
@@ -121,10 +125,11 @@ export function useProject() {
       const url = format === "3mf" ? result.model_url : result.download_url;
       if (!url)
         throw new Error(
-          "This layout has multiple pieces. Download its print pack instead.",
+          "This layout needs multiple plates. Download its print pack instead.",
         );
       if (version === source.current) {
         setDownload(url);
+        setPlateDownloads(result.plate_urls ?? []);
         const link = document.createElement("a");
         link.href = url;
         link.download = format === "3mf" ? "relief.3mf" : "print-pack.zip";
@@ -145,6 +150,7 @@ export function useProject() {
     error,
     exporting,
     download,
+    plateDownloads,
     update,
     chooseFile,
     exportPack,
