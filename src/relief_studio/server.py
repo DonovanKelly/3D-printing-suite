@@ -24,7 +24,7 @@ from pydantic import ValidationError
 from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 
-from .artwork import MAX_INPUT_BYTES
+from .artwork import MAX_INPUT_BYTES, ImageSelectionError
 from .cli import sample_bytes
 from .exports import export_project, project_manifest, vector_svg
 from .geometry import build_project
@@ -158,6 +158,8 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
             }
         except ValidationError as exc:
             raise HTTPException(422, settings_error(exc)) from exc
+        except ImageSelectionError as exc:
+            return JSONResponse({"detail": str(exc), "code": "image_selection"}, status_code=422)
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
         except HTTPException:

@@ -25,6 +25,17 @@ MAX_INPUT_BYTES = 12 * 1024 * 1024
 MAX_PIXELS = 24_000_000
 
 
+class ImageSelectionError(ValueError):
+    """Readable input whose current selection cannot produce printable artwork."""
+
+
+def selection_gray(strength: np.ndarray) -> Image.Image:
+    maximum = float(strength.max())
+    if maximum == 0:
+        return Image.fromarray(np.full(strength.shape, 255, dtype=np.uint8))
+    return Image.fromarray((255 - strength.astype(float) * (255 / maximum)).astype(np.uint8))
+
+
 def polygons(geometry: Geometry) -> list[Polygon]:
     if geometry.is_empty:
         return []
@@ -92,14 +103,21 @@ def load_image(data: bytes, settings: Settings) -> Image.Image:
                 rgba = ImageOps.exif_transpose(source).convert("RGBA")
         rgba.thumbnail((settings.trace_resolution, settings.trace_resolution))
         if is_svg and settings.foreground == "auto":
-            alpha = rgba.getchannel("A")
-            if alpha.getextrema()[0] < 255:
-                return ImageOps.invert(alpha)
+            alpha = np.asarray(rgba.getchannel("A"))
+            interior_alpha = alpha[1:-1, 1:-1] if min(alpha.shape) > 2 else alpha
+            # Fractional SVG viewport scaling can antialias just the outermost
+            # pixel of an opaque page. That fringe is not transparent artwork.
+            if interior_alpha.min() < 255:
+                # Auto selects shapes even when their SVG opacity or contrast
+                # is low; manual dark/light modes retain absolute thresholds.
+                return selection_gray(alpha)
             rgb = np.asarray(rgba.convert("RGB"), dtype=np.int16)
-            edge = np.concatenate((rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]))
+            interior = rgb[1:-1, 1:-1] if min(alpha.shape) > 2 else rgb
+            edge = np.concatenate((interior[0], interior[-1], interior[:, 0], interior[:, -1]))
             background_rgb = np.median(edge, axis=0)
             contrast = np.max(np.abs(rgb - background_rgb), axis=2)
-            return Image.fromarray((255 - contrast).astype(np.uint8))
+            contrast[alpha < 255] = 0
+            return selection_gray(contrast)
         background = Image.new(
             "RGBA", rgba.size, "black" if settings.foreground == "light" else "white"
         )
@@ -125,7 +143,14 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
         cv2.CHAIN_APPROX_SIMPLE,
     )
     if hierarchy is None:
-        raise ValueError("No artwork remains. Adjust the threshold or invert the image.")
+        mode = {"auto": "Automatic", "dark": "Dark pixels", "light": "Light pixels"}[
+            settings.foreground
+        ]
+        raise ImageSelectionError(
+            f"No artwork remains with {mode} at threshold {settings.threshold}. "
+            "Use Reset image selection, adjust the threshold, "
+            "or choose an image with visible shapes."
+        )
     if len(contours) > 5000:
         raise ValueError(
             "Too many small regions. Simplify the image or use a lower detail setting."
@@ -146,7 +171,9 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
             child = hierarchy[child][0]
         regions.extend(polygons(make_valid(Polygon(contour[:, 0, :], holes))))
     if not regions:
-        raise ValueError("Artwork is too thin to trace. Increase its resolution or line weight.")
+        raise ImageSelectionError(
+            "Artwork is too thin to trace. Increase its resolution or line weight."
+        )
     region = unary_union(regions)
     inset = settings.artwork_inset
     height, width = gray.shape
@@ -172,7 +199,10 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
     parts = polygons(simplified)
     kept = [p for p in parts if p.area >= settings.min_area_mm2]
     if not kept:
-        raise ValueError("All artwork was smaller than the minimum area. Reduce detail filtering.")
+        raise ImageSelectionError(
+            "All artwork was smaller than the minimum area. "
+            "Reset image selection or reduce filtering."
+        )
     notes = []
     if len(kept) != len(parts):
         notes.append(
@@ -182,7 +212,9 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
     # into non-manifold edges. It is below the trace tolerance and nozzle scale.
     result = unary_union(kept).buffer(-0.01, join_style="mitre")
     if result.is_empty:
-        raise ValueError("Artwork is too thin after contact cleanup. Increase its line weight.")
+        raise ImageSelectionError(
+            "Artwork is too thin after contact cleanup. Increase its line weight."
+        )
     narrow = result.difference(result.buffer(-0.2).buffer(0.2))
     if narrow.area > max(result.area * 0.03, 1):
         notes.append(

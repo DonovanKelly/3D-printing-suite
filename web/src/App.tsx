@@ -83,6 +83,7 @@ export default function App() {
               update={project.update}
               file={file}
               chooseFile={project.chooseFile}
+              resetImageSelection={project.resetImageSelection}
               disabled={exporting}
             />
           </NumericEditing.Provider>
@@ -142,8 +143,17 @@ export default function App() {
                     The canvas still shows your previous valid preview.
                   </p>
                 )}
-                <button className="text-button" onClick={project.retry}>
-                  Rebuild preview
+                <button
+                  className="text-button"
+                  onClick={
+                    project.errorCode === "image_selection"
+                      ? project.resetImageSelection
+                      : project.retry
+                  }
+                >
+                  {project.errorCode === "image_selection"
+                    ? "Reset image selection"
+                    : "Rebuild preview"}
                 </button>
               </div>
             </div>

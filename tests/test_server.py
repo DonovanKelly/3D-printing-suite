@@ -2,6 +2,7 @@
 
 import io
 import json
+from pathlib import Path
 from uuid import uuid4
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
@@ -108,6 +109,22 @@ def test_setting_errors_identify_the_control_to_fix(client, setting, value, labe
     response = client.post("/api/preview", data={"settings": json.dumps({setting: value})})
     assert response.status_code == 422
     assert response.json()["detail"].startswith(f"{label}:")
+
+
+def test_empty_selection_has_recovery_code_and_reset_restores_export(client):
+    svg = (Path(__file__).parent / "fixtures/gold-cutout.svg").read_bytes()
+    files = {"image": ("gold.svg", svg, "image/svg+xml")}
+    response = client.post(
+        "/api/preview", files=files, data={"settings": json.dumps({"foreground": "light"})}
+    )
+    assert response.status_code == 422
+    assert response.json()["code"] == "image_selection"
+    assert "Light pixels at threshold 128" in response.json()["detail"]
+    recovered = client.post("/api/preview", files=files, data={"settings": "{}"})
+    assert recovered.status_code == 200
+    export = client.post(f"/api/export/{recovered.json()['id']}")
+    assert export.status_code == 200
+    assert client.get(export.json()["model_url"]).status_code == 200
 
 
 def test_colored_svg_controls_and_direct_two_material_3mf(client):

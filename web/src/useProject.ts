@@ -2,14 +2,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Preview, Settings, Update } from "./types";
 
-async function detail(response: Response): Promise<string> {
+class ServiceError extends Error {
+  constructor(
+    message: string,
+    readonly code = "",
+  ) {
+    super(message);
+  }
+}
+
+async function failure(response: Response): Promise<ServiceError> {
   try {
     const data = await response.json();
-    return typeof data.detail === "string"
-      ? data.detail
-      : "Check the project settings.";
+    return new ServiceError(
+      typeof data.detail === "string"
+        ? data.detail
+        : "Check the project settings.",
+      typeof data.code === "string" ? data.code : "",
+    );
   } catch {
-    return `The local service returned ${response.status}.`;
+    return new ServiceError(`The local service returned ${response.status}.`);
   }
 }
 
@@ -21,6 +33,7 @@ export function useProject() {
     "loading" | "building" | "ready" | "error"
   >("loading");
   const [error, setError] = useState("");
+  const [errorCode, setErrorCode] = useState("");
   const [exporting, setExporting] = useState(false);
   const [download, setDownload] = useState("");
   const [plateDownloads, setPlateDownloads] = useState<string[]>([]);
@@ -31,7 +44,7 @@ export function useProject() {
     if (settings) return;
     fetch("/api/defaults")
       .then(async (response) => {
-        if (!response.ok) throw new Error(await detail(response));
+        if (!response.ok) throw await failure(response);
         setSettings(await response.json());
       })
       .catch((error) => {
@@ -45,6 +58,7 @@ export function useProject() {
     let canceled = false;
     setStatus("building");
     setError("");
+    setErrorCode("");
     setDownload("");
     setPlateDownloads([]);
     const timer = window.setTimeout(async () => {
@@ -65,7 +79,7 @@ export function useProject() {
             await new Promise((resolve) => setTimeout(resolve, 500));
         } while (response.status === 409 && !canceled);
         if (canceled) return;
-        if (!response.ok) throw new Error(await detail(response));
+        if (!response.ok) throw await failure(response);
         const next: Preview = await response.json();
         if (!canceled) {
           setPreview(next);
@@ -79,6 +93,7 @@ export function useProject() {
               : "The local service is unavailable.",
           );
           setStatus("error");
+          setErrorCode(error instanceof ServiceError ? error.code : "");
         }
       }
     }, 550);
@@ -98,17 +113,37 @@ export function useProject() {
     );
   }, []);
 
+  function resetImageSelection() {
+    source.current += 1;
+    setStatus("building");
+    setError("");
+    setErrorCode("");
+    setDownload("");
+    setPlateDownloads([]);
+    setSettings((current) =>
+      current
+        ? {
+            ...current,
+            foreground: "auto",
+            threshold: 128,
+            invert: false,
+            min_area_mm2: 0.6,
+          }
+        : current,
+    );
+  }
+
   function chooseFile(next: File | null) {
     if (next && next.size > 12 * 1024 * 1024) {
       setError("Choose a file smaller than 12 MiB.");
+      setErrorCode("");
       return;
     }
-    source.current += 1;
     setFile(next);
     setRevision((value) => value + 1);
-    setStatus("building");
-    setDownload("");
-    setPlateDownloads([]);
+    // Selection belongs to the source image. Keep dimensions and fabrication
+    // settings, but do not carry an incompatible threshold into a new upload.
+    resetImageSelection();
   }
 
   async function exportPack(format: "3mf" | "pack" = "pack") {
@@ -120,7 +155,7 @@ export function useProject() {
       const response = await fetch(`/api/export/${preview.id}`, {
         method: "POST",
       });
-      if (!response.ok) throw new Error(await detail(response));
+      if (!response.ok) throw await failure(response);
       const result = await response.json();
       const url = format === "3mf" ? result.model_url : result.download_url;
       if (!url)
@@ -148,11 +183,13 @@ export function useProject() {
     preview,
     status,
     error,
+    errorCode,
     exporting,
     download,
     plateDownloads,
     update,
     chooseFile,
+    resetImageSelection,
     exportPack,
     retry: () => setRevision((value) => value + 1),
   };

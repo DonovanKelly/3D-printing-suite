@@ -16,12 +16,14 @@ export function Controls({
   update,
   file,
   chooseFile,
+  resetImageSelection,
   disabled,
 }: {
   settings: Settings;
   update: Update;
   file: File | null;
   chooseFile: (file: File | null) => void;
+  resetImageSelection: () => void;
   disabled: boolean;
 }) {
   const input = useRef<HTMLInputElement>(null);
@@ -96,8 +98,12 @@ export function Controls({
             </label>
             <p className="hint control-hint">
               SVG shapes extrude automatically, including light-colored shapes
-              on transparency.
+              on transparency. Dark/light modes use brightness and may select
+              nothing at some thresholds.
             </p>
+            <button className="text-button" onClick={resetImageSelection}>
+              Reset image selection
+            </button>
             <label className="threshold">
               <span>Threshold</span>
               <div>
