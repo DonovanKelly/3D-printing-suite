@@ -129,6 +129,7 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
                 "meshes": meshes,
                 "vector_svg": vector_svg(project),
                 "assembly_svg": vector_svg(project, True),
+                "separated_svg": vector_svg(project, True, True),
             }
         except ValidationError as exc:
             raise HTTPException(422, "; ".join(error["msg"] for error in exc.errors())) from exc
@@ -160,11 +161,16 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
                 project, data = cached
                 await run_in_threadpool(export_project, project, destination, data)
             project, _ = cached
+            manifest = project_manifest(project)
+            plate_urls = [f"/api/files/{key}/{p['file']}" for p in manifest["plates"]]
             return {
                 "download_url": f"/api/files/{key}/print-pack.zip",
+                "plate_urls": plate_urls,
                 "model_url": (
                     f"/api/files/{key}/pieces/{project.pieces[0].tile.name}.3mf"
                     if len(project.pieces) == 1
+                    else plate_urls[0]
+                    if len(plate_urls) == 1
                     else None
                 ),
             }
@@ -190,6 +196,15 @@ def create_app(output_root: Path | None = None, public_origin: str | None = None
         if not re.fullmatch(r"r\d{2}-c\d{2}\.3mf", filename):
             raise HTTPException(404)
         path = root / str(identifier) / "pieces" / filename[:-4] / filename
+        if not path.is_file():
+            raise HTTPException(404)
+        return FileResponse(path, filename=filename, media_type="model/3mf")
+
+    @app.get("/api/files/{identifier}/plates/{filename}")
+    def download_plate(identifier: UUID, filename: str):
+        if not re.fullmatch(r"plate-\d{2}\.3mf", filename):
+            raise HTTPException(404)
+        path = root / str(identifier) / "plates" / filename
         if not path.is_file():
             raise HTTPException(404)
         return FileResponse(path, filename=filename, media_type="model/3mf")

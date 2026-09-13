@@ -140,7 +140,8 @@ def test_multi_piece_export_uses_pack_and_piece_downloads_are_bounded(client):
         "layout": "puzzle", "columns": 2, "rows": 1,
     })}).json()
     result = client.post(f"/api/export/{preview['id']}").json()
-    assert result["model_url"] is None
+    assert result["model_url"].endswith("/plates/plate-01.3mf")
+    assert len(result["plate_urls"]) == 1
     assert client.get(result["download_url"]).status_code == 200
     for filename in ("anything.env", "r99-c99.3mf", "r01-c01.stl"):
         assert client.get(f"/api/files/{preview['id']}/pieces/{filename}").status_code == 404
