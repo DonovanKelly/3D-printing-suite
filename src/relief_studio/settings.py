@@ -28,6 +28,10 @@ class Settings(BaseModel):
     layout: Literal["plaque", "tiles", "puzzle"] = "plaque"
     columns: int = Field(default=0, ge=0, le=12)
     rows: int = Field(default=0, ge=0, le=12)
+    split_mode: Literal["size", "bed"] = "size"
+    piece_size_mm: float = Field(default=90, ge=30, le=256)
+    puzzle_style: Literal["random", "regular"] = "random"
+    puzzle_seed: int = Field(default=1, ge=0, le=2_147_483_647)
     clearance_mm: float = Field(default=0.25, ge=0, le=1)
     bed_width_mm: float = Field(default=230, ge=60, le=256)
     bed_height_mm: float = Field(default=230, ge=60, le=256)
@@ -48,6 +52,8 @@ class Settings(BaseModel):
             raise ValueError("A project can contain at most 64 pieces.")
         if self.layout == "plaque" and (self.columns > 1 or self.rows > 1):
             raise ValueError("Choose Tiles or Puzzle to use multiple rows or columns.")
+        if self.layout != "plaque" and self.columns == self.rows == 1:
+            raise ValueError("Tiles and Puzzle need at least two pieces. Increase the grid.")
         if self.hanging == "keyholes" and self.base_mm < 5:
             raise ValueError("Rear keyholes need a backing at least 5 mm thick.")
         return self

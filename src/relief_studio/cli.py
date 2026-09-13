@@ -28,9 +28,21 @@ def main() -> None:
     generate.add_argument("image", nargs="?", type=Path)
     generate.add_argument("--output", "-o", type=Path, required=True)
     generate.add_argument("--settings", type=Path)
-    for name in ("width", "height", "base", "relief", "clearance", "bed-width", "bed-height"):
+    for name in (
+        "width",
+        "height",
+        "base",
+        "relief",
+        "clearance",
+        "bed-width",
+        "bed-height",
+        "piece-size",
+    ):
         generate.add_argument(f"--{name}", type=float)
     generate.add_argument("--layout", choices=["plaque", "tiles", "puzzle"])
+    generate.add_argument("--split-mode", choices=["size", "bed"])
+    generate.add_argument("--puzzle-style", choices=["random", "regular"])
+    generate.add_argument("--puzzle-seed", type=int)
     generate.add_argument("--hanging", choices=["none", "loops", "keyholes"])
     generate.add_argument("--columns", type=int)
     generate.add_argument("--rows", type=int)
@@ -58,11 +70,30 @@ def main() -> None:
         return
     try:
         config = json.loads(arguments.settings.read_text()) if arguments.settings else {}
-        for name in ("width", "height", "base", "relief", "clearance", "bed_width", "bed_height"):
+        for name in (
+            "width",
+            "height",
+            "base",
+            "relief",
+            "clearance",
+            "bed_width",
+            "bed_height",
+            "piece_size",
+        ):
             value = getattr(arguments, name)
             if value is not None:
                 config[name + "_mm"] = value
-        for name in ("layout", "hanging", "columns", "rows", "threshold", "invert"):
+        for name in (
+            "layout",
+            "hanging",
+            "columns",
+            "rows",
+            "threshold",
+            "invert",
+            "split_mode",
+            "puzzle_style",
+            "puzzle_seed",
+        ):
             value = getattr(arguments, name)
             if value is not None:
                 config[name] = value

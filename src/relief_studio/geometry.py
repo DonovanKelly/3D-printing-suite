@@ -86,12 +86,17 @@ def keyhole_cutters(
     top = settings.height_mm * (1 - tile.row / rows)
     cutters = []
     for x in (left + (right - left) * 0.3, left + (right - left) * 0.7):
-        y = top - 16
-        head = Point(x, y).buffer(4, quad_segs=24)
-        shaft = box(x - 2, y, x + 2, y + 7).union(Point(x, y + 7).buffer(2, quad_segs=24))
-        opening = head.union(shaft)
-        channel = head.union(Point(x, y + 7).buffer(4, quad_segs=24)).convex_hull
-        if not tile.shape.buffer(-3).covers(channel):
+        bottom = top - settings.height_mm / rows
+        # Random tab sockets may occupy the preferred mounting position. Search
+        # down the cell for a retaining lip fully supported by the actual piece.
+        for y in np.arange(top - 16, bottom + 6, -2):
+            head = Point(x, y).buffer(4, quad_segs=24)
+            shaft = box(x - 2, y, x + 2, y + 7).union(Point(x, y + 7).buffer(2, quad_segs=24))
+            opening = head.union(shaft)
+            channel = head.union(Point(x, y + 7).buffer(4, quad_segs=24)).convex_hull
+            if tile.shape.buffer(-3).covers(channel):
+                break
+        else:
             raise ValueError("Piece is too small for rear keyholes. Use fewer pieces or top loops.")
         # Open from the bed-facing back; leave a 1.2 mm retaining lip over the head channel.
         cutters.extend([extrude(opening, 3.2, -0.1), extrude(channel, 1.9, 1.2)])

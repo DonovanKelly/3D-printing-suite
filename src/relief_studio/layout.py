@@ -7,7 +7,9 @@ strip around internal seams only; the requested outside dimensions stay exact.
 
 from dataclasses import dataclass
 from math import ceil
+from random import Random
 
+import numpy as np
 from shapely import Geometry
 from shapely.geometry import Point, Polygon, box
 from shapely.ops import unary_union
@@ -46,30 +48,40 @@ def partition(settings: Settings, columns: int, rows: int) -> list[Tile]:
     ]
     if settings.layout == "puzzle":
         radius = min(cw, ch) * 0.09
+        rng = Random(settings.puzzle_seed)
+
+        def seam(a: int, b: int, x: float, y: float, length: float, vertical: bool, sign: int):
+            randomized = settings.puzzle_style == "random"
+            direction = rng.choice((-1, 1)) if randomized else sign
+            position = rng.uniform(0.35, 0.65) if randomized else 0.5
+            size = radius * (rng.uniform(0.8, 1.1) if randomized else 1)
+            bow = rng.uniform(-0.04, 0.04) * min(cw, ch) if randomized else 0
+
+            def point(t: float, offset: float = 0) -> tuple[float, float]:
+                lateral = bow * np.sin(np.pi * t) + offset
+                return (x + lateral, y + length * t) if vertical else (x + length * t, y + lateral)
+
+            # Transfer the same bounded region once; neighbors never compute separate seams.
+            if bow:
+                strip = Polygon(
+                    [point(0), *[point(t) for t in np.linspace(0, 1, 25)[1:-1]], point(1)]
+                )
+                owner, neighbor = (a, b) if bow > 0 else (b, a)
+                cells[owner] = cells[owner].union(strip)
+                cells[neighbor] = cells[neighbor].difference(strip)
+            tab = Point(point(position, direction * size * 0.8)).buffer(size, quad_segs=24)
+            owner, neighbor = (a, b) if direction == 1 else (b, a)
+            cells[owner] = cells[owner].union(tab)
+            cells[neighbor] = cells[neighbor].difference(tab)
+
         for r in range(rows):
             for c in range(columns - 1):
                 left, right = r * columns + c, r * columns + c + 1
-                direction = 1 if (r + c) % 2 == 0 else -1
-                tab = Point((c + 1) * cw + direction * radius * 0.8, (r + 0.5) * ch).buffer(
-                    radius, quad_segs=24
-                )
-                owner, neighbor = (left, right) if direction == 1 else (right, left)
-                cells[owner], cells[neighbor] = (
-                    cells[owner].union(tab),
-                    cells[neighbor].difference(tab),
-                )
+                seam(left, right, (c + 1) * cw, r * ch, ch, True, 1 if (r + c) % 2 == 0 else -1)
         for r in range(rows - 1):
             for c in range(columns):
                 bottom, top = r * columns + c, (r + 1) * columns + c
-                direction = 1 if (r + c) % 2 else -1
-                tab = Point((c + 0.5) * cw, (r + 1) * ch + direction * radius * 0.8).buffer(
-                    radius, quad_segs=24
-                )
-                owner, neighbor = (bottom, top) if direction == 1 else (top, bottom)
-                cells[owner], cells[neighbor] = (
-                    cells[owner].union(tab),
-                    cells[neighbor].difference(tab),
-                )
+                seam(bottom, top, c * cw, (r + 1) * ch, cw, False, 1 if (r + c) % 2 else -1)
     outer = box(0, 0, settings.width_mm, settings.height_mm)
     footprint = outline(settings)
     tiles = []
@@ -91,10 +103,13 @@ def partition(settings: Settings, columns: int, rows: int) -> list[Tile]:
     return sorted(tiles, key=lambda t: (t.row, t.column))
 
 
-def fits(tiles: list[Tile], settings: Settings) -> bool:
+def fits(tiles: list[Tile], settings: Settings, size_limit: bool = False) -> bool:
+    width, height = settings.bed_width_mm, settings.bed_height_mm
+    if size_limit:
+        width, height = min(width, settings.piece_size_mm), min(height, settings.piece_size_mm)
     return all(
-        t.shape.bounds[2] - t.shape.bounds[0] <= settings.bed_width_mm + 1e-6
-        and t.shape.bounds[3] - t.shape.bounds[1] <= settings.bed_height_mm + 1e-6
+        t.shape.bounds[2] - t.shape.bounds[0] <= width + 1e-6
+        and t.shape.bounds[3] - t.shape.bounds[1] <= height + 1e-6
         for t in tiles
     )
 
@@ -109,19 +124,29 @@ def choose_layout(settings: Settings) -> tuple[list[Tile], int, int]:
                 "or increase the grid count; tabs and loops also need room."
             )
         return tiles, columns, rows
+    size_limit = settings.split_mode == "size"
+    width_limit = (
+        min(settings.bed_width_mm, settings.piece_size_mm) if size_limit else settings.bed_width_mm
+    )
+    height_limit = (
+        min(settings.bed_height_mm, settings.piece_size_mm)
+        if size_limit
+        else settings.bed_height_mm
+    )
     candidates = sorted(
         (
             (c, r)
-            for c in range(max(1, ceil(settings.width_mm / settings.bed_width_mm)), 13)
-            for r in range(max(1, ceil(settings.height_mm / settings.bed_height_mm)), 13)
-            if c * r <= 64 and min(settings.width_mm / c, settings.height_mm / r) >= 24
+            for c in range(max(1, ceil(settings.width_mm / width_limit)), 13)
+            for r in range(max(1, ceil(settings.height_mm / height_limit)), 13)
+            if 2 <= c * r <= 64 and min(settings.width_mm / c, settings.height_mm / r) >= 24
         ),
         key=lambda cr: (cr[0] * cr[1], abs(settings.width_mm / cr[0] - settings.height_mm / cr[1])),
     )
     for columns, rows in candidates:
         tiles = partition(settings, columns, rows)
-        if fits(tiles, settings):
+        if fits(tiles, settings, size_limit):
             return tiles, columns, rows
     raise ValueError(
-        "No layout fits within 64 pieces. Reduce the finished size or enlarge the usable bed."
+        "No split fits the piece size and build plate within 64 pieces (minimum cell 24 mm). "
+        "Increase Max piece size, use Largest panels, or adjust the finished dimensions."
     )

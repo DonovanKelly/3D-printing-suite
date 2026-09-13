@@ -89,9 +89,7 @@ def test_svg_brightness_selection_remains_available():
 
 
 def test_inversion_changes_foreground_and_transparency_composites_white():
-    normal, _ = trace_image(
-        ring_image(), Settings(frame=False, margin_mm=0, crop_to_artwork=False)
-    )
+    normal, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0, crop_to_artwork=False))
     inverted, _ = trace_image(
         ring_image(), Settings(frame=False, margin_mm=0, invert=True, crop_to_artwork=False)
     )
@@ -110,7 +108,9 @@ def test_partitions_cover_rectangle_without_overlap(layout):
 
 
 def test_puzzle_clearance_and_outer_dimensions():
-    settings = Settings(width_mm=80, height_mm=40, layout="puzzle", clearance_mm=0.3)
+    settings = Settings(
+        width_mm=80, height_mm=40, layout="puzzle", clearance_mm=0.3, puzzle_style="regular"
+    )
     left, right = partition(settings, 2, 1)
     assert left.shape.distance(right.shape) == pytest.approx(0.3, abs=0.002)
     assert unary_union([left.shape, right.shape]).bounds == pytest.approx((0, 0, 80, 40))
@@ -268,7 +268,14 @@ def test_large_materials_survive_importer_vertex_welding(tmp_path, example):
 
 
 def test_rear_keyholes_stay_in_puzzle_cell_bodies():
-    settings = Settings(width_mm=540, height_mm=540, layout="puzzle", hanging="keyholes", base_mm=5)
+    settings = Settings(
+        width_mm=540,
+        height_mm=540,
+        layout="puzzle",
+        hanging="keyholes",
+        base_mm=5,
+        split_mode="bed",
+    )
     project = build_project(sample_bytes(), settings)
     assert len(project.pieces) > 1
     for piece in project.pieces:
@@ -297,11 +304,16 @@ def test_padding_trims_empty_canvas_and_preserves_artwork_proportions():
 @pytest.mark.parametrize("profile", ["flat", "rounded"])
 def test_rounded_designs_preserve_closed_materials_and_piece_alignment(tmp_path, layout, profile):
     settings = Settings(
-        width_mm=120, height_mm=90, layout=layout,
+        width_mm=120,
+        height_mm=90,
+        layout=layout,
         columns=1 if layout == "plaque" else 2,
         rows=1 if layout == "plaque" else 2,
-        corner_radius_mm=12, frame_profile=profile,
-        base_mm=3, relief_mm=1.2, frame_height_mm=2.4,
+        corner_radius_mm=12,
+        frame_profile=profile,
+        base_mm=3,
+        relief_mm=1.2,
+        frame_height_mm=2.4,
     )
     project = build_project(sample_bytes(), settings)
     output = tmp_path / "rounded"
@@ -340,9 +352,15 @@ def test_rounded_border_has_curved_height_sections_and_retains_its_dimensions(ra
 
 @pytest.mark.parametrize("hanging", ["none", "loops", "keyholes"])
 def test_rounded_background_without_border_supports_optional_hanging(hanging):
-    project = build_project(sample_bytes(), Settings(
-        frame=False, corner_radius_mm=15, hanging=hanging, base_mm=5,
-    ))
+    project = build_project(
+        sample_bytes(),
+        Settings(
+            frame=False,
+            corner_radius_mm=15,
+            hanging=hanging,
+            base_mm=5,
+        ),
+    )
     piece = project.pieces[0]
     assert piece.base.is_volume and piece.combined.body_count == 1
     assert piece.combined.extents[2] == pytest.approx(5.8)
@@ -353,7 +371,13 @@ def test_corner_radius_must_fit_the_background():
     with pytest.raises(ValidationError, match="Corner radius"):
         Settings(width_mm=40, corner_radius_mm=25)
     with pytest.raises(ValueError, match="Layout disconnected"):
-        choose_layout(Settings(
-            width_mm=192, height_mm=192, corner_radius_mm=96,
-            layout="tiles", columns=8, rows=8,
-        ))
+        choose_layout(
+            Settings(
+                width_mm=192,
+                height_mm=192,
+                corner_radius_mm=96,
+                layout="tiles",
+                columns=8,
+                rows=8,
+            )
+        )
