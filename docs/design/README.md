@@ -204,3 +204,29 @@ combined solid, and one through-hole in the backing.
 centered-loop topology on rounded plaques/panels, narrow/wide border dimensions,
 padding/material alignment, and useful validation labels. Physical mounting
 strength and target-machine Bambu Studio import remain untested.
+
+## Empty image selection and automated regression coverage
+
+Image selection now offers Reset image selection, including directly in the
+error panel when no printable artwork remains. New imports reset foreground,
+threshold, inversion, and minimum-area filtering while retaining fabrication
+settings. This prevents a previous image's Light pixels selection from erasing
+a gold SVG at threshold 128. Automatic mode also normalizes faint opacity and
+low contrast, and ignores a viewport's antialiased fringe when deciding whether
+an SVG page is opaque. Tests preserve actual holes/islands instead of merely
+asserting that generation returned something.
+
+The browser suite records the [desktop recovery state](selection-recovery.png)
+and [mobile error state](selection-error-mobile.png) using the original synthetic
+gold-cutout fixture. These were inspected with view_image against the original
+concept: the existing error panel, helper typography, colors, spacing, and
+responsive behavior are retained. The recovery action fits both widths and
+exports stay disabled during an invalid selection. No material visual mismatch
+remains within this update's scope.
+
+The automated [regression suite](../testing.md) replaces the earlier manual-only
+browser checks as a required publication check. It drives real Python-backed
+desktop/mobile uploads, image-selection failure/recovery, numeric drafts,
+fabrication controls, puzzle exports, stale responses, and server failures.
+Optional private-source runs exercise user uploads without publishing them.
+The machine-readable reports and private run evidence belong in shared storage.

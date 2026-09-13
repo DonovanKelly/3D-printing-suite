@@ -78,7 +78,12 @@ versions. `web/package-lock.json` locks the frontend dependencies.
    and transparent holes regardless of fill color. For an opaque SVG, it uses
    contrast against the perimeter color. Photos use dark pixels by default.
    **Image selection** contains dark/light selection, threshold, inversion,
-   and trace detail when you need them.
+   and trace detail when you need them. New imports start with Automatic
+   selection, threshold 128, and inversion off; geometry and colors are kept.
+   Dark/light modes can intentionally select no pixels at some thresholds.
+   **Reset image selection** recovers from an empty selection without changing
+   your dimensions, border, or hanging settings. Automatic SVG selection also
+   normalizes faint opacity and low contrast.
 2. Under **Image & background**, set finished width/height, **Image thickness**
    (height above the backing), **Background thickness**, and **Padding** (the
    minimum space inside the border). **Trim empty image space** starts enabled;
@@ -220,11 +225,14 @@ including tabs and loops; your slicer still decides placement and toolpath fit.
 ## Development
 
 ```sh
-python -m pytest
-ruff check .
-npm --prefix web run build
+bash scripts/check.sh
 python -m build --wheel
 ```
+
+The complete [regression suite](docs/testing.md) includes real desktop/mobile
+browser flows and accepts private SVG inputs without committing them. Install
+Chromium once with `npm --prefix web exec -- playwright install chromium`.
+The Gitea workflow runs the same checks on pushes/PRs when a runner is configured.
 
 Read [architecture and extension decisions](docs/architecture.md) and
 [the design/visual verification record](docs/design/README.md). Source artwork

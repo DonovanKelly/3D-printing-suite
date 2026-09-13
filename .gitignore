@@ -12,6 +12,8 @@ src/relief_studio/static/
 web/*.tsbuildinfo
 output/
 .playwright-cli/
+web/test-results/
+web/playwright-report/
 .env
 .env.*
 !.env.example

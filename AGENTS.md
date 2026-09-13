@@ -19,8 +19,13 @@ a Bambu Lab P1S with AMS. Keep colors configurable.
   slicer limitations explicitly. Never send jobs to a printer automatically.
 - Keep image preparation independent of geometry. Optional cloud providers
   must be explicit; local import and export must work without an API key.
-- Use `python -m pytest`, `ruff check .`, and `npm --prefix web run build` for
-  relevant changes. Keep source module comments focused on purpose/invariants.
+- Run `bash scripts/check.sh` before publishing application changes. It includes
+  Python tests, Ruff, TypeScript checks, the production build, and real browser
+  regression tests. For documentation-only changes, use relevant narrow checks.
+- Preserve each reproduced user-reported failure in the regression suite. Test
+  both the failure boundary and recovery; do not weaken or skip a case to pass.
+  Private SVGs use `RELIEF_TEST_ARTWORK` and stay outside Git. See `docs/testing.md`.
+- Keep source module comments focused on purpose/invariants.
 
 ## Structure
 
