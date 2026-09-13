@@ -19,6 +19,7 @@ export default function App() {
   const { settings, preview, file, status, error, exporting, download } =
     project;
   const ready = status === "ready";
+  const singlePiece = preview?.manifest.piece_count === 1;
   const title = file ? file.name.replace(/\.[^.]+$/, "") : "Alpine study";
   return (
     <div className="app-shell">
@@ -35,14 +36,20 @@ export default function App() {
           <button
             className="primary-button"
             disabled={!ready || exporting}
-            onClick={project.exportPack}
+            onClick={() => project.exportPack(singlePiece ? "3mf" : "pack")}
           >
             {exporting ? (
               <LoaderCircle size={19} className="spin" />
             ) : (
               <Download size={19} />
             )}
-            <span>{exporting ? "Preparing pack…" : "Export print pack"}</span>
+            <span>
+              {exporting
+                ? "Preparing download…"
+                : singlePiece
+                  ? "Download 3MF"
+                  : "Export print pack"}
+            </span>
           </button>
         </div>
       </header>
@@ -137,6 +144,7 @@ export default function App() {
             busy={status === "building"}
             download={download}
             disabled={exporting}
+            exportPack={() => project.exportPack("pack")}
           />
         ) : (
           <aside />

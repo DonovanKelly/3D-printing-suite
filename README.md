@@ -8,7 +8,8 @@ CLI share the same geometry engine.
 Implemented: threshold/inversion, preserved negative-space holes, configurable
 dimensions and colors, raised borders, top hanging loops, rear keyhole recesses,
 automatic or manual tiling, adjustable puzzle clearance, orbitable 3D preview,
-assembly map, vector preview, and grouped 3MF/aligned STL export.
+assembly map, vector preview, rounded corners and border edges, and grouped
+3MF/aligned STL export. The web app is the primary interface.
 
 ## Run locally
 
@@ -70,6 +71,35 @@ then run `start`.
 `pip install -r requirements-dev.lock` then `pip install -e . --no-deps` for those
 versions. `web/package-lock.json` locks the frontend dependencies.
 
+## From SVG to two-color 3MF
+
+1. Upload your SVG. **Automatic** foreground selection uses its filled shapes
+   and transparent holes regardless of fill color. For an opaque SVG, it uses
+   contrast against the perimeter color. Photos use dark pixels by default.
+   **Image selection** contains dark/light selection, threshold, inversion,
+   and trace detail when you need them.
+2. Under **Image & background**, set finished width/height, **Image thickness**
+   (height above the backing), **Background thickness**, and **Padding** (the
+   minimum space inside the border). **Trim empty image space** starts enabled;
+   disable it to retain the source canvas margins. Aspect ratio is preserved,
+   so two sides may have extra space. Rounded corners can add more inset to
+   keep the complete artwork inside the backing.
+3. Choose the two **Filament colors**. Background and Image + border remain
+   separate aligned material parts in the 3MF.
+4. Optionally choose no border, a raised flat border, or a raised border with
+   rounded top edges. Width and height are independent; border height is above
+   the background. **Corner radius** rounds the outside corners of the design,
+   including its backing. Set it to 0 for square corners.
+5. Choose **None**, **Top loops**, or **Rear keyholes** for hanging. Rear
+   keyholes automatically raise backing thickness to 5 mm when necessary.
+   **Print format** chooses a single plaque, tiles, or a puzzle; a multi-piece
+   layout clips the same outside border across its panels.
+6. For one piece, click **Download 3MF**. For multiple pieces, **Export print
+   pack** downloads a ZIP containing a 3MF for each piece. **Download full
+   print pack** is always available and includes STLs, settings, and an
+   assembly map. Assign the named parts to your chosen AMS slots in Bambu
+   Studio; the file's display colors do not automatically select slots.
+
 ## Generate files without a browser
 
 ```sh
@@ -88,7 +118,7 @@ python scripts/build_starter_pack.py output/starter-collection
 Output directories must be new: existing files are never replaced. Use
 `--settings project.json` to reuse exported settings with the same source image.
 The browser retains only four recent previews in memory; it writes a persistent
-pack only when **Export print pack** is pressed. Restarting clears previews,
+pack only when a download/export button is pressed. Restarting clears previews,
 but exported folders remain under `output/projects` or the `--output-root`
 directory. User images are not copied into exported packs.
 

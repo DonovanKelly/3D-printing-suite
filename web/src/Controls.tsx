@@ -1,4 +1,4 @@
-/** Artwork, layout, and fabrication controls grouped in the editor's left inspector. */
+/** Keep extrusion, backing, and border controls visible; image cleanup and printer tuning are secondary. */
 import { useRef, useState } from "react";
 import {
   ChevronRight,
@@ -81,7 +81,7 @@ export function Controls({
               if (next) chooseFile(next);
             }}
           >
-            {file ? <ImageIcon size={31} /> : <Upload size={31} />}
+            {file ? <ImageIcon size={25} /> : <Upload size={25} />}
             <strong>{file ? file.name : "Drop an image or SVG"}</strong>
             <span>
               or <u>browse files</u>
@@ -105,45 +105,220 @@ export function Controls({
           >
             Use sample artwork
           </button>
-          <label className="threshold">
-            <span>Threshold</span>
-            <div>
+          <details className="print-settings image-settings">
+            <summary>
+              <ChevronRight size={18} /> Image selection
+            </summary>
+            <label className="field-row">
+              <span>Foreground</span>
+              <select
+                aria-label="Foreground"
+                value={s.foreground}
+                onChange={(event) =>
+                  update(
+                    "foreground",
+                    event.target.value as Settings["foreground"],
+                  )
+                }
+              >
+                <option value="auto">Automatic</option>
+                <option value="dark">Dark pixels</option>
+                <option value="light">Light pixels</option>
+              </select>
+            </label>
+            <p className="hint control-hint">
+              SVG shapes extrude automatically, including light-colored shapes
+              on transparency.
+            </p>
+            <label className="threshold">
+              <span>Threshold</span>
+              <div>
+                <input
+                  aria-label="Threshold"
+                  type="range"
+                  min="1"
+                  max="254"
+                  value={s.threshold}
+                  onChange={(event) => update("threshold", +event.target.value)}
+                />
+                <output>{s.threshold}</output>
+              </div>
+            </label>
+            <label className="field-row toggle-row">
+              <span>Invert artwork</span>
               <input
-                type="range"
-                min="1"
-                max="254"
-                value={s.threshold}
-                onChange={(event) => update("threshold", +event.target.value)}
+                type="checkbox"
+                role="switch"
+                checked={s.invert}
+                onChange={(event) => update("invert", event.target.checked)}
               />
-              <output>{s.threshold}</output>
-            </div>
-          </label>
-          <label className="field-row toggle-row">
-            <span>Invert artwork</span>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={s.invert}
-              onChange={(event) => update("invert", event.target.checked)}
-            />
-          </label>
-          <label className="field-row">
-            <span>Detail</span>
-            <select
-              value={s.detail}
-              onChange={(event) =>
-                update("detail", event.target.value as Settings["detail"])
-              }
-            >
-              <option value="draft">Draft</option>
-              <option value="balanced">Balanced</option>
-              <option value="fine">Fine</option>
-            </select>
-          </label>
+            </label>
+            <label className="field-row">
+              <span>Detail</span>
+              <select
+                aria-label="Detail"
+                value={s.detail}
+                onChange={(event) =>
+                  update("detail", event.target.value as Settings["detail"])
+                }
+              >
+                <option value="draft">Draft</option>
+                <option value="balanced">Balanced</option>
+                <option value="fine">Fine</option>
+              </select>
+            </label>
+          </details>
         </section>
         <section className="control-section">
           <h2>
-            <span>02</span> Format
+            <span>02</span> Image &amp; background
+          </h2>
+          <div className="size-fields">
+            <Numeric
+              label="Width (mm)"
+              value={s.width_mm}
+              min={30}
+              max={1500}
+              onChange={(value) => update("width_mm", value)}
+            />
+            <Numeric
+              label="Height (mm)"
+              value={s.height_mm}
+              min={30}
+              max={1500}
+              onChange={(value) => update("height_mm", value)}
+            />
+          </div>
+          <Numeric
+            label="Image thickness (mm)"
+            value={s.relief_mm}
+            min={0.4}
+            max={8}
+            step={0.2}
+            onChange={(value) => update("relief_mm", value)}
+          />
+          <Numeric
+            label="Background thickness (mm)"
+            value={s.base_mm}
+            min={s.hanging === "keyholes" ? 5 : 1.2}
+            max={12}
+            step={0.2}
+            onChange={(value) => update("base_mm", value)}
+          />
+          <Numeric
+            label="Padding (mm)"
+            value={s.margin_mm}
+            min={0}
+            max={30}
+            step={0.5}
+            onChange={(value) => update("margin_mm", value)}
+          />
+          <p className="hint control-hint">
+            Image thickness is the height above the background. Padding adds
+            space inside the border.
+          </p>
+          <label className="field-row toggle-row">
+            <span>Trim empty image space</span>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={s.crop_to_artwork}
+              onChange={(event) =>
+                update("crop_to_artwork", event.target.checked)
+              }
+            />
+          </label>
+          <p className="hint">
+            Your image keeps its proportions. Extra space may remain on two
+            sides.
+          </p>
+        </section>
+        <section className="control-section">
+          <h2>
+            <span>03</span> Border &amp; hanging
+          </h2>
+          <label className="field-row">
+            <span>Border</span>
+            <select
+              aria-label="Border"
+              value={s.frame ? s.frame_profile : "none"}
+              onChange={(event) => {
+                update("frame", event.target.value !== "none");
+                if (event.target.value !== "none")
+                  update(
+                    "frame_profile",
+                    event.target.value as Settings["frame_profile"],
+                  );
+              }}
+            >
+              <option value="none">No border</option>
+              <option value="flat">Raised · flat</option>
+              <option value="rounded">Raised · rounded</option>
+            </select>
+          </label>
+          {s.frame && (
+            <>
+              <Numeric
+                label="Border width (mm)"
+                value={s.frame_width_mm}
+                min={1}
+                max={30}
+                step={0.5}
+                onChange={(value) => update("frame_width_mm", value)}
+              />
+              <Numeric
+                label="Border height (mm)"
+                value={s.frame_height_mm}
+                min={0.4}
+                max={12}
+                step={0.2}
+                onChange={(value) => update("frame_height_mm", value)}
+              />
+              <p className="hint control-hint">
+                Border height is measured above the background. It shares the
+                image color.
+              </p>
+            </>
+          )}
+          <Numeric
+            label="Corner radius (mm)"
+            value={s.corner_radius_mm}
+            min={0}
+            max={Math.min(100, s.width_mm / 2, s.height_mm / 2)}
+            step={1}
+            onChange={(value) => update("corner_radius_mm", value)}
+          />
+          <p className="hint control-hint">
+            0 makes square corners. Rounded corners apply to the outside of the
+            whole design.
+          </p>
+          <label className="field-row">
+            <span>Hanging</span>
+            <select
+              aria-label="Hanging"
+              value={s.hanging}
+              onChange={(event) => {
+                const hanging = event.target.value as Settings["hanging"];
+                update("hanging", hanging);
+                if (hanging === "keyholes" && s.base_mm < 5)
+                  update("base_mm", 5);
+              }}
+            >
+              <option value="none">None</option>
+              <option value="loops">Top loops</option>
+              <option value="keyholes">Rear keyholes</option>
+            </select>
+          </label>
+          {s.hanging === "keyholes" && (
+            <p className="hint control-hint">
+              Recesses on the back for screw heads. Requires a background at
+              least 5 mm thick.
+            </p>
+          )}
+        </section>
+        <section className="control-section">
+          <h2>
+            <span>04</span> Print format
           </h2>
           <div
             className="format-options"
@@ -171,57 +346,12 @@ export function Controls({
               </button>
             ))}
           </div>
-          <p className="field-label">Size (mm)</p>
-          <div className="size-fields">
-            <Numeric
-              label="Width"
-              value={s.width_mm}
-              min={30}
-              max={1500}
-              onChange={(value) => update("width_mm", value)}
-            />
-            <Numeric
-              label="Height"
-              value={s.height_mm}
-              min={30}
-              max={1500}
-              onChange={(value) => update("height_mm", value)}
-            />
-          </div>
-          <label className="field-row">
-            <span>Frame</span>
-            <select
-              value={s.frame ? "raised" : "none"}
-              onChange={(event) =>
-                update("frame", event.target.value === "raised")
-              }
-            >
-              <option value="raised">Raised border</option>
-              <option value="none">No border</option>
-            </select>
-          </label>
-          <label className="field-row">
-            <span>Hanging</span>
-            <select
-              value={s.hanging}
-              onChange={(event) => {
-                const hanging = event.target.value as Settings["hanging"];
-                update("hanging", hanging);
-                if (hanging === "keyholes" && s.base_mm < 5)
-                  update("base_mm", 5);
-              }}
-            >
-              <option value="none">None</option>
-              <option value="loops">Top loops</option>
-              <option value="keyholes">Rear keyholes</option>
-            </select>
-          </label>
           {s.layout !== "plaque" && (
             <div className="layout-options">
               <label className="field-row">
                 <span>Split</span>
                 <select
-                  aria-label="Split mode"
+                  aria-label="Split"
                   value={s.columns ? "manual" : "auto"}
                   onChange={(event) => {
                     const n = event.target.value === "auto" ? 0 : 2;
@@ -264,73 +394,30 @@ export function Controls({
         </section>
         <details className="print-settings">
           <summary>
-            <ChevronRight size={18} /> Print settings
+            <ChevronRight size={18} /> Printer &amp; detail limits
           </summary>
           <div className="advanced-fields">
-            <Numeric
-              label="Backing (mm)"
-              value={s.base_mm}
-              min={1.2}
-              max={12}
-              step={0.2}
-              onChange={(v) => update("base_mm", v)}
-            />
-            <Numeric
-              label="Relief (mm)"
-              value={s.relief_mm}
-              min={0.4}
-              max={8}
-              step={0.2}
-              onChange={(v) => update("relief_mm", v)}
-            />
-            {s.frame && (
-              <>
-                <Numeric
-                  label="Border width (mm)"
-                  value={s.frame_width_mm}
-                  min={1}
-                  max={30}
-                  step={0.5}
-                  onChange={(v) => update("frame_width_mm", v)}
-                />
-                <Numeric
-                  label="Border rise (mm)"
-                  value={s.frame_height_mm}
-                  min={0.4}
-                  max={12}
-                  step={0.2}
-                  onChange={(v) => update("frame_height_mm", v)}
-                />
-              </>
-            )}
-            <Numeric
-              label="Art margin (mm)"
-              value={s.margin_mm}
-              min={0}
-              max={30}
-              onChange={(v) => update("margin_mm", v)}
-            />
             <Numeric
               label="Minimum area (mm²)"
               value={s.min_area_mm2}
               min={0}
               max={20}
               step={0.1}
-              onChange={(v) => update("min_area_mm2", v)}
+              onChange={(value) => update("min_area_mm2", value)}
             />
             <Numeric
               label="Usable bed width"
               value={s.bed_width_mm}
               min={60}
               max={256}
-              onChange={(v) => update("bed_width_mm", v)}
+              onChange={(value) => update("bed_width_mm", value)}
             />
             <Numeric
               label="Usable bed height"
               value={s.bed_height_mm}
               min={60}
               max={256}
-              onChange={(v) => update("bed_height_mm", v)}
+              onChange={(value) => update("bed_height_mm", value)}
             />
             <p className="hint">
               Bed values are in mm. Leave space for your brim, prime tower, and

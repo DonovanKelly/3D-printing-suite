@@ -7,8 +7,12 @@ export type Settings = {
   frame: boolean;
   frame_width_mm: number;
   frame_height_mm: number;
+  frame_profile: "flat" | "rounded";
+  corner_radius_mm: number;
   margin_mm: number;
+  crop_to_artwork: boolean;
   threshold: number;
+  foreground: "auto" | "dark" | "light";
   invert: boolean;
   detail: "draft" | "balanced" | "fine";
   min_area_mm2: number;

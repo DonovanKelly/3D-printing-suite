@@ -10,6 +10,7 @@ export function PrintPlan({
   busy,
   download,
   disabled,
+  exportPack,
 }: {
   preview: Preview | null;
   settings: Settings;
@@ -18,6 +19,7 @@ export function PrintPlan({
   busy: boolean;
   download: string;
   disabled: boolean;
+  exportPack: () => void;
 }) {
   const manifest = preview?.manifest;
   return (
@@ -45,12 +47,16 @@ export function PrintPlan({
             </dd>
           </div>
           <div>
-            <dt>Base</dt>
+            <dt>Background</dt>
             <dd>{manifest ? `${manifest.settings.base_mm} mm` : "—"}</dd>
           </div>
           <div>
-            <dt>Relief</dt>
+            <dt>Image thickness</dt>
             <dd>{manifest ? `${manifest.settings.relief_mm} mm` : "—"}</dd>
+          </div>
+          <div>
+            <dt>Padding</dt>
+            <dd>{manifest ? `${manifest.settings.margin_mm} mm` : "—"}</dd>
           </div>
         </dl>
         {manifest && manifest.piece_count > 1 && (
@@ -81,16 +87,27 @@ export function PrintPlan({
             value={settings.artwork_color}
             onChange={(event) => update("artwork_color", event.target.value)}
           />
-          <span>Artwork + frame</span>
+          <span>Image + border</span>
         </label>
         <p className="hint filament-hint">
           Assign these parts to your AMS slots in Bambu Studio.
         </p>
       </section>
       <div className="plan-bottom">
+        <p className="hint export-hint">
+          3MF keeps the image and background as separate, aligned color parts.
+        </p>
+        <button
+          className="secondary-button"
+          disabled={!ready || disabled}
+          onClick={exportPack}
+        >
+          <Download size={16} /> Download full print pack
+        </button>
         {download && (
           <a className="download-again" href={download} download>
-            <Download size={16} /> Download print pack again
+            <Download size={16} /> Download{" "}
+            {download.endsWith(".3mf") ? "3MF" : "print pack"} again
           </a>
         )}
         <div className={`fit-status ${ready ? "" : "pending"}`}>

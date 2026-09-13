@@ -107,7 +107,7 @@ export function useProject() {
     setDownload("");
   }
 
-  async function exportPack() {
+  async function exportPack(format: "3mf" | "pack" = "pack") {
     if (!preview || status !== "ready" || exporting) return;
     const version = source.current;
     setExporting(true);
@@ -118,11 +118,16 @@ export function useProject() {
       });
       if (!response.ok) throw new Error(await detail(response));
       const result = await response.json();
+      const url = format === "3mf" ? result.model_url : result.download_url;
+      if (!url)
+        throw new Error(
+          "This layout has multiple pieces. Download its print pack instead.",
+        );
       if (version === source.current) {
-        setDownload(result.download_url);
+        setDownload(url);
         const link = document.createElement("a");
-        link.href = result.download_url;
-        link.download = "print-pack.zip";
+        link.href = url;
+        link.download = format === "3mf" ? "relief.3mf" : "print-pack.zip";
         link.click();
       }
     } catch (error) {

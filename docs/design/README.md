@@ -89,3 +89,42 @@ available here. The Dockerfile change was inspected but the full Dev Container
 image was not rebuilt. The frontend build reports a large Three.js bundle;
 Python test dependencies emit two deprecation warnings. Neither prevents the
 checks or local operation.
+
+## SVG extrusion control update
+
+The user's follow-up makes SVG extrusion the primary task. Within the existing
+visual system, the inspector now puts Image thickness, Background thickness,
+and Padding ahead of optional finishing and partition controls. Conversion
+controls move into Image selection. Border & hanging exposes width, height,
+rounded top edges, outside corner radius, loops, and rear keyholes. Print
+format follows these controls. These requested label/order changes supersede
+the initial concept's inspector copy; header, canvas, palette, typography,
+three-column layout, and responsive structure are retained.
+
+The primary action is Download 3MF for a single piece; multi-piece layouts keep
+Export print pack. A secondary full-pack action remains available in the print
+plan. The print plan also shows the applied padding and uses Background/Image
+thickness labels matching the inspector. Long border options were shortened
+after screenshot inspection to fit their select control.
+
+Latest desktop and mobile screenshots above use the original repository sample
+and were checked with view_image against the original concept. Private uploaded
+artwork and its review screenshots remain in shared outputs, outside Git.
+Desktop 1536×1024, tablet 820×1180, and mobile 390×844 have no horizontal overflow.
+The image/background controls are visible in the initial desktop viewport;
+finishing controls remain accessible in the independently scrolling inspector.
+
+Browser verification used the actual uploaded transparent, gold-filled SVG:
+automatic extrusion, thickness/padding/color edits, a rounded frame, a plain
+backing, top loops, rear keyholes (automatically increasing backing to 5 mm),
+custom four-piece tiles/puzzles, and assembly view. Both single-piece 3MFs and
+full ZIP packs were downloaded through the UI and independently reloaded with
+Trimesh; named material colors and z ranges matched the selected settings.
+An oversized 400 mm plaque blocked export and recovered after correction.
+The only browser console error came from that intentionally invalid HTTP 422.
+
+62 Python tests, Ruff, and the TypeScript/Vite build pass. Tests cover transparent
+SVG fill colors, negative-space holes and islands, padding with/without source
+margins, rounded border surfaces, rounded tiled/puzzle geometry, optional
+mounting, bounded direct 3MF downloads, and material heights/colors. The physical
+printing and slicer-validation limits above still apply.

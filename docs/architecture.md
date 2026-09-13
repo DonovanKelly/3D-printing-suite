@@ -12,6 +12,11 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   binary mask, including nested holes. SVG input is normalized through the same
   trace so colors, strokes, and transforms work consistently. Analytic SVG
   curve preservation is a future improvement.
+- Automatic SVG selection uses opacity for transparent canvases and contrast
+  against the perimeter color for opaque canvases. Bright artwork is therefore
+  extruded without manually darkening it. Explicit dark/light pixel selection
+  remains available. Fitting trims empty margins by default and preserves the
+  image's proportions within the requested padding and border.
 - Shapely owns polygon topology, clipping, frames, and complementary puzzle
   edges. Manifold normalizes and extrudes contours; Trimesh validates and exports
   meshes. Manifold performs necessary solid unions
@@ -19,6 +24,13 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   and have positive volume.
   A 0.01 mm artwork inset separates point-only contacts. Validation also checks
   a vertex-welded copy, matching the normalization performed by common importers.
+  If a boolean collapses a seam triangle to coincident vertices, weld it and
+  remove only triangles with repeated vertex indices, then validate again.
+  Do not remove valid skinny triangles from mounting recesses.
+- A shared rounded rectangle outline clips all outside panel corners. Rounded
+  border tops loft matching corner samples through quarter-circle height
+  sections, then clip the closed border solid to the selected layout. Padding
+  accounts for the curved corners so fitting never clips the source artwork.
 - A base occupies z=0..base thickness. Artwork and border occupy separate
   non-overlapping volumes above it. Each tile is a grouped, two-material 3MF
   with preserved relative coordinates, plus aligned STL parts. A single merged
@@ -33,6 +45,8 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
 - Completed exports are self-contained, with settings, SVG, assembly map,
   geometry checks, and print instructions. CLI output uses a new directory;
   browser generation uses unique directories with failed work cleaned up.
+  Single-piece export also returns a direct 3MF URL. Piece downloads validate
+  both the export UUID and a bounded piece filename and serve only saved files.
 
 ## Scope and validation
 
@@ -53,7 +67,7 @@ on slicer bridging. The suite exports geometry, not sliced printer jobs.
    schema, cost confirmation, cancellation, and persistent local output. Do not
    assume every image model emits printable SVG. Stylize first, then trace.
 2. Analytic SVG import, manual cleanup, minimum-feature visualization.
-3. Frame profiles, connector-only wall panels, calibrated mounting hardware.
+3. Additional frame profiles, connector-only wall panels, calibrated mounting hardware.
 4. Project library and richer image generation variants.
 
 References: [Trimesh extrusion](https://trimesh.org/trimesh.creation.html),

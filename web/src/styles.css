@@ -226,15 +226,15 @@ h2 > span {
 }
 .upload-zone {
   width: 100%;
-  min-height: 139px;
+  min-height: 102px;
   border: 1px dashed #bfc5bd;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 11px;
-  padding: 16px 8px;
+  gap: 7px;
+  padding: 12px 8px;
   transition:
     background 0.15s,
     border 0.15s;
@@ -272,7 +272,35 @@ h2 > span {
 }
 .sample-button {
   display: block;
-  margin: 13px auto 25px;
+  margin: 11px auto 18px;
+}
+.control-hint {
+  margin: 10px 0 12px;
+}
+.image-settings .threshold {
+  margin-top: 14px;
+}
+.controls .size-fields .field-row {
+  flex-direction: column;
+  align-items: stretch;
+}
+.controls .size-fields input[type="number"] {
+  width: 100%;
+}
+.secondary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 11px 8px;
+  font-size: 12px;
+  margin: 12px 0 16px;
+}
+.secondary-button:hover:not(:disabled) {
+  background: var(--selected);
 }
 .threshold {
   display: block;
