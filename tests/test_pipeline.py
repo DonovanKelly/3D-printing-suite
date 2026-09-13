@@ -44,6 +44,44 @@ def test_nested_negative_space_and_island_are_preserved():
     assert not region.covers(Point(10, 10))
 
 
+@pytest.mark.parametrize("fill", ["#D4A62A", "#ffffff", "#000000"])
+def test_transparent_svg_extrudes_filled_shapes_regardless_of_color(fill):
+    data = (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        f'<path fill="{fill}" fill-rule="evenodd" '
+        'd="M10 10H90V90H10Z M30 30H70V70H30Z M45 45H55V55H45Z"/></svg>'
+    ).encode()
+    settings = Settings(width_mm=100, height_mm=100, frame=False, margin_mm=0)
+    project = build_project(data, settings)
+    assert project.vector.covers(Point(20, 50))
+    assert not project.vector.covers(Point(35, 50))
+    assert project.vector.covers(Point(50, 50))
+    assert not project.vector.covers(Point(5, 5))
+    assert project.pieces[0].artwork.is_volume
+    assert project.pieces[0].combined.body_count == 1
+
+
+@pytest.mark.parametrize("background", ["#ffffff", "#000000"])
+def test_opaque_svg_selects_artwork_against_its_background(background):
+    data = (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        f'<rect width="100" height="100" fill="{background}"/>'
+        '<circle cx="50" cy="50" r="20" fill="#D4A62A"/></svg>'
+    ).encode()
+    vector, _ = trace_image(data, Settings(frame=False, margin_mm=0))
+    assert vector.covers(Point(90, 90))
+    assert not vector.covers(Point(10, 10))
+
+
+def test_svg_brightness_selection_remains_available():
+    data = (
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        b'<circle cx="50" cy="50" r="20" fill="#D4A62A"/></svg>'
+    )
+    with pytest.raises(ValueError, match="No artwork"):
+        trace_image(data, Settings(foreground="dark"))
+
+
 def test_inversion_changes_foreground_and_transparency_composites_white():
     normal, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0))
     inverted, _ = trace_image(ring_image(), Settings(frame=False, margin_mm=0, invert=True))

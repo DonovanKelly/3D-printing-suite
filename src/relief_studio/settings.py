@@ -17,6 +17,7 @@ class Settings(BaseModel):
     frame_height_mm: float = Field(default=1.6, ge=0.4, le=12)
     margin_mm: float = Field(default=3, ge=0, le=30)
     threshold: int = Field(default=128, ge=1, le=254)
+    foreground: Literal["auto", "dark", "light"] = "auto"
     invert: bool = False
     detail: Literal["draft", "balanced", "fine"] = "balanced"
     min_area_mm2: float = Field(default=0.6, ge=0, le=20)

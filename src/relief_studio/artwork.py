@@ -1,7 +1,8 @@
 """Normalize local images to bounded binary contours, preserving nested holes.
 
-SVG is rasterized before tracing so filled paths, transforms, and strokes share
-the same conversion controls as photos. Resource fetching is denied at the
+SVG opacity selects transparent artwork independently of its fill color. Opaque
+SVGs use contrast against the perimeter color; photos use brightness controls.
+SVG is rasterized before tracing. Resource fetching is denied at the
 renderer boundary; uploaded SVG never gets embedded directly in the workbench.
 """
 
@@ -90,6 +91,15 @@ def load_image(data: bytes, settings: Settings) -> Image.Image:
                     raise ValueError("Image aspect ratio must be between 1:50 and 50:1.")
                 rgba = ImageOps.exif_transpose(source).convert("RGBA")
         rgba.thumbnail((settings.trace_resolution, settings.trace_resolution))
+        if is_svg and settings.foreground == "auto":
+            alpha = rgba.getchannel("A")
+            if alpha.getextrema()[0] < 255:
+                return ImageOps.invert(alpha)
+            rgb = np.asarray(rgba.convert("RGB"), dtype=np.int16)
+            edge = np.concatenate((rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]))
+            background_rgb = np.median(edge, axis=0)
+            contrast = np.max(np.abs(rgb - background_rgb), axis=2)
+            return Image.fromarray((255 - contrast).astype(np.uint8))
         background = Image.new("RGBA", rgba.size, "white")
         return Image.alpha_composite(background, rgba).convert("L")
     except ValueError:
@@ -103,6 +113,8 @@ def load_image(data: bytes, settings: Settings) -> Image.Image:
 def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
     gray = np.asarray(load_image(data, settings))
     mask = gray <= settings.threshold
+    if settings.foreground == "light":
+        mask = ~mask
     if settings.invert:
         mask = ~mask
     contours, hierarchy = cv2.findContours(
