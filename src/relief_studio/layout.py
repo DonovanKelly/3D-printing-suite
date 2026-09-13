@@ -11,8 +11,7 @@ from random import Random
 
 import numpy as np
 from shapely import Geometry
-from shapely.geometry import Point, Polygon, box
-from shapely.ops import unary_union
+from shapely.geometry import LineString, Point, Polygon, box
 
 from .profiles import outline
 from .settings import Settings
@@ -29,14 +28,19 @@ class Tile:
         return f"r{self.row + 1:02d}-c{self.column + 1:02d}"
 
 
-def add_loops(shape: Geometry, settings: Settings, left: float, right: float) -> Geometry:
-    top = settings.height_mm
-    rings = []
-    for x in (left + (right - left) * 0.25, left + (right - left) * 0.75):
-        outer = Point(x, top + 3).buffer(6, quad_segs=24)
-        hole = Point(x, top + 3).buffer(2.5, quad_segs=24)
-        rings.append(outer.difference(hole))
-    return unary_union([shape, *rings])
+def add_top_loop(shape: Geometry, settings: Settings, left: float, right: float) -> Geometry:
+    x = (left + right) / 2
+    section = shape.intersection(LineString([(x, -1), (x, settings.height_mm + 1)]))
+    if section.is_empty:
+        raise ValueError(
+            "No backing supports the top loop. Reduce corner radius or use larger pieces."
+        )
+    # Follow the actual upper edge of rounded panels so the loop has a solid
+    # neck. Cutting the hole last keeps its 5 mm opening clear on sloping edges.
+    top = section.bounds[3]
+    outer = Point(x, top + 3).buffer(6, quad_segs=24)
+    hole = Point(x, top + 3).buffer(2.5, quad_segs=24)
+    return shape.union(outer).difference(hole)
 
 
 def partition(settings: Settings, columns: int, rows: int) -> list[Tile]:
@@ -93,7 +97,7 @@ def partition(settings: Settings, columns: int, rows: int) -> list[Tile]:
                 shape = shape.difference(seam.buffer(settings.clearance_mm / 2))
             shape = shape.intersection(footprint)
             if settings.hanging == "loops" and r == rows - 1:
-                shape = add_loops(shape, settings, c * cw, (c + 1) * cw)
+                shape = add_top_loop(shape, settings, c * cw, (c + 1) * cw)
             if shape.is_empty or shape.geom_type != "Polygon" or not shape.is_valid:
                 raise ValueError(
                     "Layout disconnected a piece. Reduce clearance or use larger pieces."
