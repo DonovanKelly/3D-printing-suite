@@ -122,7 +122,9 @@ versions. `web/package-lock.json` locks the frontend dependencies.
 
 ## Make a contour-shaped icon
 
-1. Upload the image and choose **Image & background → Backing shape → Image contour**.
+1. Use the built-in Alpine crest or upload an image, then choose
+   **Image & background → Backing shape → Image contour**. The sample has a
+   closed curved outline, so it works even with no bezel and zero padding.
    The backing follows the outside of the selected artwork. Enclosed holes get
    background beneath them; the raised image keeps its cutouts and interior details.
 2. **Width / Height** limit the image itself in this mode, preserving its aspect

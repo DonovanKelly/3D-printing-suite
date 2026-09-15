@@ -17,6 +17,7 @@ from pydantic import ValidationError
 from shapely.geometry import Point, Polygon, box
 
 from relief_studio.artwork import load_image, polygons
+from relief_studio.cli import sample_bytes
 from relief_studio.exports import export_project, vector_svg
 from relief_studio.geometry import build_project
 from relief_studio.server import create_app
@@ -31,6 +32,32 @@ ISLANDS = (
 
 def config(**kwargs):
     return Settings(shape="contour", width_mm=120, height_mm=180, **kwargs)
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        {},
+        *(
+            {"frame": False, "margin_mm": 0, "detail": detail}
+            for detail in ["draft", "balanced", "fine"]
+        ),
+        {"frame_profile": "rounded", "hanging": "loops"},
+        {"frame_profile": "beaded", "hanging": "keyholes", "base_mm": 5},
+    ],
+)
+def test_builtin_sample_has_one_contour_with_or_without_bezel(options):
+    project = build_project(sample_bytes(), Settings(shape="contour", **options))
+    (piece,) = project.pieces
+    footprint = piece.tile.shape
+    assert footprint.area < box(*footprint.bounds).area * 0.85
+    assert footprint.buffer(1e-6).covers(project.vector)
+    assert any(p.interiors for p in polygons(project.vector))
+    assert piece.combined.is_volume and piece.combined.body_count == 1
+    assert piece.base.is_volume and piece.base.body_count == 1
+    assert piece.artwork.is_volume
+    assert piece.artwork.bounds[0, 2] == pytest.approx(project.settings.base_mm)
+    assert np.all(piece.combined.extents[:2] < 230)
 
 
 @pytest.mark.parametrize("profile", ["none", "flat", "rounded", "beaded"])

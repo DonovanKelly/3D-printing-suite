@@ -318,6 +318,67 @@ for (const [index, source] of privateSources.entries()) {
   });
 }
 
+test("built-in sample supports contour directly and recovers from disconnected artwork", async ({
+  page,
+}, info) => {
+  const initial: Preview = await rebuild(page, () =>
+    page
+      .getByRole("combobox", { name: "Backing shape", exact: true })
+      .selectOption("contour"),
+  );
+  expect(initial.manifest.piece_count).toBe(1);
+  await number(page, "Padding (mm)", 0);
+  const plain: Preview = await rebuild(page, () =>
+    page
+      .getByRole("combobox", { name: "Border", exact: true })
+      .selectOption("none"),
+  );
+  expect(plain.manifest.pieces[0].extents_mm[1]).toBeCloseTo(180, 1);
+  await rebuild(page, () =>
+    page
+      .getByRole("combobox", { name: "Border", exact: true })
+      .selectOption("rounded"),
+  );
+  await rebuild(page, () =>
+    page
+      .getByRole("combobox", { name: "Hanging", exact: true })
+      .selectOption("loops"),
+  );
+  await rebuild(
+    page,
+    () =>
+      page.getByLabel("Upload artwork", { exact: true }).setInputFiles({
+        name: "disconnected.svg",
+        mimeType: "image/svg+xml",
+        buffer: Buffer.from(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+            '<circle cx="15" cy="50" r="10"/><circle cx="85" cy="50" r="10"/></svg>',
+        ),
+      }),
+    422,
+  );
+  await expect(page.getByRole("alert")).toContainText("disconnected islands");
+  await expect(primary(page)).toBeDisabled();
+  const restored: Preview = await rebuild(page, () =>
+    page.getByRole("button", { name: "Use sample artwork", exact: true }).click(),
+  );
+  expect(restored.manifest.settings.shape).toBe("contour");
+  expect(restored.manifest.settings.frame_profile).toBe("rounded");
+  expect(restored.manifest.settings.hanging).toBe("loops");
+  expect(restored.manifest.pieces[0].material_parts).toBe(2);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await page.getByRole("button", { name: "View from top", exact: true }).click();
+  await page.screenshot({
+    path: info.outputPath("sample-contour-rounded.png"),
+    fullPage: true,
+  });
+  const download = page.waitForEvent("download");
+  await primary(page).click();
+  const path = info.outputPath("sample-contour.3mf");
+  await (await download).saveAs(path);
+  expect((await readFile(path)).subarray(0, 2).toString()).toBe("PK");
+});
+
 test("contour bezels expand the icon, keep one piece, and recover from bed overflow", async ({
   page,
 }, info) => {
