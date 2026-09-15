@@ -175,6 +175,13 @@ def test_colored_svg_controls_and_direct_two_material_3mf(client):
         assert len(root.findall(".//c:component", ns)) == 2
         colors = [e.attrib["displaycolor"] for e in root.findall(".//c:base", ns)]
         assert colors == ["#123456", "#D4A62A"]
+        config = json.loads(archive.read("Metadata/project_settings.config"))
+        assert config["filament_colour"] == colors
+        assert config["nozzle_diameter"] == ["0.4"]
+        model_config = ET.fromstring(archive.read("Metadata/model_settings.config"))
+        assert [
+            p.attrib["value"] for p in model_config.findall("object/part/metadata[@key='extruder']")
+        ] == ["1", "2"]
 
 
 def test_multi_piece_export_uses_pack_and_piece_downloads_are_bounded(client):

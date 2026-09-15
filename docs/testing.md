@@ -51,6 +51,16 @@ are ignored by Git. To inspect a trace:
 npm --prefix web exec -- playwright show-trace /absolute/path/to/trace.zip
 ```
 
+## Bambu Studio import
+
+Set `RELIEF_TEST_BAMBU` to an absolute Bambu Studio executable or extracted
+AppImage `AppRun` path to enable real import/save checks in the same suite.
+They exercise the original geometry-only failure and corrected two-filament
+projects, including per-part mesh integrity and placement after saving in Studio.
+Without this optional executable, package/configuration and independent mesh
+tests still run. See [3MF compatibility](3mf-compatibility.md) for the format
+contract and desktop verification procedure.
+
 ## Private source artwork
 
 The committed gold cutout fixture is original synthetic artwork. User uploads

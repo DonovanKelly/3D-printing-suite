@@ -96,13 +96,14 @@ export function PrintPlan({
           <span>Image + border</span>
         </label>
         <p className="hint filament-hint">
-          Assign these parts to your AMS slots in Bambu Studio.
+          Background uses filament 1; image + border uses filament 2. Map them
+          to your AMS trays in Bambu Studio.
         </p>
       </section>
       <div className="plan-bottom">
         <p className="hint export-hint">
           Each piece is a separate object with aligned background and image
-          parts. Open the plate 3MFs in Bambu Studio.
+          parts. Open the plate 3MFs as projects in Bambu Studio.
         </p>
         <button
           className="secondary-button"
