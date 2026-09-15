@@ -1,5 +1,6 @@
 /** Regress real upload/edit/recovery/export flows against Python, with isolated browser state. */
 import { test, expect, type Page } from "@playwright/test";
+import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { delimiter } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,6 +10,9 @@ const gold = fileURLToPath(
   new URL("../../tests/fixtures/gold-cutout.svg", import.meta.url),
 );
 const primary = (page: Page) => page.locator(".primary-button");
+const python = process.env.RELIEF_TEST_PYTHON || fileURLToPath(
+  new URL("../../.venv/bin/python", import.meta.url),
+);
 
 async function rebuild(
   page: Page,
@@ -116,6 +120,23 @@ test("empty selection offers reset and restores a downloadable two-color relief"
   const path = info.outputPath("recovered.3mf");
   await file.saveAs(path);
   expect((await readFile(path)).subarray(0, 2).toString()).toBe("PK");
+  const project = JSON.parse(execFileSync(python, ["-c", `
+import json, sys
+from zipfile import ZipFile
+from xml.etree import ElementTree as ET
+with ZipFile(sys.argv[1]) as archive:
+    config = json.loads(archive.read("Metadata/project_settings.config"))
+    parts = ET.fromstring(archive.read("Metadata/model_settings.config"))
+    config["part_filaments"] = [p.attrib["value"] for p in parts.findall(
+        "object/part/metadata[@key='extruder']")]
+    print(json.dumps(config))
+`, path], { encoding: "utf8" }));
+  expect(project.filament_colour).toEqual([
+    restored.manifest.settings.background_color.toUpperCase(),
+    restored.manifest.settings.artwork_color.toUpperCase(),
+  ]);
+  expect(project.nozzle_diameter).toEqual(["0.4"]);
+  expect(project.part_filaments).toEqual(["1", "2"]);
 });
 
 test("numeric drafts do not build until applied, cancel cleanly, and block invalid exports", async ({
