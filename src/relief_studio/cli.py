@@ -37,8 +37,13 @@ def main() -> None:
         "bed-width",
         "bed-height",
         "piece-size",
+        "margin",
+        "frame-width",
+        "frame-height",
     ):
         generate.add_argument(f"--{name}", type=float)
+    generate.add_argument("--shape", choices=["rectangle", "contour"])
+    generate.add_argument("--frame-profile", choices=["flat", "rounded", "beaded"])
     generate.add_argument("--layout", choices=["plaque", "tiles", "puzzle"])
     generate.add_argument("--split-mode", choices=["size", "bed"])
     generate.add_argument("--puzzle-style", choices=["random", "regular"])
@@ -79,12 +84,17 @@ def main() -> None:
             "bed_width",
             "bed_height",
             "piece_size",
+            "margin",
+            "frame_width",
+            "frame_height",
         ):
             value = getattr(arguments, name)
             if value is not None:
                 config[name + "_mm"] = value
         for name in (
             "layout",
+            "shape",
+            "frame_profile",
             "hanging",
             "columns",
             "rows",

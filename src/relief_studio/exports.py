@@ -35,9 +35,14 @@ def vector_svg(project: Project, assembly: bool = False, separated: bool = False
     settings = project.settings
     height = settings.height_mm + (10 if settings.hanging == "loops" else 0)
     width = settings.width_mm
+    min_x = min_y = 0
+    if settings.shape == "contour":
+        min_x, min_y, max_x, max_y = project.pieces[0].tile.shape.bounds
+        width, height = max_x - min_x, max_y - min_y
     placements, extent = separated_layout(project)
     if separated:
         width, height = extent
+        min_x = min_y = 0
     paths = []
     if assembly:
         for index, piece in enumerate(project.pieces):
@@ -56,10 +61,12 @@ def vector_svg(project: Project, assembly: bool = False, separated: bool = False
             )
             paths.append("</g>")
     else:
-        paths.append(f'<rect width="{width}" height="{settings.height_mm}" fill="white"/>')
+        paths.append(
+            f'<rect x="{min_x}" y="{min_y}" width="{width}" height="{height}" fill="white"/>'
+        )
         paths.append(f'<path d="{path_data(project.vector)}" fill="black"/>')
     labels = []
-    if assembly:
+    if assembly and (settings.shape != "contour" or len(project.pieces) > 1):
         font_size = min(width / project.columns, height / project.rows) * 0.06
         for index, piece in enumerate(project.pieces):
             x, y = piece.tile.shape.representative_point().coords[0]
@@ -80,7 +87,7 @@ def vector_svg(project: Project, assembly: bool = False, separated: bool = False
         f'viewBox="0 0 {width} {height}">'
         f'<rect width="{width}" height="{height}" fill="#f5f4f0"/>'
         f'<g fill-rule="evenodd" '
-        f'transform="translate(0 {height}) scale(1 -1)">{"".join(paths)}</g>'
+        f'transform="translate({-min_x} {height + min_y}) scale(1 -1)">{"".join(paths)}</g>'
         f"{''.join(labels)}</svg>"
     )
 
@@ -231,9 +238,18 @@ def project_manifest(project: Project) -> dict:
 
 def print_instructions(project: Project) -> str:
     settings = project.settings
+    dimensions = (
+        "Image contour, finished piece including hanging: "
+        + " × ".join(f"{v:.2f}" for v in project.pieces[0].combined.extents[:2])
+        + " mm. Image size limits: "
+        + f"{settings.width_mm:g} × {settings.height_mm:g} mm; bezel/padding expand outward."
+        if settings.shape == "contour"
+        else f"Finished plaque: {settings.width_mm:g} × {settings.height_mm:g} mm "
+        "(loops extend above this)."
+    )
     return f"""# Relief Studio print pack
 
-Finished plaque: {settings.width_mm:g} × {settings.height_mm:g} mm (loops extend above this).
+{dimensions}
 Layout: {project.columns} columns × {project.rows} rows, {len(project.pieces)} pieces.
 Backing: {settings.base_mm:g} mm. Raised art: {settings.relief_mm:g} mm.
 Clearance between internal edges: {settings.clearance_mm:g} mm.

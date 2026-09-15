@@ -24,6 +24,8 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   and have positive volume.
   A 0.01 mm artwork inset separates point-only contacts. Validation also checks
   a vertex-welded copy, matching the normalization performed by common importers.
+  Traced pixel contours use structural shell/hole repair: linework repair can
+  turn a touching hole into a filled exterior, flooding a detailed image.
   If a boolean collapses a seam triangle to coincident vertices, weld it and
   remove only triangles with repeated vertex indices, then validate again.
   Do not remove valid skinny triangles from mounting recesses.
@@ -31,6 +33,24 @@ pipeline. Python owns geometry; React and Three.js render actual output meshes.
   border tops loft matching corner samples through quarter-circle height
   sections, then clip the closed border solid to the selected layout. Padding
   accounts for the curved corners so fitting never clips the source artwork.
+- `shape=contour` fits the selected artwork into width/height image limits with
+  no rectangular inset. It always trims source-canvas margins. `contours.py`
+  fills exterior rings for the backing, preserving holes in the raised vector;
+  round planar offsets add padding and then bezel width outward. Disconnected
+  backings fail with a padding/shape recovery hint; no convex hull or largest-
+  island shortcut is used. Contours require `layout=plaque` at the settings
+  boundary, and actual expanded bounds (including mounting) must fit the bed.
+- Contour rounded rims use nested inward offsets in height bands of at most
+  0.1 mm, allowing topology changes at concave corners. The rectangular rounded
+  profile keeps its existing loft. Beaded rims place bounded sphere caps along
+  an offset contour and clip them to the rim prism; bead pitch grows if needed
+  to bound complexity. Border height above relief gives a recessed appearance.
+  Both profiles stay in the existing artwork material, touching only the base.
+- Contour rear mounting searches down the actual centerline for one supported
+  keyhole; rectangles retain paired keyholes. Top-loop anchors use actual shape
+  bounds. Decorative solids are clipped when a loop cuts into the original
+  footprint so the raised rim cannot refill the mounting hole. Preview framing,
+  2D output, print notes, and material exports use actual contour bounds.
 - Top hanging uses one loop centered on each top-row panel. A vertical section
   finds the panel's actual upper edge before adding its ring; attaching paired
   loops at the design's global top could disconnect them on large corner radii.

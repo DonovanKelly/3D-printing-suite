@@ -107,7 +107,12 @@ export default function App() {
             </span>
             <span>
               {preview
-                ? `${preview.manifest.settings.width_mm} × ${preview.manifest.settings.height_mm} mm`
+                ? preview.manifest.settings.shape === "contour"
+                  ? `${preview.manifest.pieces[0].extents_mm
+                      .slice(0, 2)
+                      .map((v) => v.toFixed(1))
+                      .join(" × ")} mm · finished`
+                  : `${preview.manifest.settings.width_mm} × ${preview.manifest.settings.height_mm} mm`
                 : ""}
             </span>
           </div>

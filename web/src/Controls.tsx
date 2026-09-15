@@ -26,6 +26,7 @@ export function Controls({
   resetImageSelection: () => void;
   disabled: boolean;
 }) {
+  const contour = s.shape === "contour";
   const input = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   return (
@@ -150,6 +151,32 @@ export function Controls({
           <p className="hint control-hint">
             Type a value, then press Enter or leave the field to apply.
           </p>
+          <label className="field-row">
+            <span>Backing shape</span>
+            <select
+              aria-label="Backing shape"
+              value={s.shape}
+              onChange={(event) => {
+                const shape = event.target.value as Settings["shape"];
+                update("shape", shape);
+                if (shape === "contour") {
+                  update("layout", "plaque");
+                  update("rows", 0);
+                  update("columns", 0);
+                }
+              }}
+            >
+              <option value="rectangle">Rectangle</option>
+              <option value="contour">Image contour</option>
+            </select>
+          </label>
+          {contour && (
+            <p className="hint control-hint">
+              Width and height limit the image, keeping its proportions. Padding
+              and the bezel grow outward without shrinking it. The preview shows
+              the finished size, including hanging.
+            </p>
+          )}
           <div className="size-fields">
             <Numeric
               label="Width (mm)"
@@ -194,21 +221,32 @@ export function Controls({
             Image thickness is the height above the background. Padding adds
             space inside the border.
           </p>
-          <label className="field-row toggle-row">
-            <span>Trim empty image space</span>
-            <input
-              type="checkbox"
-              role="switch"
-              checked={s.crop_to_artwork}
-              onChange={(event) =>
-                update("crop_to_artwork", event.target.checked)
-              }
-            />
-          </label>
-          <p className="hint">
-            Your image keeps its proportions. Extra space may remain on two
-            sides.
-          </p>
+          {!contour && (
+            <>
+              <label className="field-row toggle-row">
+                <span>Trim empty image space</span>
+                <input
+                  type="checkbox"
+                  role="switch"
+                  checked={s.crop_to_artwork}
+                  onChange={(event) =>
+                    update("crop_to_artwork", event.target.checked)
+                  }
+                />
+              </label>
+              <p className="hint">
+                Your image keeps its proportions. Extra space may remain on two
+                sides.
+              </p>
+            </>
+          )}
+          {contour && (
+            <p className="hint">
+              The backing fills enclosed holes; the raised image keeps its
+              cutouts. Separate islands need enough padding to join into one
+              piece.
+            </p>
+          )}
         </section>
         <section className="control-section">
           <h2>
@@ -231,6 +269,7 @@ export function Controls({
               <option value="none">No border</option>
               <option value="flat">Raised · flat</option>
               <option value="rounded">Raised · rounded</option>
+              <option value="beaded">Raised · beaded</option>
             </select>
           </label>
           <Numeric
@@ -260,22 +299,27 @@ export function Controls({
               />
               <p className="hint control-hint">
                 Border height is measured above the background. It shares the
-                image color.
+                image color. Set it higher than Image thickness for a recessed
+                look.
               </p>
             </>
           )}
-          <Numeric
-            label="Corner radius (mm)"
-            value={s.corner_radius_mm}
-            min={0}
-            max={Math.min(100, s.width_mm / 2, s.height_mm / 2)}
-            step={1}
-            onChange={(value) => update("corner_radius_mm", value)}
-          />
-          <p className="hint control-hint">
-            0 makes square corners. Rounded corners apply to the outside of the
-            whole design.
-          </p>
+          {!contour && (
+            <>
+              <Numeric
+                label="Corner radius (mm)"
+                value={s.corner_radius_mm}
+                min={0}
+                max={Math.min(100, s.width_mm / 2, s.height_mm / 2)}
+                step={1}
+                onChange={(value) => update("corner_radius_mm", value)}
+              />
+              <p className="hint control-hint">
+                0 makes square corners. Rounded corners apply to the outside of
+                the whole design.
+              </p>
+            </>
+          )}
           <label className="field-row">
             <span>Hanging</span>
             <select
@@ -302,8 +346,10 @@ export function Controls({
           )}
           {s.hanging === "keyholes" && (
             <p className="hint control-hint">
-              Recesses on the back for screw heads. Requires a background at
-              least 5 mm thick.
+              {contour
+                ? "One centered rear keyhole where the backing supports it."
+                : "Recesses on the back for screw heads."}{" "}
+              Requires a background at least 5 mm thick.
             </p>
           )}
         </section>
@@ -325,6 +371,7 @@ export function Controls({
             ).map(({ value, label, Icon }) => (
               <button
                 key={value}
+                disabled={contour && value !== "plaque"}
                 aria-pressed={s.layout === value}
                 onClick={() => {
                   update("layout", value);
@@ -337,6 +384,12 @@ export function Controls({
               </button>
             ))}
           </div>
+          {contour && (
+            <p className="hint">
+              Image contour prints as one piece. Choose Rectangle for tiles or
+              puzzles.
+            </p>
+          )}
           {s.layout !== "plaque" && (
             <div className="layout-options">
               <label className="field-row">

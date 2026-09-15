@@ -4,10 +4,11 @@ export type Settings = {
   height_mm: number;
   base_mm: number;
   relief_mm: number;
+  shape: "rectangle" | "contour";
   frame: boolean;
   frame_width_mm: number;
   frame_height_mm: number;
-  frame_profile: "flat" | "rounded";
+  frame_profile: "flat" | "rounded" | "beaded";
   corner_radius_mm: number;
   margin_mm: number;
   crop_to_artwork: boolean;

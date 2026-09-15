@@ -1,9 +1,11 @@
 """Cover SVG color/opacity/contrast and manual selection boundaries before extrusion."""
 
+import io
 from pathlib import Path
 
 import numpy as np
 import pytest
+from PIL import Image
 from shapely.geometry import Point
 
 from relief_studio.artwork import ImageSelectionError, load_image, trace_image
@@ -89,3 +91,26 @@ def test_truly_blank_svg_stays_an_explicit_error():
     svg = b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"/>'
     with pytest.raises(ImageSelectionError, match="visible shapes"):
         trace_image(svg, Settings())
+
+
+def test_touching_pixel_contours_keep_holes_instead_of_flooding_the_outline():
+    # An original synthetic ring with pixel contacts reproduces the same
+    # shell/hole repair failure as a detailed private SVG at Balanced detail.
+    mask = np.zeros((32, 32), dtype=np.uint8)
+    mask[1:31, 1:31] = 255
+    mask[2:30, 2:30] = 0
+    rng = np.random.default_rng(0)
+    for _ in range(60):
+        x, y = rng.integers(2, 30, 2)
+        mask[y : y + 2, x : x + 2] = 255
+    data = io.BytesIO()
+    Image.fromarray(255 - mask).save(data, format="PNG")
+    region, _ = trace_image(
+        data.getvalue(),
+        Settings(
+            shape="contour", width_mm=90, height_mm=90, min_area_mm2=0, frame=False, margin_mm=0
+        ),
+    )
+    scale = 90 / 29
+    assert region.area < np.count_nonzero(mask) * scale**2
+    assert region.area > 0

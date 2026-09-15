@@ -27,8 +27,9 @@ in `requirements-dev.lock`. The default interpreter is `.venv/bin/python`;
 
 | Layer | Failure cases covered |
 | --- | --- |
-| Image selection | Transparent SVG fills in black, white, gold, and gray; faint opacity; opaque low-contrast images; fractional viewport edges; nested holes and islands; threshold endpoints; dark/light selection and inversion; every trace detail. Blank input remains an explicit error. |
+| Image selection | Transparent SVG fills in black, white, gold, and gray; faint opacity; opaque low-contrast images; fractional viewport edges; nested holes and islands; threshold endpoints; dark/light selection and inversion; every trace detail. Touching pixel contours cannot flood negative space during repair. Blank input remains an explicit error. |
 | Fabrication | 54 combinations of plaque/tiles/puzzle, no/flat/rounded border, no/loop/keyhole mounting, portrait/landscape dimensions, border width/height, backing/relief thickness, padding, radius, and random seed. Closed positive volumes, connected backing, aligned materials, and bed bounds are checked. |
+| Contour icons | Synthetic concave icon with image holes; no/flat/rounded/beaded bezel and every mount; outward padding/width without image resizing; disconnected-island rejection and recovery; narrow rear mount rejection and recovery; bezel/loop bed overflow; single-piece validation; independent 3MF/STL reload and actual preview bounds. Optional private sources exercise each contour bezel. |
 | Partitions and exports | Default sample splitting, piece-size limits including tabs/loops, seed reproducibility, complementary seams, clearance, plate gaps, every piece exactly once, separate 3MF build objects, material transforms, independent 3MF/STL reloads, and bounded download paths. |
 | Local API | Invalid settings/uploads, unsupported SVG resources, local-origin boundaries, empty-selection recovery, successful exports after errors, and multiple-plate downloads. |
 | Real browser | Fresh imports reset incompatible selection without changing geometry; empty selections offer recovery; numeric drafts and cancellation; invalid-export blocking; borders/loops; tiles/puzzles/size/shuffle; actual 3MF/ZIP downloads; out-of-order responses; busy-worker retry; server-error recovery; preview modes; desktop/mobile overflow. |
@@ -63,8 +64,8 @@ Multiple paths may be separated with the platform's path separator (`:` on
 Linux/macOS). Optional private tests are skipped when no path is supplied; the
 public regression suite still runs in full. Private tests cover import after
 incompatible selection, extrusion, border changes, rounded hanging, inversion,
-detail, tiles, and puzzles. Reports and failure screenshots from these runs may
-contain private artwork; preserve them in shared storage, outside Git.
+detail, tiles, puzzles, and contour bezels with hanging. Reports and failure
+screenshots from these runs may contain private artwork; preserve them in shared storage, outside Git.
 
 ## Local regression policy
 

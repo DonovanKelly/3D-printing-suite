@@ -30,7 +30,7 @@ class Tile:
 
 def add_top_loop(shape: Geometry, settings: Settings, left: float, right: float) -> Geometry:
     x = (left + right) / 2
-    section = shape.intersection(LineString([(x, -1), (x, settings.height_mm + 1)]))
+    section = shape.intersection(LineString([(x, shape.bounds[1] - 1), (x, shape.bounds[3] + 1)]))
     if section.is_empty:
         raise ValueError(
             "No backing supports the top loop. Reduce corner radius or use larger pieces."
