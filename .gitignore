@@ -19,3 +19,5 @@ web/playwright-report/
 !.env.example
 *.log
 .DS_Store
+/target/
+/web/public/engine/
