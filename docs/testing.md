@@ -66,13 +66,11 @@ incompatible selection, extrusion, border changes, rounded hanging, inversion,
 detail, tiles, and puzzles. Reports and failure screenshots from these runs may
 contain private artwork; preserve them in shared storage, outside Git.
 
-## Continuous integration and regression policy
+## Local regression policy
 
-`.gitea/workflows/checks.yaml` runs the same command on pushes and pull requests
-using Python 3.12 and Node 22. Remote execution requires Repository Actions to
-be enabled and an `ubuntu-latest` runner to be available. Adding the workflow
-does not itself configure that server-side runner. Local pass results and a
-remote CI result must be reported separately.
+All verification runs locally with `bash scripts/check.sh`; this repository
+does not use hosted CI/CD workflows. Report the command and its result with
+each change.
 
 For a reported bug, reproduce it first, preserve a small synthetic regression
 fixture or use the optional private-input path, and add the failing interaction
@@ -84,5 +82,4 @@ fit, mounting strength, fine-feature printability, AMS slot assignment, or Bambu
 Studio behavior. A settings error that safely blocks an impossible print is
 expected; losing valid artwork or exporting a stale preview is a regression.
 
-References: [Playwright test-owned servers](https://playwright.dev/docs/test-webserver),
-[Gitea Actions setup](https://docs.gitea.com/usage/actions/quickstart/).
+Reference: [Playwright test-owned servers](https://playwright.dev/docs/test-webserver).

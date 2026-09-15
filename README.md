@@ -232,7 +232,8 @@ python -m build --wheel
 The complete [regression suite](docs/testing.md) includes real desktop/mobile
 browser flows and accepts private SVG inputs without committing them. Install
 Chromium once with `npm --prefix web exec -- playwright install chromium`.
-The Gitea workflow runs the same checks on pushes/PRs when a runner is configured.
+All verification runs locally through `bash scripts/check.sh`; this repository
+does not use hosted CI/CD workflows.
 
 Read [architecture and extension decisions](docs/architecture.md) and
 [the design/visual verification record](docs/design/README.md). Source artwork
