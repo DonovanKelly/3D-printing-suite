@@ -1,4 +1,4 @@
-/** Summarize the last valid geometry and expose material colors and fabrication notes. */
+/** Summarize validated geometry and map background, artwork, and border to filaments. */
 import { Check, Download, LoaderCircle, TriangleAlert } from "lucide-react";
 import type { Preview, Settings, Update } from "./types";
 import { fileStem } from "./workspace";
@@ -53,7 +53,7 @@ export function PrintPlan({
             <dt>Materials</dt>
             <dd>
               {manifest
-                ? Math.max(...manifest.pieces.map((p) => p.material_parts))
+                ? new Set(preview!.meshes.map((mesh) => mesh.material)).size
                 : "—"}
             </dd>
           </div>
@@ -87,7 +87,7 @@ export function PrintPlan({
             value={settings.background_color}
             onChange={(event) => update("background_color", event.target.value)}
           />
-          <span>Background</span>
+          <span>{settings.frame && settings.border_material === "background" ? "Background + border" : "Background"}</span>
           <small>{settings.background_color.toUpperCase()}</small>
         </label>
         <label className="color-row">
@@ -98,11 +98,32 @@ export function PrintPlan({
             value={settings.artwork_color}
             onChange={(event) => update("artwork_color", event.target.value)}
           />
-          <span>Image + border</span>
+          <span>{settings.frame && settings.border_material === "artwork" ? "Image + border" : "Image"}</span>
         </label>
+        <label className="field-row border-material-field">
+          <span>Border color</span>
+          <select aria-label="Border material" value={settings.border_material}
+            disabled={disabled || !settings.frame}
+            onChange={(event) => update("border_material", event.target.value as Settings["border_material"])}>
+            <option value="artwork">Same as image</option>
+            <option value="background">Same as background</option>
+            <option value="custom">Third color</option>
+          </select>
+        </label>
+        {settings.border_material === "custom" && (
+          <label className="color-row">
+            <input aria-label="Border color" type="color" value={settings.border_color}
+              disabled={disabled || !settings.frame}
+              onChange={(event) => update("border_color", event.target.value)} />
+            <span>Border · filament 3</span>
+          </label>
+        )}
         <p className="hint filament-hint">
-          Background uses filament 1; image + border uses filament 2. Map them
-          to your AMS trays in Bambu Studio.
+          Background uses filament 1; image uses filament 2.
+          {settings.frame
+            ? ` Border uses filament ${settings.border_material === "background" ? 1 : settings.border_material === "custom" ? 3 : 2}.`
+            : " Add a border to use its color."}
+          {" "}Map these to your AMS trays in Bambu Studio.
         </p>
       </section>
       <div className="plan-bottom">

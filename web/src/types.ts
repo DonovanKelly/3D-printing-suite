@@ -30,6 +30,8 @@ export type Settings = {
   hanging: "none" | "loops" | "keyholes";
   background_color: string;
   artwork_color: string;
+  border_material: "artwork" | "background" | "custom";
+  border_color: string;
 };
 export type Piece = {
   id: string;
@@ -63,7 +65,7 @@ export type Preview = {
   separated_svg: string;
   meshes: {
     piece: string;
-    material: string;
+    material: "background" | "artwork" | "border";
     origin: number[];
     vertices: number[];
     faces: number[];

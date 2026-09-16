@@ -1,6 +1,6 @@
 # Relief Studio · 3D Printing Suite
 
-Turn a local image into two-color printable wall art. Upload PNG, JPEG, WebP,
+Turn a local image into two- or three-color printable wall art. Upload PNG, JPEG, WebP,
 or a self-contained SVG, tune its black-and-white conversion, then make a raised
 plaque, large tiled panels, or an interlocking puzzle. A browser workbench and
 native Rust CLI share the same geometry engine.
@@ -96,7 +96,7 @@ Run `setup` once if development dependencies are missing.
 frontend, and Python reference dependencies. The full verification command is
 `bash scripts/check.sh`; see [testing](docs/testing.md).
 
-## From SVG to two-color 3MF
+## From SVG to a multicolor 3MF
 
 1. Upload your SVG. **Automatic** foreground selection uses its filled shapes
    and transparent holes regardless of fill color. For an opaque SVG, it uses
@@ -117,8 +117,12 @@ frontend, and Python reference dependencies. The full verification command is
    or when you leave the field; Escape cancels. Clearing a field temporarily
    is allowed, and leaving it empty restores its previous value. Downloads
    wait until the edit is applied and the new preview is ready.
-3. Choose the two **Filament colors**. Background and Image + border remain
-   separate aligned material parts in the 3MF.
+3. Choose **Filament colors** for the background and image. **Border color**
+   can be **Same as image** (the default), **Same as background**, or **Third
+   color**, which reveals a separate color picker. Linked borders follow changes
+   to the selected image/background color. The choice works for every border
+   profile and is saved with the workspace. Removing the border keeps the choice
+   for later, but exports no extra border material.
 4. Optionally choose no border, a raised flat border, or a raised border with
    rounded top edges. **Border width** stays visible: 0 removes the border,
    and 0.5–30 mm adds or adjusts its rim. Width and height are independent;
@@ -137,8 +141,9 @@ frontend, and Python reference dependencies. The full verification command is
    **Download N plates (ZIP)** contains a 3MF for each arranged plate, plus each
    individual piece. **Download full print pack** is always available and
    includes STLs, settings, and an assembly map. Open the 3MF as a project in
-   Bambu Studio: Background uses filament 1 and Artwork + frame uses filament 2.
-   Map those filaments to your actual AMS trays before printing.
+   Bambu Studio: Background uses filament 1, artwork uses filament 2, and an
+   independent border uses filament 3. A linked border joins its chosen material.
+   Map those logical filaments to your actual AMS trays before printing.
 
 ## Save and reopen your workspace
 
@@ -213,7 +218,7 @@ gaps; **Relief** and **Assembly** show how the finished artwork fits together.
 
 The print plan reports both pieces and plates. Plate exports place pieces with
 a 3 mm gap between their bounding boxes. Every piece is a separate 3MF object,
-with aligned background/artwork parts inside it. Open `plates/plate-01.3mf` from
+with aligned background/artwork parts and an optional third-color border inside it. Open `plates/plate-01.3mf` from
 the pack to see its pieces together on a plate. An individual file under
 `pieces/` intentionally contains only that one piece. `pieces.svg` labels the
 separated set; `assembly.svg` labels their final positions.
@@ -249,23 +254,25 @@ portable review `index.html` and ZIP; it is separate from the interactive app.
 ## Print with Bambu Studio and AMS
 
 Every pack includes arranged **plate 3MFs** and a grouped **3MF** for each piece,
-plus **background.stl**, **artwork.stl** when present, and a boolean-unioned
-**combined.stl** per piece. The pack also includes traced SVG, separated and
+plus **background.stl**, **artwork.stl** and **border.stl** when present, and a
+boolean-unioned **combined.stl** per piece. A border matching an existing material
+is included in that material's STL; an independent border gets its own STL. The pack also includes traced SVG, separated and
 assembly maps, project settings, a manifest, and `PRINTING.md`.
 
 1. **Open a plate's 3MF as a project** in Bambu Studio. The project starts with
-   P1S / 0.4 mm nozzle / 0.20 mm Standard and two Generic PLA filaments in your
-   chosen colors: **Background = filament 1**, **Artwork + frame = filament 2**.
-   Check the printer, nozzle and material profiles, then map the two filaments
-   to your actual AMS trays. Keep each named `rNN-cNN` puzzle piece as a separate
+   P1S / 0.4 mm nozzle / 0.20 mm Standard and Generic PLA filaments in your
+   chosen colors: **Background = filament 1**, **Artwork = filament 2**, and
+   **independent border = filament 3** when present. A linked border shares its
+   chosen background/artwork filament. Check the printer, nozzle and material
+   profiles, then map the logical filaments to your actual AMS trays. Keep each named `rNN-cNN` puzzle piece as a separate
    object. Open additional plate files separately; the app also offers individual
    plate links after export. Geometry-only import discards project settings.
    See [3MF compatibility](docs/3mf-compatibility.md) for the format and checks.
-2. If your slicer loses the grouping, import its background and artwork STLs
-   **together as one object with multiple parts**. Keep their coordinates;
-   moving the artwork to the bed independently destroys the height alignment.
-3. Or use combined.stl with a filament change at the first layer above the base.
-   Defaults use a 2.4 mm base and 0.8 mm raised art, compatible with 0.2 mm layers.
+2. If your slicer loses the grouping, import its background, artwork, and optional
+   border STLs **together as one object with multiple parts**. Keep their coordinates;
+   moving raised parts to the bed independently destroys their height alignment.
+3. `combined.stl` is a single-material fallback without color assignments. Use
+   the grouped parts for independent colors that occupy the same print layers.
 4. Slice and inspect the build plate, fine details, color assignments, brims,
    and prime tower. Print the small fit pairs before a large assembly.
 

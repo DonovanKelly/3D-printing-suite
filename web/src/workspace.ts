@@ -1,6 +1,7 @@
 /** Portable workspace documents embed source bytes, never meshes or local paths.
  * Validate the complete envelope before replacing an open project. Geometry
- * constraints stay in Rust so even an unfinished design can be saved and repaired. */
+ * constraints stay in Rust so even an unfinished design can be saved and repaired.
+ * Version 1 documents migrate missing border settings to the original artwork material. */
 import sample from "../../src/relief_studio/assets/alpine.svg?raw";
 import type { Settings, View } from "./types";
 
@@ -22,6 +23,7 @@ const choices: Partial<Record<keyof Settings, readonly string[]>> = {
   split_mode: ["size", "bed"],
   puzzle_style: ["random", "regular"],
   hanging: ["none", "loops", "keyholes"],
+  border_material: ["artwork", "background", "custom"],
 };
 const views: readonly string[] = ["relief", "pieces", "assembly", "vector"];
 
@@ -52,7 +54,8 @@ function metadata(value: unknown, defaults: Settings) {
   const settings = record(data.settings);
   const validated = { ...defaults };
   for (const key of Object.keys(defaults) as (keyof Settings)[]) {
-    const value = settings[key];
+    const legacyBorder = data.version === 1 && (key === "border_material" || key === "border_color");
+    const value = legacyBorder && settings[key] === undefined ? defaults[key] : settings[key];
     if (typeof value !== typeof defaults[key] ||
       (typeof value === "number" && !Number.isFinite(value)) ||
       (choices[key] && !choices[key]!.includes(value as string)) ||
@@ -71,7 +74,7 @@ export async function serializeWorkspace(workspace: Workspace) {
     binary += String.fromCharCode(...bytes.subarray(offset, offset + 32768));
   return JSON.stringify({
     format: "3d-printing-suite-workspace",
-    version: 1,
+    version: 2,
     name: projectName(workspace.name),
     settings: workspace.settings,
     view: workspace.view,
@@ -87,7 +90,7 @@ export async function parseWorkspace(file: File, defaults: Settings): Promise<Wo
   const data = record(value);
   if (data.format !== "3d-printing-suite-workspace")
     throw Error("This is not a workspace file. Use Upload artwork for images.");
-  if (data.version !== 1)
+  if (data.version !== 1 && data.version !== 2)
     throw Error("This workspace version is not supported. Open it in the app version that saved it.");
   const project = metadata(data, defaults);
   const artwork = record(data.artwork);
@@ -106,7 +109,7 @@ export async function parseWorkspace(file: File, defaults: Settings): Promise<Wo
 
 export function validateRecovery(value: unknown, defaults: Settings): Workspace {
   const data = record(value);
-  if (data.version !== 1) throw Error("Unsupported browser workspace version.");
+  if (data.version !== 1 && data.version !== 2) throw Error("Unsupported browser workspace version.");
   const project = metadata(data, defaults);
   if (data.file !== null && (!(data.file instanceof File) || data.file.size > MAX_ARTWORK_BYTES))
     throw Error("The browser's saved artwork could not be read.");

@@ -765,6 +765,13 @@ h2 > span {
   margin-top: 35px;
   max-width: 280px;
 }
+.border-material-field {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.border-material-field select { width: 100%; }
 .grid-summary {
   margin-top: 10px;
 }

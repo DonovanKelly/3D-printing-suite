@@ -37,6 +37,6 @@ export async function readRecovery(defaults: Settings) {
 
 export async function writeRecovery(workspace: Workspace | null) {
   await transaction("readwrite", (store) => workspace
-    ? store.put({ ...workspace, name: workspace.name.trim() || "Untitled project", version: 1 }, "last")
+    ? store.put({ ...workspace, name: workspace.name.trim() || "Untitled project", version: 2 }, "last")
     : store.delete("last"));
 }

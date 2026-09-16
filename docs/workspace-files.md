@@ -49,11 +49,16 @@ meshes, and old print download links are not stored.
 
 ## Format and validation
 
-Version 1 is UTF-8 JSON with format `3d-printing-suite-workspace`, `version: 1`,
+Version 2 is UTF-8 JSON with format `3d-printing-suite-workspace`, `version: 2`,
 `name`, `settings`, `view`, and `artwork`. Artwork stores `name`, `type`, and
 `base64` source bytes, with no filesystem paths or external image references.
 The reader bounds the document to 17 MiB and decoded artwork to 12 MiB, validates
 required setting types/enums/colors and metadata, and rejects unknown versions.
+Version 1 files and browser recovery records remain readable: missing border
+settings migrate to `border_material: "artwork"` and the default third-color
+swatch. Version 2 saves `border_material` and `border_color` and requires both.
+The version increase prevents older app builds from silently losing an independent
+border material when reopening a newer document.
 Rust remains responsible for image decoding, resource limits, geometry settings
 constraints, and printability checks. Invalid image bytes or impossible geometry
 produce the normal editable preview error after opening.

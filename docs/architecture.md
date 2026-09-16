@@ -36,11 +36,14 @@ behavioral reference; see [its architecture](architecture-v1.md).
 - `geometry.rs` / `solids.rs`: Manifold cross-sections, extrusion, booleans,
   rectangle border lofts, contour height bands, decorative beads, rear mounting,
   and triangle validation after conversion to STL's float32 representation.
+  A border joins the artwork or background material, or becomes a third aligned
+  part. Any shared volume belongs to the border before materials are separated;
+  their union and the finished bounds are independent of the material choice.
   Closed opposite edges, finite coordinates, and positive volume are required.
 - `packing.rs`: stable shelf packing with 3 mm gaps, aligned material placement,
   and P1S front-left exclusion-zone checks.
 - `exports.rs`: preview DTOs, maps, PNG, source hashes, manifests, aligned STL,
-  Bambu two-filament 3MF projects, and ZIP packs produced in memory.
+  Bambu two/three-filament 3MF projects, and ZIP packs produced in memory.
 - `wasm.rs`: owned-buffer ABI. JavaScript copies results before the next call;
   Rust frees project/kernel resources automatically. Export bytes transfer back
   to the UI without an additional worker-to-main-thread copy.

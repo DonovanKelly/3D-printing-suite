@@ -1,5 +1,5 @@
 /*! In-memory preview DTOs and reproducible ZIP/STL/3MF packs. Core component groups
-and Bambu project metadata assign two logical filaments through one physical nozzle.
+and Bambu project metadata assign two or three logical filaments through one nozzle.
 All material parts keep identical local origins; source images are never exported. */
 use crate::{
     EngineError, Result,
@@ -24,12 +24,35 @@ pub fn manifest(p: &Project) -> Result<Value> {
         let [dx, dy] = packing::bambu_offset(p, plate)?;
         plate_data.push(json!({"id":format!("plate-{:02}",i+1),"file":format!("plates/plate-{:02}.3mf",i+1),"pieces":plate.iter().map(|q|json!({"id":p.pieces[q.piece].tile.name(),"origin_mm":[q.x+dx,q.y+dy,0.0]})).collect::<Vec<_>>() }));
     }
-    Ok(
-        json!({"schema_version":1,"generator":"relief-studio/0.2.0","units":"mm","settings":p.settings,"source_sha256":p.source_hash,"grid":{"columns":p.columns,"rows":p.rows},"piece_count":p.pieces.len(),"plate_count":plates.len(),"separated_extents_mm":extents,"plates":plate_data,"warnings":p.warnings,"physically_tested":false,
-        "pieces":p.pieces.iter().enumerate().map(|(i,q)|{let name=q.tile.name();let mut files=json!({"3mf":format!("pieces/{name}/{name}.3mf"),"combined":format!("pieces/{name}/combined.stl"),"background":format!("pieces/{name}/background.stl")});if q.artwork.is_some() {files["artwork"]=json!(format!("pieces/{name}/artwork.stl"));}
-        json!({"id":name,"row":q.tile.row+1,"column":q.tile.column+1,"assembly_origin_mm":q.origin,"separated_origin_mm":[separated[i].x,separated[i].y,0.0],"extents_mm":q.extents,"volume_mm3":q.combined.volume(),"watertight":true,"material_parts":if q.artwork.is_some(){2}else{1},"files":files})}).collect::<Vec<_>>() }),
-    )
+    let pieces = p.pieces.iter().enumerate().map(|(i, piece)| {
+        let name = piece.tile.name();
+        let mut files = json!({
+            "3mf": format!("pieces/{name}/{name}.3mf"),
+            "combined": format!("pieces/{name}/combined.stl"),
+            "background": format!("pieces/{name}/background.stl"),
+        });
+        for (material, mesh) in [("artwork", &piece.artwork), ("border", &piece.border)] {
+            if mesh.is_some() { files[material] = json!(format!("pieces/{name}/{material}.stl")); }
+        }
+        json!({
+            "id": name, "row": piece.tile.row + 1, "column": piece.tile.column + 1,
+            "assembly_origin_mm": piece.origin,
+            "separated_origin_mm": [separated[i].x, separated[i].y, 0.0],
+            "extents_mm": piece.extents, "volume_mm3": piece.combined.volume(), "watertight": true,
+            "material_parts": 1 + usize::from(piece.artwork.is_some()) + usize::from(piece.border.is_some()),
+            "files": files,
+        })
+    }).collect::<Vec<_>>();
+    Ok(json!({
+        "schema_version": 1, "generator": "relief-studio/0.2.0", "units": "mm",
+        "settings": p.settings, "source_sha256": p.source_hash,
+        "grid": { "columns": p.columns, "rows": p.rows },
+        "piece_count": pieces.len(), "plate_count": plates.len(),
+        "separated_extents_mm": extents, "plates": plate_data,
+        "warnings": p.warnings, "physically_tested": false, "pieces": pieces,
+    }))
 }
+
 fn path(shape: &CrossSection) -> String {
     let mut s = String::new();
     for ring in shape.to_polygons() {
@@ -87,11 +110,13 @@ pub fn svg(p: &Project, assembly: bool, separated: bool) -> String {
             };
             let _ = write!(
                 paths,
-                "<g transform=\"translate({dx:.5} {dy:.5})\"><path d=\"{}\" fill=\"{}\" stroke=\"#8e958e\" stroke-width=\"0.3\"/><path d=\"{}\" fill=\"{}\"/><path d=\"{}\" fill=\"none\" stroke=\"#859184\" stroke-width=\"0.25\"/></g>",
+                "<g transform=\"translate({dx:.5} {dy:.5})\"><path d=\"{}\" fill=\"{}\" stroke=\"#8e958e\" stroke-width=\"0.3\"/><path d=\"{}\" fill=\"{}\"/><path d=\"{}\" fill=\"{}\"/><path d=\"{}\" fill=\"none\" stroke=\"#859184\" stroke-width=\"0.25\"/></g>",
                 path(&piece.tile.shape),
                 s.background_color,
-                path(&p.raised.intersection(&piece.tile.shape)),
+                path(&p.vector.intersection(&piece.tile.shape)),
                 s.artwork_color,
+                path(&p.border.intersection(&piece.tile.shape)),
+                s.resolved_border_color(),
                 path(&piece.tile.shape)
             );
             if s.shape != Shape::Contour || p.pieces.len() > 1 {
@@ -131,6 +156,7 @@ pub fn preview(p: &Project, id: &str) -> Result<Value> {
         for (name, mesh) in [
             ("background", Some(&piece.base)),
             ("artwork", piece.artwork.as_ref()),
+            ("border", piece.border.as_ref()),
         ] {
             if let Some(mesh) = mesh {
                 meshes.push(json!({"piece":piece.tile.name(),"material":name,"origin":piece.origin,"vertices":mesh.vertices,"faces":mesh.faces}));
@@ -141,11 +167,55 @@ pub fn preview(p: &Project, id: &str) -> Result<Value> {
         json!({"id":id,"manifest":manifest(p)?,"vector_svg":svg(p,false,false),"assembly_svg":svg(p,true,false),"separated_svg":svg(p,true,true),"meshes":meshes}),
     )
 }
+fn filaments(p: &Project) -> Vec<(&str, &str)> {
+    let s = &p.settings;
+    let mut materials = vec![
+        (
+            if s.frame && s.border_material == BorderMaterial::Background {
+                "Background + border"
+            } else {
+                "Background"
+            },
+            s.background_color.as_str(),
+        ),
+        (
+            if s.frame && s.border_material == BorderMaterial::Artwork {
+                "Artwork + frame"
+            } else {
+                "Artwork"
+            },
+            s.artwork_color.as_str(),
+        ),
+    ];
+    if p.pieces.iter().any(|piece| piece.border.is_some()) {
+        materials.push(("Border", &s.border_color));
+    }
+    materials
+}
 pub fn bambu_settings(p: &Project) -> Value {
     let printer = "Bambu Lab P1S 0.4 nozzle";
     let process = "0.20mm Standard @BBL X1C";
     let filament = "Generic PLA";
-    json!({"name":"project_settings","from":"project","version":"2.0.0.0","printer_technology":"FFF","printer_model":"Bambu Lab P1S","printer_variant":"0.4","printer_settings_id":printer,"print_settings_id":process,"filament_settings_id":[filament,filament],"inherits_group":[process,filament,filament,printer],"different_settings_to_system":["","filament_colour","filament_colour",""],"nozzle_diameter":["0.4"],"filament_diameter":["1.75","1.75"],"filament_type":["PLA","PLA"],"filament_is_support":["0","0"],"filament_soluble":["0","0"],"filament_colour":[p.settings.background_color.to_uppercase(),p.settings.artwork_color.to_uppercase()],"filament_ids":["GFL99","GFL99"],"printable_area":["0x0","256x0","256x256","0x256"],"printable_height":"256"})
+    let materials = filaments(p);
+    let count = materials.len();
+    let mut inherits = vec![process];
+    inherits.extend(vec![filament; count]);
+    inherits.push(printer);
+    let mut differences = vec![""];
+    differences.extend(vec!["filament_colour"; count]);
+    differences.push("");
+    json!({
+        "name":"project_settings", "from":"project", "version":"2.0.0.0",
+        "printer_technology":"FFF", "printer_model":"Bambu Lab P1S", "printer_variant":"0.4",
+        "printer_settings_id":printer, "print_settings_id":process,
+        "filament_settings_id":vec![filament; count], "inherits_group":inherits,
+        "different_settings_to_system":differences, "nozzle_diameter":["0.4"],
+        "filament_diameter":vec!["1.75"; count], "filament_type":vec!["PLA"; count],
+        "filament_is_support":vec!["0"; count], "filament_soluble":vec!["0"; count],
+        "filament_colour":materials.iter().map(|(_,color)|color.to_uppercase()).collect::<Vec<_>>(),
+        "filament_ids":vec!["GFL99"; count],
+        "printable_area":["0x0","256x0","256x256","0x256"], "printable_height":"256",
+    })
 }
 fn zip(entries: Vec<(String, Vec<u8>)>) -> Result<Vec<u8>> {
     let mut archive = ZipWriter::new(Cursor::new(Vec::new()));
@@ -165,32 +235,39 @@ fn zip(entries: Vec<(String, Vec<u8>)>) -> Result<Vec<u8>> {
 }
 pub fn three_mf(p: &Project, places: &[Placement]) -> Result<Vec<u8>> {
     let [dx, dy] = packing::bambu_offset(p, places)?;
-    let mut resources = format!(
-        "<basematerials id=\"1\"><base name=\"Background\" displaycolor=\"{}\"/><base name=\"Artwork + frame\" displaycolor=\"{}\"/></basematerials>",
-        p.settings.background_color.to_uppercase(),
-        p.settings.artwork_color.to_uppercase()
-    );
+    let materials = filaments(p);
+    let mut resources = String::from("<basematerials id=\"1\">");
+    for (label, color) in &materials {
+        let _ = write!(
+            resources,
+            "<base name=\"{label}\" displaycolor=\"{}\"/>",
+            color.to_uppercase()
+        );
+    }
+    resources.push_str("</basematerials>");
     let mut build = String::new();
     let mut config = String::from("<config>");
     let mut plate = String::from("<plate><metadata key=\"plater_id\" value=\"1\"/>");
     for (i, place) in places.iter().enumerate() {
         let piece = &p.pieces[place.piece];
         let name = piece.tile.name();
-        let group = i * 3 + 4;
+        let group = i * 4 + 5;
         let _ = write!(
             config,
             "<object id=\"{group}\"><metadata key=\"name\" value=\"{name}\"/><metadata key=\"extruder\" value=\"1\"/>"
         );
         let mut components = String::new();
-        for (material, (label, mesh)) in [
-            ("Background", Some(&piece.base)),
-            ("Artwork + frame", piece.artwork.as_ref()),
+        for (material, mesh) in [
+            Some(&piece.base),
+            piece.artwork.as_ref(),
+            piece.border.as_ref(),
         ]
         .into_iter()
         .enumerate()
         {
             if let Some(mesh) = mesh {
-                let id = i * 3 + material + 2;
+                let id = i * 4 + material + 2;
+                let label = materials[material].0;
                 let _ = write!(
                     resources,
                     "<object id=\"{id}\" type=\"model\" name=\"{label}\" pid=\"1\" pindex=\"{material}\"><mesh><vertices>"
@@ -268,7 +345,16 @@ pub fn instructions(p: &Project) -> String {
         p.settings.base_mm,
         p.settings.relief_mm,
         p.settings.clearance_mm,
-        include_str!("../assets/PRINTING.md"),
+        format_args!(
+            "Logical filaments: {}.\n\n{}",
+            filaments(p)
+                .iter()
+                .enumerate()
+                .map(|(i, (label, color))| format!("{} = {label} ({color})", i + 1))
+                .collect::<Vec<_>>()
+                .join("; "),
+            include_str!("../assets/PRINTING.md")
+        ),
         p.warnings
             .iter()
             .map(|s| format!("- {s}"))
@@ -325,6 +411,9 @@ pub fn export(p: &Project) -> Result<Export> {
         entries.push((format!("{folder}/combined.stl"), piece.combined.stl()));
         if let Some(art) = &piece.artwork {
             entries.push((format!("{folder}/artwork.stl"), art.stl()));
+        }
+        if let Some(border) = &piece.border {
+            entries.push((format!("{folder}/border.stl"), border.stl()));
         }
     }
     Ok(Export {
