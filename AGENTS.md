@@ -20,7 +20,8 @@ a Bambu Lab P1S with AMS. Keep colors configurable.
 - Keep image preparation independent of geometry. Optional cloud providers
   must be explicit; local import and export must work without an API key.
 - Run `bash scripts/check.sh` before publishing application changes. It includes
-  Python tests, Ruff, TypeScript checks, the production build, and real browser
+  Rust tests/Clippy, Python reference and export tests, Ruff, TypeScript checks,
+  the production Wasm build, and real browser
   regression tests. For documentation-only changes, use relevant narrow checks.
 - Preserve each reproduced user-reported failure in the regression suite. Test
   both the failure boundary and recovery; do not weaken or skip a case to pass.
@@ -29,11 +30,12 @@ a Bambu Lab P1S with AMS. Keep colors configurable.
 
 ## Structure
 
-- `src/relief_studio`: image preparation, geometry, exports, CLI, and local API.
+- `crates/relief-core`: shared Rust image, geometry, exports, native CLI, and Wasm engine.
+- `src/relief_studio`: frozen Python reference pipeline, legacy CLI, and local API.
 - `web`: React/TypeScript workbench and live geometry preview.
 - `examples`: original sample artwork and reproducible project settings.
 - `docs`: design, usage, print workflow, and follow-up decisions.
 
-The browser and CLI share the same Python geometry pipeline. Keep printer and
+The browser worker and native CLI share the same Rust geometry pipeline. Keep printer and
 project settings validated at that boundary. Generated packs belong outside
 Git; source artwork deliberately included as examples belongs in Git.

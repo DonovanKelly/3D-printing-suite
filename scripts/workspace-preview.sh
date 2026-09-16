@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Supervise this checkout's local preview and rebuild its frontend on source edits.
-# Keep process state outside Git and print exports in the shared workspace folder.
+# Keep process state outside Git; print exports download directly in the browser.
 set -euo pipefail
 umask 077
 
@@ -10,11 +10,6 @@ repo_key="$(printf '%s' "$repo_root" | sha256sum | cut -c1-10)"
 state_dir="$HOME/.local/state/relief-preview-$repo_key"
 config="$state_dir/supervisor.conf"
 port="${RELIEF_PREVIEW_PORT:-8000}"
-public_origin="${RELIEF_PUBLIC_ORIGIN:-https://$(id -un).local}"
-output_root="${RELIEF_OUTPUT_ROOT:-$repo_root/output/projects}"
-if [[ -z "${RELIEF_OUTPUT_ROOT:-}" && -d /shared && -w /shared ]]; then
-  output_root=/shared/relief-studio/projects
-fi
 
 cd "$repo_root"
 install -d -m 700 "$state_dir"
@@ -41,7 +36,7 @@ stop() {
 }
 
 start() {
-  [[ -x .venv/bin/supervisord && -x .venv/bin/relief && -f src/relief_studio/static/index.html ]] || {
+  [[ -x .venv/bin/supervisord && -f web/dist/index.html && -f web/dist/engine/relief_web.wasm ]] || {
     printf 'Run bash scripts/workspace-preview.sh setup first.\n' >&2
     return 1
   }
@@ -67,7 +62,8 @@ serverurl=unix://$state_dir/control.sock
 
 [program:relief]
 directory=$repo_root
-command="$repo_root/.venv/bin/relief" serve --host 0.0.0.0 --port $port --output-root "$output_root" --public-origin "$public_origin"
+command=node "$repo_root/scripts/serve.mjs" $port
+environment=RELIEF_PREVIEW_HOST="0.0.0.0"
 autostart=true
 autorestart=true
 startsecs=2
@@ -80,7 +76,7 @@ stdout_logfile_backups=2
 
 [program:frontend]
 directory=$repo_root/web
-command=npm run build -- --watch
+command=npm run build:web -- --watch
 autostart=true
 autorestart=true
 startsecs=2
@@ -98,8 +94,8 @@ EOF
   fi
   for _ in {1..30}; do
     if control status | awk '$2 != "RUNNING" { bad=1 } END { exit bad }' &&
-       curl --fail --silent --max-time 2 "http://127.0.0.1:$port/api/health" >/dev/null; then
-      printf 'Preview ready on port %s; exports: %s\n' "$port" "$output_root"
+       curl --fail --silent --max-time 2 "http://127.0.0.1:$port/" >/dev/null; then
+      printf 'Static workbench ready on port %s; exports download in the browser.\n' "$port"
       return
     fi
     sleep 1
@@ -114,6 +110,7 @@ case "${1:-start}" in
     python3 -m venv .venv
     .venv/bin/pip install -r requirements-dev.lock
     .venv/bin/pip install -e . --no-deps
+    bash scripts/setup-toolchain.sh
     npm --prefix web ci
     npm --prefix web run build
     ;;

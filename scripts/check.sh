@@ -10,6 +10,12 @@ if [[ ! -x "$relief_python" ]]; then
   exit 1
 fi
 export RELIEF_TEST_PYTHON="$relief_python"
+if ! command -v cargo >/dev/null && [[ -f "$HOME/.cargo/env" ]]; then source "$HOME/.cargo/env"; fi
+export PATH="$repo_root/.venv/bin:$PATH"
+cargo fmt --all --check
+cargo clippy --all-targets -- -D warnings
+cargo test --locked --release
+cargo build --locked --release --bin relief-native
 mkdir -p output/verification
 "$relief_python" -m ruff check .
 "$relief_python" -m pytest --junitxml=output/verification/python.xml

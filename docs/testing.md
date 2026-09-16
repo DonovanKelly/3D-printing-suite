@@ -6,12 +6,14 @@ Run the complete suite from the repository:
 bash scripts/check.sh
 ```
 
-It runs Ruff, all Python tests, TypeScript checks for browser tests, the production
-frontend build, and Playwright tests in real Chromium at desktop and mobile
+It runs Rust formatting/Clippy/native tests, Ruff, all Python reference and Rust
+export-comparison tests, TypeScript checks, the production Wasm/frontend build,
+and Playwright tests in real Chromium at desktop and mobile
 sizes. A failed check returns a nonzero exit status. Tests do not retry failures
 into a pass. The suite does not contact a printer or an image-generation service.
 
-Install the normal development dependencies first. Install the browser once:
+Install the build toolchains with `bash scripts/setup-toolchain.sh` and the
+Python reference dependencies first. Install the browser once:
 
 ```sh
 npm --prefix web ci
@@ -32,13 +34,12 @@ in `requirements-dev.lock`. The default interpreter is `.venv/bin/python`;
 | Contour icons | Built-in Alpine crest with zero padding/no bezel at every detail, decorative bezels and mounts, direct browser selection and sample-button recovery after disconnected artwork. Synthetic concave icon with image holes; no/flat/rounded/beaded bezel and every mount; outward padding/width without image resizing; disconnected-island rejection and recovery; narrow rear mount rejection and recovery; bezel/loop bed overflow; single-piece validation; independent 3MF/STL reload and actual preview bounds. Optional private sources exercise each contour bezel. |
 | Partitions and exports | Default sample splitting, piece-size limits including tabs/loops, seed reproducibility, complementary seams, clearance, plate gaps, every piece exactly once, separate 3MF build objects, material transforms, independent 3MF/STL reloads, and bounded download paths. |
 | Local API | Invalid settings/uploads, unsupported SVG resources, local-origin boundaries, empty-selection recovery, successful exports after errors, and multiple-plate downloads. |
-| Real browser | Fresh imports reset incompatible selection without changing geometry; empty selections offer recovery; numeric drafts and cancellation; invalid-export blocking; borders/loops; tiles/puzzles/size/shuffle; actual 3MF/ZIP downloads; out-of-order responses; busy-worker retry; server-error recovery; preview modes; desktop/mobile overflow. |
+| Real browser | Fresh imports reset incompatible selection without changing geometry; empty selections offer recovery; numeric drafts and cancellation; invalid-export blocking; borders/loops; tiles/puzzles/size/shuffle; actual 3MF/ZIP downloads; out-of-order responses; serialized-worker queue; worker-error recovery; offline reload/import/download; 64-piece overflow/recovery; preview modes; desktop/mobile overflow. |
 
-The browser suite starts its own local Python server on port 8011 and uses a
-temporary export directory. It refuses to reuse an existing server, so it cannot
+The browser suite starts its own Node static server on port 8011. It has no
+geometry/upload/export endpoints; downloads are browser Blob bytes. It refuses to reuse an existing server, so it cannot
 attach to a user's live workbench. Set `RELIEF_TEST_PORT` if that port is occupied.
-Each test gets a fresh browser context; one worker matches the local API's
-serialized geometry queue. The compiled frontend must exist when running only
+Each test gets a fresh browser context and its own serialized Wasm worker. The compiled frontend must exist when running only
 `npm --prefix web run test:e2e`; the full script builds it automatically.
 
 Reports are written to `output/verification/python.xml` and
@@ -50,6 +51,16 @@ are ignored by Git. To inspect a trace:
 ```sh
 npm --prefix web exec -- playwright show-trace /absolute/path/to/trace.zip
 ```
+
+## Rust compatibility reference
+
+`tests/fixtures/reference-v1.json` freezes 33 cases from Python commit `9d79cce`.
+`tests/test_rust_engine.py` compares native results and independently reopens all
+STLs and 3MFs. It requires `cargo build --release --bin relief-native` first;
+`check.sh` performs this automatically. Reference regeneration is explicit:
+`.venv/bin/python scripts/reference_corpus.py`. Do not regenerate it to hide a
+port regression. Native tests in `crates/relief-core/tests` exercise additional
+selection, resource, mounting, and seam invariants.
 
 ## Bambu Studio import
 

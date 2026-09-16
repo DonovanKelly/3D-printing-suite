@@ -2,28 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Preview, Settings, Update } from "./types";
 
-class ServiceError extends Error {
-  constructor(
-    message: string,
-    readonly code = "",
-  ) {
-    super(message);
-  }
-}
-
-async function failure(response: Response): Promise<ServiceError> {
-  try {
-    const data = await response.json();
-    return new ServiceError(
-      typeof data.detail === "string"
-        ? data.detail
-        : "Check the project settings.",
-      typeof data.code === "string" ? data.code : "",
-    );
-  } catch {
-    return new ServiceError(`The local service returned ${response.status}.`);
-  }
-}
+import { WorkerEngine, EngineError } from "./engine";
 
 export function useProject() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -36,21 +15,34 @@ export function useProject() {
   const [errorCode, setErrorCode] = useState("");
   const [exporting, setExporting] = useState(false);
   const [download, setDownload] = useState("");
+  const [downloadName, setDownloadName] = useState("print-pack.zip");
   const [plateDownloads, setPlateDownloads] = useState<string[]>([]);
   const [revision, setRevision] = useState(0);
   const source = useRef(0);
+  const engine = useRef<WorkerEngine | null>(null);
+  const urls = useRef<string[]>([]);
+  const clearDownloads = useCallback(() => {
+    urls.current.forEach((url) => URL.revokeObjectURL(url));
+    urls.current = [];
+    setDownload("");
+    setPlateDownloads([]);
+  }, []);
+
+  useEffect(() => {
+    const worker = new WorkerEngine();
+    engine.current = worker;
+    return () => { worker.dispose(); clearDownloads(); };
+  }, [clearDownloads]);
 
   useEffect(() => {
     if (settings) return;
-    fetch("/api/defaults")
-      .then(async (response) => {
-        if (!response.ok) throw await failure(response);
-        setSettings(await response.json());
-      })
+    let canceled = false;
+    engine.current!.defaults()
+      .then((next) => { if (!canceled) setSettings(next); })
       .catch((error) => {
-        setError(error.message);
-        setStatus("error");
+        if (!canceled) { setError(error.message); setStatus("error"); }
       });
+    return () => { canceled = true; };
   }, [revision]);
 
   useEffect(() => {
@@ -59,28 +51,10 @@ export function useProject() {
     setStatus("building");
     setError("");
     setErrorCode("");
-    setDownload("");
-    setPlateDownloads([]);
+    clearDownloads();
     const timer = window.setTimeout(async () => {
-      const form = new FormData();
-      form.set("settings", JSON.stringify(settings));
-      if (file) form.set("image", file);
       try {
-        let response: Response;
-        // A superseded request may still be finishing in the local geometry worker.
-        // Wait for that bounded worker instead of racing two model generations.
-        do {
-          response = await fetch("/api/preview", {
-            method: "POST",
-            body: form,
-          });
-          if (canceled) return;
-          if (response.status === 409)
-            await new Promise((resolve) => setTimeout(resolve, 500));
-        } while (response.status === 409 && !canceled);
-        if (canceled) return;
-        if (!response.ok) throw await failure(response);
-        const next: Preview = await response.json();
+        const next = await engine.current!.build(settings, file);
         if (!canceled) {
           setPreview(next);
           setStatus("ready");
@@ -90,10 +64,10 @@ export function useProject() {
           setError(
             error instanceof Error
               ? error.message
-              : "The local service is unavailable.",
+              : "The browser geometry engine is unavailable.",
           );
           setStatus("error");
-          setErrorCode(error instanceof ServiceError ? error.code : "");
+          setErrorCode(error instanceof EngineError ? error.code : "");
         }
       }
     }, 550);
@@ -106,8 +80,7 @@ export function useProject() {
   const update: Update = useCallback((key, value) => {
     source.current += 1;
     setStatus("building");
-    setDownload("");
-    setPlateDownloads([]);
+    clearDownloads();
     setSettings((current) =>
       current ? { ...current, [key]: value } : current,
     );
@@ -118,8 +91,7 @@ export function useProject() {
     setStatus("building");
     setError("");
     setErrorCode("");
-    setDownload("");
-    setPlateDownloads([]);
+    clearDownloads();
     setSettings((current) =>
       current
         ? {
@@ -152,19 +124,22 @@ export function useProject() {
     setExporting(true);
     setError("");
     try {
-      const response = await fetch(`/api/export/${preview.id}`, {
-        method: "POST",
-      });
-      if (!response.ok) throw await failure(response);
-      const result = await response.json();
-      const url = format === "3mf" ? result.model_url : result.download_url;
-      if (!url)
-        throw new Error(
-          "This layout needs multiple plates. Download its print pack instead.",
-        );
+      const result = await engine.current!.export(preview.id);
+      if (version !== source.current) return;
+      clearDownloads();
+      const [pack, ...plates] = result.files;
+      const blobUrl = (data: ArrayBuffer, type: string) => {
+        const url = URL.createObjectURL(new Blob([data], { type }));
+        urls.current.push(url);
+        return url;
+      };
+      const packUrl = blobUrl(pack, "application/zip");
+      const plateUrls = plates.map((data) => blobUrl(data, "model/3mf"));
+      const url = format === "3mf" ? plateUrls[0] : packUrl;
       if (version === source.current) {
         setDownload(url);
-        setPlateDownloads(result.plate_urls ?? []);
+        setDownloadName(format === "3mf" ? "relief.3mf" : "print-pack.zip");
+        setPlateDownloads(plateUrls);
         const link = document.createElement("a");
         link.href = url;
         link.download = format === "3mf" ? "relief.3mf" : "print-pack.zip";
@@ -186,6 +161,7 @@ export function useProject() {
     errorCode,
     exporting,
     download,
+    downloadName,
     plateDownloads,
     update,
     chooseFile,

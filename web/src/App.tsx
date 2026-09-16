@@ -172,6 +172,7 @@ export default function App() {
             ready={ready}
             busy={status === "building"}
             download={editing ? "" : download}
+            downloadName={project.downloadName}
             plateDownloads={editing ? [] : project.plateDownloads}
             disabled={exporting}
             exportPack={() => project.exportPack("pack")}
@@ -182,7 +183,7 @@ export default function App() {
       </main>
       <footer className="status-bar">
         <span>
-          <i /> Local processing
+          <i /> Runs in your browser
         </span>
         <span>Millimeters</span>
       </footer>

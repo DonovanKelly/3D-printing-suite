@@ -9,6 +9,7 @@ export function PrintPlan({
   ready,
   busy,
   download,
+  downloadName,
   plateDownloads,
   disabled,
   exportPack,
@@ -19,6 +20,7 @@ export function PrintPlan({
   ready: boolean;
   busy: boolean;
   download: string;
+  downloadName: string;
   plateDownloads: string[];
   disabled: boolean;
   exportPack: () => void;
@@ -113,14 +115,14 @@ export function PrintPlan({
           <Download size={16} /> Download full print pack
         </button>
         {download && (
-          <a className="download-again" href={download} download>
+          <a className="download-again" href={download} download={downloadName}>
             <Download size={16} /> Download{" "}
-            {download.endsWith(".3mf") ? "3MF" : "print pack"} again
+            {downloadName.endsWith(".3mf") ? "3MF" : "print pack"} again
           </a>
         )}
         {plateDownloads.length > 1 &&
           plateDownloads.map((url, i) => (
-            <a key={url} className="download-again" href={url} download>
+            <a key={url} className="download-again" href={url} download={`plate-${String(i + 1).padStart(2, "0")}.3mf`}>
               <Download size={16} /> Plate {i + 1} ·{" "}
               {manifest?.plates[i]?.pieces.length} pieces
             </a>

@@ -1,10 +1,11 @@
-/** Regress real upload/edit/recovery/export flows against Python, with isolated browser state. */
+/** Regress real upload/edit/recovery/export flows against the static Rust/Wasm engine, with isolated browser state. */
 import { test, expect, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { delimiter } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Preview } from "../src/types";
+import { observeWorker, nextBuild } from "./worker-harness";
 
 const gold = fileURLToPath(
   new URL("../../tests/fixtures/gold-cutout.svg", import.meta.url),
@@ -19,11 +20,7 @@ async function rebuild(
   action: () => Promise<unknown>,
   status = 200,
 ) {
-  const response = page.waitForResponse(
-    (r) => r.url().endsWith("/api/preview") && r.status() === status,
-  );
-  await action();
-  const body = await (await response).json();
+  const body = await nextBuild(page, action, status);
   if (status === 200) await expect(primary(page)).toBeEnabled();
   else await expect(page.getByRole("alert")).toBeVisible();
   return body;
@@ -53,6 +50,7 @@ async function upload(page: Page, path = gold): Promise<Preview> {
 }
 
 test.beforeEach(async ({ page }) => {
+  await observeWorker(page);
   await page.goto("/");
   await expect(primary(page)).toBeEnabled();
 });
@@ -142,10 +140,7 @@ with ZipFile(sys.argv[1]) as archive:
 test("numeric drafts do not build until applied, cancel cleanly, and block invalid exports", async ({
   page,
 }) => {
-  let requests = 0;
-  page.on("request", (r) => {
-    if (r.url().endsWith("/api/preview")) requests += 1;
-  });
+  const requests = await page.evaluate(() => window.engineTest.requests.length);
   const width = page.getByRole("spinbutton", {
     name: "Width (mm)",
     exact: true,
@@ -154,7 +149,7 @@ test("numeric drafts do not build until applied, cancel cleanly, and block inval
   await expect(width).toHaveValue("");
   await width.fill("1");
   await page.waitForTimeout(800);
-  expect(requests).toBe(0);
+  expect(await page.evaluate(() => window.engineTest.requests.length)).toBe(requests);
   await expect(primary(page)).toBeDisabled();
   await width.press("Escape");
   await expect(width).toHaveValue("180");
@@ -222,72 +217,45 @@ test("tiles and puzzles split the sample and download separate plate objects", a
   expect(result.manifest.plate_count).toBeGreaterThan(1);
   await expect(primary(page)).toContainText("plates (ZIP)");
   const download = page.waitForEvent("download");
-  const exported = page.waitForResponse(
-    (r) => r.url().includes("/api/export/") && r.status() === 200,
-  );
   await primary(page).click();
   await (await download).saveAs(info.outputPath("puzzle-plates.zip"));
-  const urls = await (await exported).json();
-  expect(urls.plate_urls).toHaveLength(result.manifest.plate_count);
-  for (const url of urls.plate_urls)
-    expect((await page.request.get(url)).ok()).toBe(true);
+  const links = page.locator("a[download$='.3mf']");
+  await expect(links).toHaveCount(result.manifest.plate_count);
+  for (const url of await links.evaluateAll((links) => links.map((link) => (link as HTMLAnchorElement).href)))
+    expect(await page.evaluate(async (url) => (await fetch(url)).ok, url)).toBe(true);
+
 });
 
 test("a newer preview wins when an older response arrives late", async ({
   page,
 }) => {
-  let first = true;
-  let release!: () => void;
-  let captured!: () => void;
-  const capturedResponse = new Promise<void>((resolve) => {
-    captured = resolve;
-  });
-  const gate = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  await page.route("**/api/preview", async (route) => {
-    if (!first) return route.continue();
-    first = false;
-    const response = await route.fetch();
-    captured();
-    await gate;
-    await route.fulfill({ response });
-  });
+  await page.evaluate(() => { window.engineTest.holdNext = true; });
   const field = page.getByRole("spinbutton", {
     name: "Width (mm)",
     exact: true,
   });
   await field.fill("160");
   await field.press("Enter");
-  await capturedResponse;
-  await number(page, "Width (mm)", 170);
-  release();
+  await page.waitForFunction(() => window.engineTest.held);
+  const newer = number(page, "Width (mm)", 170);
+  await page.waitForTimeout(650);
+  await page.evaluate(() => window.engineTest.release());
+  await newer;
   await page.waitForTimeout(300);
   await expect(page.locator(".canvas-heading")).toContainText("170 × 180 mm");
   await expect(primary(page)).toBeEnabled();
 });
 
-test("preview requests recover from a busy worker and a temporary server failure", async ({
+test("preview requests recover after a worker failure", async ({
   page,
 }) => {
-  let calls = 0;
-  await page.route("**/api/preview", async (route) => {
-    calls += 1;
-    if (calls === 1)
-      return route.fulfill({ status: 409, json: { detail: "Busy" } });
-    if (calls === 2)
-      return route.fulfill({
-        status: 500,
-        json: { detail: "Temporary failure" },
-      });
-    return route.continue();
-  });
+  await page.evaluate(() => { window.engineTest.failNext = true; });
   await number(page, "Width (mm)", 160, 500);
   await expect(primary(page)).toBeDisabled();
   await rebuild(page, () =>
     page.getByRole("button", { name: "Rebuild preview", exact: true }).click(),
   );
-  expect(calls).toBe(3);
+  await expect(primary(page)).toBeEnabled();
 });
 
 test("preview modes remain usable without horizontal overflow", async ({
@@ -546,3 +514,58 @@ for (const [index, source] of privateSources.entries()) {
     });
   });
 }
+
+test("cached workbench reloads, imports, generates and downloads offline without API traffic", async ({
+  page, context,
+}, info) => {
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() !== "GET" || request.url().includes("/api/")) requests.push(request.url());
+  });
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await context.setOffline(true);
+  await page.reload();
+  await expect(primary(page)).toBeEnabled();
+  const preview = await upload(page);
+  expect(preview.manifest.pieces[0].material_parts).toBe(2);
+  await number(page, "Border width (mm)", 8);
+  const downloaded = page.waitForEvent("download");
+  await primary(page).click();
+  const file = await downloaded;
+  expect(file.suggestedFilename()).toBe("relief.3mf");
+  await file.saveAs(info.outputPath("offline.3mf"));
+  await page.getByRole("button", { name: "View from top", exact: true }).click();
+  await page.screenshot({ path: info.outputPath("offline-workbench.png"), fullPage: true });
+  expect(requests).toEqual([]);
+});
+
+test("64 pieces stay responsive and an oversized grid recovers", async ({ page }) => {
+  await rebuild(page, () => page.getByRole("button", { name: "Tiles", exact: true }).click());
+  await rebuild(page, () => page.getByRole("combobox", { name: "Split", exact: true }).selectOption("manual"));
+  await number(page, "Width (mm)", 420);
+  await number(page, "Height (mm)", 420);
+  await number(page, "Cols", 8);
+  await page.evaluate(() => {
+    const state = window as unknown as { uiTicks: number; uiTimer: number };
+    state.uiTicks = 0;
+    state.uiTimer = window.setInterval(() => {
+      const last = window.engineTest.requests.at(-1);
+      if (last?.operation === "build" && last.settings?.rows === 8 &&
+          !window.engineTest.responses.some((response) => response.id === last.id)) state.uiTicks += 1;
+    }, 10);
+  });
+  const result = await number(page, "Rows", 8);
+  const ticks = await page.evaluate(() => {
+    const state = window as unknown as { uiTicks: number; uiTimer: number };
+    clearInterval(state.uiTimer); return state.uiTicks;
+  });
+  expect(result.manifest.piece_count).toBe(64);
+  // A separate browser timer proves the UI event loop continues during worker computation.
+  expect(ticks).toBeGreaterThan(3);
+  await number(page, "Cols", 9, 422);
+  await expect(page.getByRole("alert")).toContainText("at most 64");
+  const restored = await number(page, "Cols", 8);
+  expect(restored.manifest.piece_count).toBe(64);
+  await expect(primary(page)).toBeEnabled();
+});

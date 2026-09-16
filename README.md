@@ -3,7 +3,7 @@
 Turn a local image into two-color printable wall art. Upload PNG, JPEG, WebP,
 or a self-contained SVG, tune its black-and-white conversion, then make a raised
 plaque, large tiled panels, or an interlocking puzzle. A browser workbench and
-CLI share the same geometry engine.
+native Rust CLI share the same geometry engine.
 
 **Image contour** makes a single icon-shaped print with an optional flat,
 rounded, or beaded bezel. Padding and bezel width expand outward around the
@@ -16,40 +16,69 @@ orbitable assembled/separated 3D previews, assembly map, vector preview, rounded
 corners and border edges, and arranged plate 3MF/aligned STL export. The web app
 is the primary interface.
 
-## Run locally
+## Version 2: entirely in your browser
 
-Requires Python 3.12+, Node 22.12+, and Cairo. The Dev Container includes Python,
-Node, and Cairo. For another Debian/Ubuntu environment, install `libcairo2`;
-on macOS install Cairo with `brew install cairo` and use Python 3.12 or later.
+The workbench runs a Rust geometry engine and Manifold in a WebAssembly worker.
+Images, previews, and print packs stay in browser memory. No Python HTTP server,
+cloud account, API key, or upload endpoint is used. After the first successful
+load on localhost or HTTPS, the application caches its assets for offline reloads.
+Keep downloaded print packs: imported images and the current project are not saved
+across page reloads. Browser storage eviction can remove the offline cache.
+
+### Build and run
+
+Build requirements: Node 22.12+, Rust 1.98.1, Emscripten 4.0.15, CMake, Git, and a
+C++ compiler. On Debian/Ubuntu install `build-essential cmake`; on macOS install
+Xcode command-line tools and CMake. The setup script installs the pinned Rust and
+Emscripten toolchains into your home directory. Building needs internet access
+on first use to fetch dependencies; the built application needs none.
+
+```sh
+bash scripts/setup-toolchain.sh
+npm --prefix web ci
+npm --prefix web run build
+npm --prefix web start
+```
+
+Open [the local workbench](http://127.0.0.1:8000). `web/dist` is a complete static
+site that can also be served by any static host with WebAssembly MIME support.
+Use localhost or HTTPS for offline caching; opening `index.html` through `file://`
+does not support browser module workers. The supplied Node server serves static
+files only and binds to loopback by default.
+
+For UI development, build Wasm once with `npm --prefix web run build:wasm`, then
+run `npm --prefix web run dev`. Rebuild Wasm after Rust changes. Service-worker
+caching is enabled in production builds, not the Vite development server.
+
+### Native engine and Python reference
+
+The same Rust core builds natively, including for macOS:
+
+```sh
+cargo build --locked --release --bin relief-native
+./target/release/relief-native --input artwork.svg --settings examples/plaque.json \
+  --output print-pack.zip
+```
+
+Omit `--input` for the built-in sample; `--preview` prints the browser preview
+DTO, and `--defaults` prints settings. Output paths must be new files. The legacy
+Python `relief` CLI remains available for reference and existing scripts. Its
+installation requires Python 3.12+ and Cairo:
 
 ```sh
 python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.lock
+.venv/bin/pip install -e . --no-deps
 . .venv/bin/activate
-pip install -e '.[dev]'
-npm --prefix web ci
-npm --prefix web run build
-relief serve
 ```
-
-Open [the local workbench](http://127.0.0.1:8000). In a remote workspace,
-forward port 8000 through your workspace tooling before opening that address
-on another machine. The default server is loopback-only and has no multi-user
-authentication. Do not expose it publicly. No image leaves the local service.
-
-For frontend development, leave the Python server on port 8000 and run
-`npm --prefix web run dev`; Vite on port 5173 proxies `/api` to Python. Override
-ports in isolated workspaces as needed. The server serves the compiled frontend
-from the Python package, so a wheel built after the frontend includes the UI.
 
 ### Managed workspace development site
 
-The Dev Container installs dependencies on creation and starts a supervised
-preview on port 8000 whenever the container starts. The Compose command and
-DevPod startup hook both use the same idempotent service controller. Dioikeo registers the
-workspace's friendly `.local` HTTPS address; use the URL shown by its connections
-view. The preview serves the UI and API together, rebuilds frontend assets after
-edits (reload the browser to see them), and restarts a failed server automatically.
-Restart after Python changes. No Mac port forwarding is needed.
+The development container starts a supervised static workbench on port 8000.
+It uses the workspace's configured friendly HTTPS address. Frontend edits rebuild
+automatically. Close all workbench tabs and reopen to activate a newer offline
+cache, or use the Vite dev server for immediate reloads. Run the full build after
+Rust changes.
 
 ```sh
 bash scripts/workspace-preview.sh status
@@ -58,23 +87,14 @@ bash scripts/workspace-preview.sh stop
 bash scripts/workspace-preview.sh start
 ```
 
-The service runs as the workspace user. Its control socket and bounded logs live
-under `~/.local/state/relief-preview-*`, and exports go to
-`/shared/relief-studio/projects` when shared storage is mounted. Otherwise they
-use this checkout's `output/projects`. `RELIEF_PREVIEW_PORT` and
-`RELIEF_OUTPUT_ROOT` can override these defaults before the first start.
-`RELIEF_PUBLIC_ORIGIN` defaults to the managed user's friendly HTTPS `.local`
-URL; it permits browser generation through the proxy while rejecting other
-origins. Set it explicitly if your workspace uses a different URL. Keep
-this unauthenticated development service on the trusted local OrbStack network.
-The supervisor is pinned in the project virtual environment, so service startup
-does not depend on a package installed in a container's replaceable filesystem.
-For an existing workspace, run `setup` once if its dependencies are missing,
-then run `start`.
+`RELIEF_PREVIEW_PORT` overrides the port. Downloads go to the browser's download
+location; no server export directory is used. Python/Supervisor manages this
+development process only; the application itself can run on any static host.
+Run `setup` once if development dependencies are missing.
 
-`requirements-dev.lock` records the tested Python environment; use
-`pip install -r requirements-dev.lock` then `pip install -e . --no-deps` for those
-versions. `web/package-lock.json` locks the frontend dependencies.
+`Cargo.lock`, `web/package-lock.json`, and `requirements-dev.lock` pin the Rust,
+frontend, and Python reference dependencies. The full verification command is
+`bash scripts/check.sh`; see [testing](docs/testing.md).
 
 ## From SVG to two-color 3MF
 
@@ -204,15 +224,12 @@ python scripts/build_starter_pack.py output/starter-collection
 
 Output directories must be new: existing files are never replaced. Use
 `--settings project.json` to reuse exported settings with the same source image.
-The browser retains only four recent previews in memory; it writes a persistent
-pack only when a download/export button is pressed. Restarting clears previews,
-but exported folders remain under `output/projects` or the `--output-root`
-directory. User images are not copied into exported packs.
-
-To send exports to a mounted shared directory, run
-`relief serve --output-root /shared/relief-studio/projects` or pass a new shared
-directory to the CLI. The starter collection includes a portable `index.html`,
-which can be opened directly on another computer, plus a ZIP of the collection.
+The browser retains its current project in worker memory and creates download
+bytes only on an explicit export. Reloading clears the source and preview; keep
+downloaded packs in durable storage. Source images are not copied into packs.
+Choose a shared directory through your browser's download dialog or pass a new
+shared output path to the native CLI. The legacy starter collection includes a
+portable review `index.html` and ZIP; it is separate from the interactive app.
 
 ## Print with Bambu Studio and AMS
 
@@ -260,8 +277,9 @@ including tabs and loops; your slicer still decides placement and toolpath fit.
   load-rated. Rear keyholes require at least a 5 mm backing and may need support
   or bridging adjustments. No hardware screw size is assumed to be compatible.
 - Export meshes are checked for closure, winding, positive volume, and bed
-  extents. Bambu Studio 2.8.2 import and saved-project reload have been checked;
-  physical printing and actual AMS tray mapping still need confirmation.
+  extents. The v1 Bambu project format had desktop import/save checks; v2 retains that
+  metadata and passes independent package/mesh checks. A fresh v2 desktop slicer
+  and physical print test remain to be performed, including actual AMS mapping.
 - The app does not persist browser projects across reloads; exported settings
   can be reused through the CLI. It does not slice or send jobs to a printer.
 
