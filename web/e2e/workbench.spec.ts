@@ -533,7 +533,7 @@ test("cached workbench reloads, imports, generates and downloads offline without
   const downloaded = page.waitForEvent("download");
   await primary(page).click();
   const file = await downloaded;
-  expect(file.suggestedFilename()).toBe("relief.3mf");
+  expect(file.suggestedFilename()).toBe("gold-cutout.3mf");
   await file.saveAs(info.outputPath("offline.3mf"));
   await page.getByRole("button", { name: "View from top", exact: true }).click();
   await page.screenshot({ path: info.outputPath("offline-workbench.png"), fullPage: true });
@@ -563,7 +563,7 @@ test("inverting a contour keeps its outline, swaps the relief, and restores clea
   const downloaded = page.waitForEvent("download");
   await primary(page).click();
   const file = await downloaded;
-  expect(file.suggestedFilename()).toBe("relief.3mf");
+  expect(file.suggestedFilename()).toBe("contour-icon.3mf");
   const path = info.outputPath("inverted-contour.3mf");
   await file.saveAs(path);
   execFileSync(python, ["-c", "import sys, trimesh; s=trimesh.load_scene(sys.argv[1], file_type='3mf'); assert len(s.geometry)==2; assert all(m.is_volume for m in s.geometry.values())", path]);
@@ -571,7 +571,7 @@ test("inverting a contour keeps its outline, swaps the relief, and restores clea
   expect(restored.vector_svg).toBe(normal.vector_svg);
   expect(restored.meshes).toEqual(normal.meshes);
   await expect(page.getByRole("alert")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Download again", exact: true })).toHaveCount(0);
+  await expect(page.locator(".download-again")).toHaveCount(0);
 });
 
 test("64 pieces stay responsive and an oversized grid recovers", async ({ page }) => {

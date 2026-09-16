@@ -1,6 +1,7 @@
 /** Summarize the last valid geometry and expose material colors and fabrication notes. */
 import { Check, Download, LoaderCircle, TriangleAlert } from "lucide-react";
 import type { Preview, Settings, Update } from "./types";
+import { fileStem } from "./workspace";
 
 export function PrintPlan({
   preview,
@@ -11,6 +12,7 @@ export function PrintPlan({
   download,
   downloadName,
   plateDownloads,
+  projectName,
   disabled,
   exportPack,
 }: {
@@ -22,6 +24,7 @@ export function PrintPlan({
   download: string;
   downloadName: string;
   plateDownloads: string[];
+  projectName: string;
   disabled: boolean;
   exportPack: () => void;
 }) {
@@ -122,7 +125,7 @@ export function PrintPlan({
         )}
         {plateDownloads.length > 1 &&
           plateDownloads.map((url, i) => (
-            <a key={url} className="download-again" href={url} download={`plate-${String(i + 1).padStart(2, "0")}.3mf`}>
+            <a key={url} className="download-again" href={url} download={`${fileStem(projectName)}-plate-${String(i + 1).padStart(2, "0")}.3mf`}>
               <Download size={16} /> Plate {i + 1} ·{" "}
               {manifest?.plates[i]?.pieces.length} pieces
             </a>

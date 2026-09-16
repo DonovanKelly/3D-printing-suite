@@ -53,6 +53,12 @@ edited or generated. Export IDs must identify the current Rust project. Worker
 errors/timeouts settle requests; explicit retry starts a fresh worker. Blob URLs
 are revoked on edits, replacement exports, and unmount.
 
+The UI owns a workspace document separately from the generated preview. Portable
+JSON files embed original source bytes, settings, the project name, and selected
+preview tab. Opening replaces these atomically and clears old exports. Optional
+IndexedDB recovery stores the latest workspace on this browser only. Neither
+path needs a runtime server API. See [workspace files](workspace-files.md).
+
 Rust and C++ compile together using Emscripten, avoiding JavaScript geometry or a
 second boolean kernel. The build is single-threaded inside its worker and needs
 no cross-origin isolation headers or SharedArrayBuffer. The module starts with

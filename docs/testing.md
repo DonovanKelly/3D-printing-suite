@@ -35,6 +35,7 @@ in `requirements-dev.lock`. The default interpreter is `.venv/bin/python`;
 | Partitions and exports | Default sample splitting, piece-size limits including tabs/loops, seed reproducibility, complementary seams, clearance, plate gaps, every piece exactly once, separate 3MF build objects, material transforms, independent 3MF/STL reloads, and bounded download paths. |
 | Local API | Invalid settings/uploads, unsupported SVG resources, local-origin boundaries, empty-selection recovery, successful exports after errors, and multiple-plate downloads. |
 | Real browser | Fresh imports reset incompatible selection without changing geometry; empty selections offer recovery; numeric drafts and cancellation; invalid-export blocking; borders/loops; tiles/puzzles/size/shuffle; actual 3MF/ZIP downloads; out-of-order responses; serialized-worker queue; worker-error recovery; offline reload/import/download; 64-piece overflow/recovery; preview modes; desktop/mobile overflow. |
+| Workspace files | Editable/sanitized filenames; exact artwork/settings/tab round trips into a fresh offline tab; corrupt, oversized, and future-version documents preserve current work; replacement cancellation; optional reload/new-tab recovery and removal; unavailable browser storage; import with a focused name; unfinished settings save/open/repair. |
 
 The browser suite starts its own Node static server on port 8011. It has no
 geometry/upload/export endpoints; downloads are browser Blob bytes. It refuses to reuse an existing server, so it cannot

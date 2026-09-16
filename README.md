@@ -140,6 +140,16 @@ frontend, and Python reference dependencies. The full verification command is
    Bambu Studio: Background uses filament 1 and Artwork + frame uses filament 2.
    Map those filaments to your actual AMS trays before printing.
 
+## Save and reopen your workspace
+
+Edit the project name above the preview to change workspace and print download
+filenames. **Save workspace** (Ctrl/Cmd+S) downloads a `.print-workspace` file
+with the original artwork, all settings, colors, and selected preview tab.
+**Open workspace** restores it in this or a fresh app tab. Enable **Restore on
+return** to also save the latest workspace in this browser and reopen it
+automatically on your next visit. All storage and processing stay on your device.
+See [workspace files](docs/workspace-files.md) for behavior and format details.
+
 ## Make a contour-shaped icon
 
 1. Use the built-in Alpine crest or upload an image, then choose
@@ -228,9 +238,10 @@ python scripts/build_starter_pack.py output/starter-collection
 
 Output directories must be new: existing files are never replaced. Use
 `--settings project.json` to reuse exported settings with the same source image.
-The browser retains its current project in worker memory and creates download
-bytes only on an explicit export. Reloading clears the source and preview; keep
-downloaded packs in durable storage. Source images are not copied into packs.
+The browser creates print download bytes only on an explicit export. Save a
+workspace file to retain source artwork and editable settings, or enable optional
+browser recovery across reloads. Keep downloaded files in durable storage.
+Source images are included in workspace files, but not in print packs.
 Choose a shared directory through your browser's download dialog or pass a new
 shared output path to the native CLI. The legacy starter collection includes a
 portable review `index.html` and ZIP; it is separate from the interactive app.
@@ -284,8 +295,9 @@ including tabs and loops; your slicer still decides placement and toolpath fit.
   extents. The v1 Bambu project format had desktop import/save checks; v2 retains that
   metadata and passes independent package/mesh checks. A fresh v2 desktop slicer
   and physical print test remain to be performed, including actual AMS mapping.
-- The app does not persist browser projects across reloads; exported settings
-  can be reused through the CLI. It does not slice or send jobs to a printer.
+- Optional browser recovery keeps the latest workspace at the same app address;
+  downloaded workspace files provide portable storage independent of the browser.
+  The app does not slice or send jobs to a printer.
 
 ## Development
 
