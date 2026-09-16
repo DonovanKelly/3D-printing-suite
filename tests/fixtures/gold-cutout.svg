@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140">
+  <!-- Original regression artwork: a rim, transparent opening, and solid island. -->
+  <path fill="#958714" fill-rule="evenodd"
+        d="M8 8H92V132H8Z M24 32H76V104H24Z M42 54H58V80H42Z"/>
+</svg>

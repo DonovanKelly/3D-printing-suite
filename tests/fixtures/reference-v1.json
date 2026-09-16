@@ -1,0 +1,5901 @@
+{
+  "reference_commit": "9d79cce",
+  "cases": [
+    {
+      "name": "default",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 90983.96,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "no-border",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "frame": false
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": false,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              3.2
+            ],
+            "volume_mm3": 87341.166,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 11976.453410887363,
+        "bounds": [
+          3.7309944751381243,
+          3.010421899257721,
+          176.26900552486188,
+          176.99
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "flat-border",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "frame_width_mm": 8,
+        "frame_height_mm": 3
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 8.0,
+          "frame_height_mm": 3.0,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              5.4
+            ],
+            "volume_mm3": 102168.228,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 9870.281892754216,
+        "bounds": [
+          11.664696132596683,
+          11.010421899257722,
+          168.3353038674033,
+          168.99
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "rounded-border",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "frame_profile": "rounded",
+        "corner_radius_mm": 24
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "rounded",
+          "corner_radius_mm": 24.0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 88348.778,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 9631.018218160958,
+        "bounds": [
+          12.635766061929562,
+          11.989606619086402,
+          167.36423393807047,
+          168.01081528017133
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "beaded-border",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "frame_profile": "beaded",
+        "width_mm": 90,
+        "height_mm": 90
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 90.0,
+          "height_mm": 90.0,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "beaded",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          90.0,
+          90.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  83.0,
+                  83.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              90.0,
+              90.0,
+              4.0
+            ],
+            "volume_mm3": 22480.654,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 2290.417635136719,
+        "bounds": [
+          7.3249313862966705,
+          7.010262282622071,
+          82.67508287292817,
+          82.99
+        ],
+        "regions": 5,
+        "holes": 11
+      }
+    },
+    {
+      "name": "loops",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "hanging": "loops",
+        "corner_radius_mm": 40
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 40.0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "loops",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          189.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  33.5,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Mounting features are experimental and not load-rated. Support every wall panel.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              189.0,
+              4.0
+            ],
+            "volume_mm3": 85502.893,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 8502.220829299114,
+        "bounds": [
+          17.28322089304689,
+          16.675898120101664,
+          162.7167791069531,
+          163.32452377915607
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "keyholes",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "hanging": "keyholes",
+        "base_mm": 5
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 5.0,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "keyholes",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Mounting features are experimental and not load-rated. Support every wall panel.",
+          "Rear keyholes: 8 mm head entry, 4 mm shaft, 7 mm slide. Inspect bridging/supports.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              6.6
+            ],
+            "volume_mm3": 174654.187,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "tiles",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "tiles"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "tiles",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 2,
+          "rows": 2
+        },
+        "piece_count": 4,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          182.75,
+          182.75
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  36.625,
+                  129.5,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  129.5,
+                  129.5,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  36.625,
+                  36.625,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  129.5,
+                  36.625,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              90.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              92.875,
+              0
+            ],
+            "extents_mm": [
+              89.875,
+              89.875,
+              4.0
+            ],
+            "volume_mm3": 21893.129,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              90.125,
+              90.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              92.875,
+              92.875,
+              0
+            ],
+            "extents_mm": [
+              89.875,
+              89.875,
+              4.0
+            ],
+            "volume_mm3": 21822.418,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              89.875,
+              89.875,
+              4.0
+            ],
+            "volume_mm3": 23224.125,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              90.125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              92.875,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              89.875,
+              89.875,
+              4.0
+            ],
+            "volume_mm3": 23788.181,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "large-tiles",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "tiles",
+        "width_mm": 420,
+        "height_mm": 320
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 420.0,
+          "height_mm": 320.0,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "tiles",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 5,
+          "rows": 4
+        },
+        "piece_count": 20,
+        "plate_count": 5,
+        "separated_extents_mm": [
+          431.0,
+          328.25
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  42.6875,
+                  46.625,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  129.5625,
+                  46.625,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  42.6875,
+                  129.5,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c04",
+                "origin_mm": [
+                  129.4375,
+                  129.5,
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "id": "plate-02",
+            "file": "plates/plate-02.3mf",
+            "pieces": [
+              {
+                "id": "r01-c05",
+                "origin_mm": [
+                  42.625,
+                  46.625,
+                  0
+                ]
+              },
+              {
+                "id": "r04-c01",
+                "origin_mm": [
+                  129.5,
+                  46.625,
+                  0
+                ]
+              },
+              {
+                "id": "r04-c02",
+                "origin_mm": [
+                  42.625,
+                  129.5,
+                  0
+                ]
+              },
+              {
+                "id": "r04-c03",
+                "origin_mm": [
+                  129.375,
+                  129.5,
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "id": "plate-03",
+            "file": "plates/plate-03.3mf",
+            "pieces": [
+              {
+                "id": "r04-c04",
+                "origin_mm": [
+                  42.6875,
+                  46.6875,
+                  0
+                ]
+              },
+              {
+                "id": "r04-c05",
+                "origin_mm": [
+                  129.4375,
+                  46.6875,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  42.6875,
+                  129.5625,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  129.5625,
+                  129.5625,
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "id": "plate-04",
+            "file": "plates/plate-04.3mf",
+            "pieces": [
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  42.625,
+                  46.75,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c04",
+                "origin_mm": [
+                  129.375,
+                  46.75,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c05",
+                "origin_mm": [
+                  42.625,
+                  129.5,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  129.5,
+                  129.5,
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "id": "plate-05",
+            "file": "plates/plate-05.3mf",
+            "pieces": [
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  42.6875,
+                  46.75,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  129.4375,
+                  46.75,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c04",
+                "origin_mm": [
+                  42.6875,
+                  129.5,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c05",
+                "origin_mm": [
+                  129.4375,
+                  129.5,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              240.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              248.375,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 17119.68,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              84.125,
+              240.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              86.875,
+              248.375,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 18410.101,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              168.125,
+              240.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              173.625,
+              248.375,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 17149.243,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c04",
+            "row": 1,
+            "column": 4,
+            "assembly_origin_mm": [
+              252.125,
+              240.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              260.375,
+              248.375,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 17079.189,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c04/r01-c04.3mf",
+              "combined": "pieces/r01-c04/combined.stl",
+              "background": "pieces/r01-c04/background.stl",
+              "artwork": "pieces/r01-c04/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c05",
+            "row": 1,
+            "column": 5,
+            "assembly_origin_mm": [
+              336.125,
+              240.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              347.125,
+              248.375,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 17119.68,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c05/r01-c05.3mf",
+              "combined": "pieces/r01-c05/combined.stl",
+              "background": "pieces/r01-c05/background.stl",
+              "artwork": "pieces/r01-c05/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              160.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              165.625,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.75,
+              4.0
+            ],
+            "volume_mm3": 17052.944,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              84.125,
+              160.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              86.875,
+              165.625,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.75,
+              3.2
+            ],
+            "volume_mm3": 17341.185,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              168.125,
+              160.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              173.625,
+              165.625,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.75,
+              3.2
+            ],
+            "volume_mm3": 18402.495,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c04",
+            "row": 2,
+            "column": 4,
+            "assembly_origin_mm": [
+              252.125,
+              160.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              260.375,
+              165.625,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.75,
+              3.2
+            ],
+            "volume_mm3": 17747.487,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c04/r02-c04.3mf",
+              "combined": "pieces/r02-c04/combined.stl",
+              "background": "pieces/r02-c04/background.stl",
+              "artwork": "pieces/r02-c04/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c05",
+            "row": 2,
+            "column": 5,
+            "assembly_origin_mm": [
+              336.125,
+              160.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              347.125,
+              165.625,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.75,
+              4.0
+            ],
+            "volume_mm3": 16970.07,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c05/r02-c05.3mf",
+              "combined": "pieces/r02-c05/combined.stl",
+              "background": "pieces/r02-c05/background.stl",
+              "artwork": "pieces/r02-c05/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              80.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              82.875,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.75,
+              4.0
+            ],
+            "volume_mm3": 17658.233,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              84.125,
+              80.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              86.875,
+              82.875,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.75,
+              3.2
+            ],
+            "volume_mm3": 19787.562,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              168.125,
+              80.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              173.625,
+              82.875,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.75,
+              3.2
+            ],
+            "volume_mm3": 19576.488,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c04",
+            "row": 3,
+            "column": 4,
+            "assembly_origin_mm": [
+              252.125,
+              80.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              260.375,
+              82.875,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.75,
+              3.2
+            ],
+            "volume_mm3": 20212.322,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c04/r03-c04.3mf",
+              "combined": "pieces/r03-c04/combined.stl",
+              "background": "pieces/r03-c04/background.stl",
+              "artwork": "pieces/r03-c04/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c05",
+            "row": 3,
+            "column": 5,
+            "assembly_origin_mm": [
+              336.125,
+              80.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              347.125,
+              82.875,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.75,
+              4.0
+            ],
+            "volume_mm3": 17751.466,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c05/r03-c05.3mf",
+              "combined": "pieces/r03-c05/combined.stl",
+              "background": "pieces/r03-c05/background.stl",
+              "artwork": "pieces/r03-c05/artwork.stl"
+            }
+          },
+          {
+            "id": "r04-c01",
+            "row": 4,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 17228.153,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r04-c01/r04-c01.3mf",
+              "combined": "pieces/r04-c01/combined.stl",
+              "background": "pieces/r04-c01/background.stl",
+              "artwork": "pieces/r04-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r04-c02",
+            "row": 4,
+            "column": 2,
+            "assembly_origin_mm": [
+              84.125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              86.875,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 18602.931,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r04-c02/r04-c02.3mf",
+              "combined": "pieces/r04-c02/combined.stl",
+              "background": "pieces/r04-c02/background.stl",
+              "artwork": "pieces/r04-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r04-c03",
+            "row": 4,
+            "column": 3,
+            "assembly_origin_mm": [
+              168.125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              173.625,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 18442.242,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r04-c03/r04-c03.3mf",
+              "combined": "pieces/r04-c03/combined.stl",
+              "background": "pieces/r04-c03/background.stl",
+              "artwork": "pieces/r04-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r04-c04",
+            "row": 4,
+            "column": 4,
+            "assembly_origin_mm": [
+              252.125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              260.375,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              83.75,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 18956.968,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r04-c04/r04-c04.3mf",
+              "combined": "pieces/r04-c04/combined.stl",
+              "background": "pieces/r04-c04/background.stl",
+              "artwork": "pieces/r04-c04/artwork.stl"
+            }
+          },
+          {
+            "id": "r04-c05",
+            "row": 4,
+            "column": 5,
+            "assembly_origin_mm": [
+              336.125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              347.125,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              83.875,
+              79.875,
+              4.0
+            ],
+            "volume_mm3": 17263.932,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r04-c05/r04-c05.3mf",
+              "combined": "pieces/r04-c05/combined.stl",
+              "background": "pieces/r04-c05/background.stl",
+              "artwork": "pieces/r04-c05/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 37066.4498340467,
+        "bounds": [
+          58.277955801104966,
+          7.010000000000057,
+          361.722044198895,
+          312.99
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "regular-puzzle",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "puzzle",
+        "puzzle_style": "regular"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "puzzle",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "regular",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3
+        },
+        "piece_count": 9,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          224.3797378540039,
+          224.3797378540039
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  23.0,
+                  175.45490264892578,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  105.31486892700195,
+                  170.5949363708496,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  177.78480529785156,
+                  175.45490264892578,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  27.859966278076172,
+                  88.40506362915039,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  95.59493255615234,
+                  98.125,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  182.64477157592773,
+                  88.40506362915039,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  23.0,
+                  20.67009735107422,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  105.31486892700195,
+                  15.810131072998047,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  177.78480529785156,
+                  20.67009735107422,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              120.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              159.64477157592773,
+              0
+            ],
+            "extents_mm": [
+              69.5949,
+              59.875,
+              4.0
+            ],
+            "volume_mm3": 9835.468,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              60.125,
+              110.40506744384766,
+              0.0
+            ],
+            "separated_origin_mm": [
+              82.31486892700195,
+              154.78480529785156,
+              0
+            ],
+            "extents_mm": [
+              59.75,
+              69.5949,
+              4.0
+            ],
+            "volume_mm3": 9181.478,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              110.40506744384766,
+              120.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              154.78480529785156,
+              159.64477157592773,
+              0
+            ],
+            "extents_mm": [
+              69.5949,
+              59.875,
+              4.0
+            ],
+            "volume_mm3": 9499.391,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              50.405067443847656,
+              0.0
+            ],
+            "separated_origin_mm": [
+              4.859966278076172,
+              72.59493255615234,
+              0
+            ],
+            "extents_mm": [
+              59.875,
+              79.1899,
+              4.0
+            ],
+            "volume_mm3": 10376.185,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              50.405067443847656,
+              60.125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              72.59493255615234,
+              82.31486892700195,
+              0
+            ],
+            "extents_mm": [
+              79.1899,
+              59.75,
+              3.2
+            ],
+            "volume_mm3": 10378.431,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.125,
+              50.405067443847656,
+              0.0
+            ],
+            "separated_origin_mm": [
+              159.64477157592773,
+              72.59493255615234,
+              0
+            ],
+            "extents_mm": [
+              59.875,
+              79.1899,
+              4.0
+            ],
+            "volume_mm3": 10641.972,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              4.859966278076172,
+              0
+            ],
+            "extents_mm": [
+              69.5949,
+              59.875,
+              4.0
+            ],
+            "volume_mm3": 10228.147,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              60.125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              82.31486892700195,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              59.75,
+              69.5949,
+              4.0
+            ],
+            "volume_mm3": 9809.802,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              110.40506744384766,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              154.78480529785156,
+              4.859966278076172,
+              0
+            ],
+            "extents_mm": [
+              69.5949,
+              59.875,
+              4.0
+            ],
+            "volume_mm3": 10349.689,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "random-puzzle",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "puzzle",
+        "puzzle_seed": 17
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "puzzle",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 17,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3
+        },
+        "piece_count": 9,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          212.82381057739258,
+          221.04082870483398
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  27.66307258605957,
+                  174.80876350402832,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  95.48382568359375,
+                  170.97189140319824,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  168.8344841003418,
+                  174.80906105041504,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  23.61138916015625,
+                  90.74884986877441,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  96.46874809265137,
+                  98.82966232299805,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  171.52736282348633,
+                  92.56368637084961,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  23.0,
+                  21.621257781982422,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  96.61145210266113,
+                  17.479585647583008,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  172.1136589050293,
+                  18.55451774597168,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              120.1252212524414,
+              0.0
+            ],
+            "separated_origin_mm": [
+              4.66307258605957,
+              157.3291778564453,
+              0
+            ],
+            "extents_mm": [
+              60.1577,
+              59.8748,
+              4.0
+            ],
+            "volume_mm3": 9167.268,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              50.559146881103516,
+              112.45147705078125,
+              0.0
+            ],
+            "separated_origin_mm": [
+              72.48382568359375,
+              153.49230575561523,
+              0
+            ],
+            "extents_mm": [
+              70.3507,
+              67.5485,
+              4.0
+            ],
+            "volume_mm3": 9740.117,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              113.01067352294922,
+              120.12581634521484,
+              0.0
+            ],
+            "separated_origin_mm": [
+              145.8344841003418,
+              157.32947540283203,
+              0
+            ],
+            "extents_mm": [
+              66.9893,
+              59.8742,
+              4.0
+            ],
+            "volume_mm3": 9147.481,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              54.18723678588867,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.61138916015625,
+              73.2692642211914,
+              0
+            ],
+            "extents_mm": [
+              68.261,
+              77.223,
+              4.0
+            ],
+            "volume_mm3": 10622.12,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              59.248687744140625,
+              60.130584716796875,
+              0.0
+            ],
+            "separated_origin_mm": [
+              73.46874809265137,
+              81.35007667541504,
+              0
+            ],
+            "extents_mm": [
+              68.3808,
+              61.0614,
+              3.2
+            ],
+            "volume_mm3": 9820.095,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              118.39643096923828,
+              57.81060791015625,
+              0.0
+            ],
+            "separated_origin_mm": [
+              148.52736282348633,
+              75.0841007232666,
+              0
+            ],
+            "extents_mm": [
+              61.6036,
+              73.5934,
+              4.0
+            ],
+            "volume_mm3": 10764.295,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              4.141672134399414,
+              0
+            ],
+            "extents_mm": [
+              69.4838,
+              61.9859,
+              4.0
+            ],
+            "volume_mm3": 10490.758,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              59.115203857421875,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              73.61145210266113,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              68.0954,
+              70.2693,
+              4.0
+            ],
+            "volume_mm3": 10309.558,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              119.56902313232422,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              149.1136589050293,
+              1.0749320983886719,
+              0
+            ],
+            "extents_mm": [
+              60.431,
+              68.1194,
+              4.0
+            ],
+            "volume_mm3": 10251.628,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "zero-clearance",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "puzzle",
+        "clearance_mm": 0
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "puzzle",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.0,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3
+        },
+        "piece_count": 9,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          222.20486450195312,
+          218.68320083618164
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  23.0,
+                  172.8327693939209,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  101.17494583129883,
+                  168.32393836975098,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  181.02532577514648,
+                  168.7451343536377,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  27.461139678955078,
+                  93.91151809692383,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  96.53395080566406,
+                  93.32751274108887,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  181.02532577514648,
+                  98.09296607971191,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  28.26697540283203,
+                  18.65839958190918,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  98.72683906555176,
+                  24.366092681884766,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  176.84578704833984,
+                  20.379823684692383,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              120.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              154.17436981201172,
+              0
+            ],
+            "extents_mm": [
+              70.534,
+              60.0,
+              4.0
+            ],
+            "volume_mm3": 9883.471,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              60.0,
+              110.98233795166016,
+              0.0
+            ],
+            "separated_origin_mm": [
+              78.17494583129883,
+              149.6655387878418,
+              0
+            ],
+            "extents_mm": [
+              68.0298,
+              69.0177,
+              4.0
+            ],
+            "volume_mm3": 9365.563,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.0,
+              111.8247299194336,
+              0.0
+            ],
+            "separated_origin_mm": [
+              158.02532577514648,
+              150.08673477172852,
+              0
+            ],
+            "extents_mm": [
+              60.0,
+              68.1753,
+              4.0
+            ],
+            "volume_mm3": 9419.008,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              60.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              4.461139678955078,
+              75.25311851501465,
+              0
+            ],
+            "extents_mm": [
+              61.6117,
+              70.8284,
+              4.0
+            ],
+            "volume_mm3": 10241.197,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              53.636375427246094,
+              49.731319427490234,
+              0.0
+            ],
+            "separated_origin_mm": [
+              73.53395080566406,
+              74.66911315917969,
+              0
+            ],
+            "extents_mm": [
+              77.3118,
+              71.9964,
+              3.2
+            ],
+            "volume_mm3": 10956.205,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.0,
+              59.806095123291016,
+              0.0
+            ],
+            "separated_origin_mm": [
+              158.02532577514648,
+              79.43456649780273,
+              0
+            ],
+            "extents_mm": [
+              60.0,
+              62.4655,
+              4.0
+            ],
+            "volume_mm3": 9944.325,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              5.266975402832031,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              60.0,
+              71.6691,
+              4.0
+            ],
+            "volume_mm3": 10201.168,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              47.79196548461914,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              75.72683906555176,
+              5.707693099975586,
+              0
+            ],
+            "extents_mm": [
+              72.9261,
+              60.2537,
+              4.0
+            ],
+            "volume_mm3": 10261.223,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              111.64092254638672,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              153.84578704833984,
+              1.7214241027832031,
+              0
+            ],
+            "extents_mm": [
+              68.3591,
+              68.2263,
+              4.0
+            ],
+            "volume_mm3": 10711.8,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "wide-clearance",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "puzzle",
+        "clearance_mm": 1
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "puzzle",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 1.0,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3
+        },
+        "piece_count": 9,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          220.20380401611328,
+          216.68239212036133
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  17.89809799194336,
+                  172.3338565826416,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  95.57420349121094,
+                  167.8238010406494,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  174.42251205444336,
+                  168.24499702453613,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  22.359107971191406,
+                  94.41205596923828,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  90.93178176879883,
+                  93.82765007019043,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  174.43363189697266,
+                  98.59414863586426,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  23.166433334350586,
+                  19.658803939819336,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  93.12917709350586,
+                  25.36637306213379,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  170.24309158325195,
+                  21.38022804260254,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              120.50271606445312,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              152.67505264282227,
+              0
+            ],
+            "extents_mm": [
+              70.0337,
+              59.4973,
+              4.0
+            ],
+            "volume_mm3": 9675.672,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              60.50310516357422,
+              111.48260498046875,
+              0.0
+            ],
+            "separated_origin_mm": [
+              77.67610549926758,
+              148.16499710083008,
+              0
+            ],
+            "extents_mm": [
+              67.0265,
+              68.5174,
+              4.0
+            ],
+            "volume_mm3": 9054.771,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.50003051757812,
+              112.32499694824219,
+              0.0
+            ],
+            "separated_origin_mm": [
+              156.5244140625,
+              148.5861930847168,
+              0
+            ],
+            "extents_mm": [
+              59.5,
+              67.675,
+              4.0
+            ],
+            "volume_mm3": 9222.069,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              60.50080108642578,
+              0.0
+            ],
+            "separated_origin_mm": [
+              4.461009979248047,
+              74.75325202941895,
+              0
+            ],
+            "extents_mm": [
+              61.1117,
+              69.8273,
+              4.0
+            ],
+            "volume_mm3": 9908.011,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              54.13664245605469,
+              50.23158645629883,
+              0.0
+            ],
+            "separated_origin_mm": [
+              73.03368377685547,
+              74.1688461303711,
+              0
+            ],
+            "extents_mm": [
+              76.3113,
+              70.9962,
+              3.2
+            ],
+            "volume_mm3": 10503.211,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.52227020263672,
+              60.306095123291016,
+              0.0
+            ],
+            "separated_origin_mm": [
+              156.5355339050293,
+              78.93534469604492,
+              0
+            ],
+            "extents_mm": [
+              59.4777,
+              61.4632,
+              4.0
+            ],
+            "volume_mm3": 9610.097,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              5.268335342407227,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              59.497,
+              71.1688,
+              4.0
+            ],
+            "volume_mm3": 9958.141,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              48.292236328125,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              75.2310791015625,
+              5.707569122314453,
+              0
+            ],
+            "extents_mm": [
+              71.9165,
+              59.7537,
+              4.0
+            ],
+            "volume_mm3": 9908.939,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              112.14118957519531,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              152.3449935913086,
+              1.7214241027832031,
+              0
+            ],
+            "extents_mm": [
+              67.8588,
+              67.726,
+              4.0
+            ],
+            "volume_mm3": 10473.705,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "puzzle-loops",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "puzzle",
+        "hanging": "loops",
+        "corner_radius_mm": 30
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 30.0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "puzzle",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "loops",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3
+        },
+        "piece_count": 9,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          221.70459747314453,
+          227.18299865722656
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  23.0,
+                  168.20803833007812,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  101.05023384094238,
+                  163.6988983154297,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  180.65009689331055,
+                  164.1200942993164,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  27.461105346679688,
+                  89.53665161132812,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  96.40888214111328,
+                  88.95254516601562,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  180.6528778076172,
+                  93.71796607971191,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  28.267314910888672,
+                  14.408500671386719,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  98.60306739807129,
+                  20.116159439086914,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  176.47058868408203,
+                  16.129924774169922,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer.",
+          "Mounting features are experimental and not load-rated. Support every wall panel.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              120.12567901611328,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              153.7995376586914,
+              0
+            ],
+            "extents_mm": [
+              70.4089,
+              68.8743,
+              4.0
+            ],
+            "volume_mm3": 9307.732,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              60.12577438354492,
+              111.1073989868164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              78.05023384094238,
+              149.29039764404297,
+              0
+            ],
+            "extents_mm": [
+              67.779,
+              77.8926,
+              4.0
+            ],
+            "volume_mm3": 9433.612,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.12500762939453,
+              111.94979095458984,
+              0.0
+            ],
+            "separated_origin_mm": [
+              157.65009689331055,
+              149.7115936279297,
+              0
+            ],
+            "extents_mm": [
+              59.875,
+              77.0502,
+              4.0
+            ],
+            "volume_mm3": 8969.214,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              60.12519836425781,
+              0.0
+            ],
+            "separated_origin_mm": [
+              4.4611053466796875,
+              75.1281509399414,
+              0
+            ],
+            "extents_mm": [
+              61.4867,
+              70.5781,
+              4.0
+            ],
+            "volume_mm3": 9945.878,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              53.761444091796875,
+              49.85638427734375,
+              0.0
+            ],
+            "separated_origin_mm": [
+              73.40888214111328,
+              74.5440444946289,
+              0
+            ],
+            "extents_mm": [
+              77.0617,
+              71.7464,
+              3.2
+            ],
+            "volume_mm3": 10821.219,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.13056945800781,
+              59.931095123291016,
+              0.0
+            ],
+            "separated_origin_mm": [
+              157.6528778076172,
+              79.3094654083252,
+              0
+            ],
+            "extents_mm": [
+              59.8694,
+              62.2155,
+              4.0
+            ],
+            "volume_mm3": 9619.356,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              5.267314910888672,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              59.8743,
+              71.544,
+              4.0
+            ],
+            "volume_mm3": 9358.048,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              47.91703414916992,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              75.60306739807129,
+              5.707658767700195,
+              0
+            ],
+            "extents_mm": [
+              72.6733,
+              60.1287,
+              4.0
+            ],
+            "volume_mm3": 10061.184,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              111.7659912109375,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              153.47058868408203,
+              1.7214241027832031,
+              0
+            ],
+            "extents_mm": [
+              68.234,
+              68.1012,
+              4.0
+            ],
+            "volume_mm3": 9781.716,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 9200.324944175683,
+        "bounds": [
+          14.378561623598552,
+          13.74696593196714,
+          165.62143837640144,
+          166.25345596729062
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "puzzle-keyholes",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "layout": "puzzle",
+        "hanging": "keyholes",
+        "base_mm": 5
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 5.0,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "puzzle",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "keyholes",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 3,
+          "rows": 3
+        },
+        "piece_count": 9,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          221.70459747314453,
+          218.18299865722656
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  23.0,
+                  172.70803833007812,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c02",
+                "origin_mm": [
+                  101.05023384094238,
+                  168.1988983154297,
+                  0
+                ]
+              },
+              {
+                "id": "r01-c03",
+                "origin_mm": [
+                  180.65009689331055,
+                  168.6200942993164,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c01",
+                "origin_mm": [
+                  27.461105346679688,
+                  94.03665161132812,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c02",
+                "origin_mm": [
+                  96.40888214111328,
+                  93.45254516601562,
+                  0
+                ]
+              },
+              {
+                "id": "r02-c03",
+                "origin_mm": [
+                  180.6528778076172,
+                  98.21796607971191,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c01",
+                "origin_mm": [
+                  28.267314910888672,
+                  18.90850067138672,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c02",
+                "origin_mm": [
+                  98.60306739807129,
+                  24.616159439086914,
+                  0
+                ]
+              },
+              {
+                "id": "r03-c03",
+                "origin_mm": [
+                  176.47058868408203,
+                  20.629924774169922,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer.",
+          "Mounting features are experimental and not load-rated. Support every wall panel.",
+          "Rear keyholes: 8 mm head entry, 4 mm shaft, 7 mm slide. Inspect bridging/supports.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              120.12567901611328,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              153.7995376586914,
+              0
+            ],
+            "extents_mm": [
+              70.4089,
+              59.8743,
+              6.6
+            ],
+            "volume_mm3": 18561.523,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c02",
+            "row": 1,
+            "column": 2,
+            "assembly_origin_mm": [
+              60.12577438354492,
+              111.1073989868164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              78.05023384094238,
+              149.29039764404297,
+              0
+            ],
+            "extents_mm": [
+              67.779,
+              68.8926,
+              6.6
+            ],
+            "volume_mm3": 17885.477,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c02/r01-c02.3mf",
+              "combined": "pieces/r01-c02/combined.stl",
+              "background": "pieces/r01-c02/background.stl",
+              "artwork": "pieces/r01-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r01-c03",
+            "row": 1,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.12500762939453,
+              111.94979095458984,
+              0.0
+            ],
+            "separated_origin_mm": [
+              157.65009689331055,
+              149.7115936279297,
+              0
+            ],
+            "extents_mm": [
+              59.875,
+              68.0502,
+              6.6
+            ],
+            "volume_mm3": 17973.471,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c03/r01-c03.3mf",
+              "combined": "pieces/r01-c03/combined.stl",
+              "background": "pieces/r01-c03/background.stl",
+              "artwork": "pieces/r01-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c01",
+            "row": 2,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              60.12519836425781,
+              0.0
+            ],
+            "separated_origin_mm": [
+              4.4611053466796875,
+              75.1281509399414,
+              0
+            ],
+            "extents_mm": [
+              61.4867,
+              70.5781,
+              6.6
+            ],
+            "volume_mm3": 18897.516,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c01/r02-c01.3mf",
+              "combined": "pieces/r02-c01/combined.stl",
+              "background": "pieces/r02-c01/background.stl",
+              "artwork": "pieces/r02-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c02",
+            "row": 2,
+            "column": 2,
+            "assembly_origin_mm": [
+              53.761444091796875,
+              49.85638427734375,
+              0.0
+            ],
+            "separated_origin_mm": [
+              73.40888214111328,
+              74.5440444946289,
+              0
+            ],
+            "extents_mm": [
+              77.0617,
+              71.7464,
+              5.8
+            ],
+            "volume_mm3": 19986.413,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c02/r02-c02.3mf",
+              "combined": "pieces/r02-c02/combined.stl",
+              "background": "pieces/r02-c02/background.stl",
+              "artwork": "pieces/r02-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r02-c03",
+            "row": 2,
+            "column": 3,
+            "assembly_origin_mm": [
+              120.13056945800781,
+              59.931095123291016,
+              0.0
+            ],
+            "separated_origin_mm": [
+              157.6528778076172,
+              79.3094654083252,
+              0
+            ],
+            "extents_mm": [
+              59.8694,
+              62.2155,
+              6.6
+            ],
+            "volume_mm3": 18057.235,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r02-c03/r02-c03.3mf",
+              "combined": "pieces/r02-c03/combined.stl",
+              "background": "pieces/r02-c03/background.stl",
+              "artwork": "pieces/r02-c03/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c01",
+            "row": 3,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              5.267314910888672,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              59.8743,
+              71.544,
+              6.6
+            ],
+            "volume_mm3": 18800.467,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c01/r03-c01.3mf",
+              "combined": "pieces/r03-c01/combined.stl",
+              "background": "pieces/r03-c01/background.stl",
+              "artwork": "pieces/r03-c01/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c02",
+            "row": 3,
+            "column": 2,
+            "assembly_origin_mm": [
+              47.91703414916992,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              75.60306739807129,
+              5.707658767700195,
+              0
+            ],
+            "extents_mm": [
+              72.6733,
+              60.1287,
+              6.6
+            ],
+            "volume_mm3": 18972.301,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c02/r03-c02.3mf",
+              "combined": "pieces/r03-c02/combined.stl",
+              "background": "pieces/r03-c02/background.stl",
+              "artwork": "pieces/r03-c02/artwork.stl"
+            }
+          },
+          {
+            "id": "r03-c03",
+            "row": 3,
+            "column": 3,
+            "assembly_origin_mm": [
+              111.7659912109375,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              153.47058868408203,
+              1.7214241027832031,
+              0
+            ],
+            "extents_mm": [
+              68.234,
+              68.1012,
+              6.6
+            ],
+            "volume_mm3": 19666.256,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r03-c03/r03-c03.3mf",
+              "combined": "pieces/r03-c03/combined.stl",
+              "background": "pieces/r03-c03/background.stl",
+              "artwork": "pieces/r03-c03/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 10897.94778568098,
+        "bounds": [
+          7.697845303867403,
+          7.01042189925775,
+          172.30215469613262,
+          172.99000000000004
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "contour",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          192.48828411102295,
+          193.97707557678223
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  31.755857944488525,
+                  31.011462211608887,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              -6.244143486022949,
+              -6.987070083618164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              192.4883,
+              193.9771,
+              4.0
+            ],
+            "volume_mm3": 86484.069,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12818.965543735632,
+        "bounds": [
+          0.7558563535911544,
+          0.010421899257693103,
+          179.24414364640884,
+          179.98999999999998
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "contour-bare",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour",
+        "frame": false,
+        "margin_mm": 0
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": false,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 0.0,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          178.48828428983688,
+          179.97958359122276
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.75585785508156,
+                  38.01020820438862,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.7558563351631165,
+              0.010421901941299438,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              178.4883,
+              179.9796,
+              3.2
+            ],
+            "volume_mm3": 72502.503,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12818.965543735632,
+        "bounds": [
+          0.7558563535911544,
+          0.010421899257693103,
+          179.24414364640884,
+          179.98999999999998
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "contour-rounded",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour",
+        "frame_profile": "rounded"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "rounded",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          192.48828411102295,
+          193.97707557678223
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  31.755857944488525,
+                  31.011462211608887,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Rounded contour bezels use height bands no taller than 0.1 mm.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              -6.244143486022949,
+              -6.987070083618164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              192.4883,
+              193.9771,
+              4.0
+            ],
+            "volume_mm3": 86318.411,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12818.965543735632,
+        "bounds": [
+          0.7558563535911544,
+          0.010421899257693103,
+          179.24414364640884,
+          179.98999999999998
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "contour-beaded",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour",
+        "frame_profile": "beaded"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "beaded",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          192.48828411102295,
+          193.97707557678223
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  31.755857944488525,
+                  31.011462211608887,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              -6.244143486022949,
+              -6.987070083618164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              192.4883,
+              193.9771,
+              4.0
+            ],
+            "volume_mm3": 84728.581,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12818.965543735632,
+        "bounds": [
+          0.7558563535911544,
+          0.010421899257693103,
+          179.24414364640884,
+          179.98999999999998
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "contour-loop",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour",
+        "hanging": "loops"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "loops",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          192.48828411102295,
+          202.97707557678223
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  31.755857944488525,
+                  26.511462211608887,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Mounting features are experimental and not load-rated. Support every wall panel.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              -6.244143486022949,
+              -6.987070083618164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              192.4883,
+              202.9771,
+              4.0
+            ],
+            "volume_mm3": 86655.218,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12818.965543735632,
+        "bounds": [
+          0.7558563535911544,
+          0.010421899257693103,
+          179.24414364640884,
+          179.98999999999998
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "contour-keyhole",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour",
+        "hanging": "keyholes",
+        "base_mm": 5
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 5.0,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "keyholes",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          192.48828411102295,
+          193.97707557678223
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  31.755857944488525,
+                  31.011462211608887,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Mounting features are experimental and not load-rated. Support every wall panel.",
+          "Rear keyholes: 8 mm head entry, 4 mm shaft, 7 mm slide. Inspect bridging/supports.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              -6.244143486022949,
+              -6.987070083618164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              192.4883,
+              193.9771,
+              6.6
+            ],
+            "volume_mm3": 164559.678,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12818.965543735632,
+        "bounds": [
+          0.7558563535911544,
+          0.010421899257693103,
+          179.24414364640884,
+          179.98999999999998
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "canvas-margins",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "crop_to_artwork": false
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": false,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 90014.415,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 9686.014173321799,
+        "bounds": [
+          12.1975,
+          11.333338565924379,
+          167.37020833333335,
+          167.8025
+        ],
+        "regions": 5,
+        "holes": 10
+      }
+    },
+    {
+      "name": "inverted",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "invert": true
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": true,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Removed 1 tiny artwork regions below the area filter.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 95530.132,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 16580.66040509255,
+        "bounds": [
+          7.01,
+          7.01,
+          172.99,
+          172.99
+        ],
+        "regions": 12,
+        "holes": 5
+      }
+    },
+    {
+      "name": "too-wide",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "width_mm": 300
+      },
+      "error": "A piece exceeds the usable build plate. Choose automatic Tiles/Puzzle or increase the grid count; tabs and loops also need room."
+    },
+    {
+      "name": "invalid-width",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "width_mm": 1
+      },
+      "error": "1 validation error for Settings\nwidth_mm\n  Input should be greater than or equal to 30 [type=greater_than_equal, input_value=1, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.13/v/greater_than_equal"
+    },
+    {
+      "name": "invalid-keyholes",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "hanging": "keyholes"
+      },
+      "error": "1 validation error for Settings\n  Value error, Rear keyholes need a backing at least 5 mm thick. [type=value_error, input_value={'detail': 'draft', 'hanging': 'keyholes'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error"
+    },
+    {
+      "name": "invalid-contour-layout",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour",
+        "layout": "tiles"
+      },
+      "error": "1 validation error for Settings\n  Value error, Image contour is a single piece. Choose Plaque or a rectangular shape. [type=value_error, input_value={'detail': 'draft', 'shap...our', 'layout': 'tiles'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error"
+    },
+    {
+      "name": "invalid-grid",
+      "source": "src/relief_studio/assets/alpine.svg",
+      "settings": {
+        "detail": "draft",
+        "columns": 12,
+        "rows": 12,
+        "layout": "tiles"
+      },
+      "error": "1 validation error for Settings\n  Value error, A project can contain at most 64 pieces. [type=value_error, input_value={'detail': 'draft', 'colu...: 12, 'layout': 'tiles'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error"
+    },
+    {
+      "name": "gold-holes",
+      "source": "tests/fixtures/gold-cutout.svg",
+      "settings": {
+        "detail": "draft"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 92295.651,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 12537.561071320042,
+        "bounds": [
+          33.942153392330376,
+          7.009999999999971,
+          146.0578466076696,
+          172.99
+        ],
+        "regions": 2,
+        "holes": 1
+      }
+    },
+    {
+      "name": "empty-selection",
+      "source": "tests/fixtures/gold-cutout.svg",
+      "settings": {
+        "detail": "draft",
+        "foreground": "light"
+      },
+      "error": "No artwork remains with Light pixels at threshold 128. Use Reset image selection, adjust the threshold, or choose an image with visible shapes."
+    },
+    {
+      "name": "raster-holes",
+      "source": "tests/fixtures/raster-rings.png",
+      "settings": {
+        "detail": "draft"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 91600.51,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 11668.634792935982,
+        "bounds": [
+          7.010000000000003,
+          23.609999999999996,
+          172.99,
+          156.39
+        ],
+        "regions": 2,
+        "holes": 1
+      }
+    },
+    {
+      "name": "raster-light",
+      "source": "tests/fixtures/raster-rings.png",
+      "settings": {
+        "detail": "draft",
+        "foreground": "light"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "rectangle",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "light",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          180.0,
+          180.0
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  38.0,
+                  38.0,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              180.0,
+              180.0,
+              4.0
+            ],
+            "volume_mm3": 91836.252,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 11963.310686306262,
+        "bounds": [
+          7.01,
+          27.846820083682015,
+          172.99,
+          152.153179916318
+        ],
+        "regions": 2,
+        "holes": 2
+      }
+    },
+    {
+      "name": "icon",
+      "source": "tests/fixtures/contour-icon.svg",
+      "settings": {
+        "detail": "draft",
+        "shape": "contour"
+      },
+      "manifest": {
+        "schema_version": 1,
+        "generator": "relief-studio/0.1.0",
+        "units": "mm",
+        "settings": {
+          "width_mm": 180,
+          "height_mm": 180,
+          "base_mm": 2.4,
+          "relief_mm": 0.8,
+          "shape": "contour",
+          "frame": true,
+          "frame_width_mm": 4,
+          "frame_height_mm": 1.6,
+          "frame_profile": "flat",
+          "corner_radius_mm": 0,
+          "margin_mm": 3,
+          "crop_to_artwork": true,
+          "threshold": 128,
+          "foreground": "auto",
+          "invert": false,
+          "detail": "draft",
+          "min_area_mm2": 0.6,
+          "layout": "plaque",
+          "columns": 0,
+          "rows": 0,
+          "split_mode": "size",
+          "piece_size_mm": 90,
+          "puzzle_style": "random",
+          "puzzle_seed": 1,
+          "clearance_mm": 0.25,
+          "bed_width_mm": 230,
+          "bed_height_mm": 230,
+          "hanging": "none",
+          "background_color": "#fcfcfa",
+          "artwork_color": "#252b28"
+        },
+        "grid": {
+          "columns": 1,
+          "rows": 1
+        },
+        "piece_count": 1,
+        "plate_count": 1,
+        "separated_extents_mm": [
+          126.41402435302734,
+          193.98000526428223
+        ],
+        "plates": [
+          {
+            "id": "plate-01",
+            "file": "plates/plate-01.3mf",
+            "pieces": [
+              {
+                "id": "r01-c01",
+                "origin_mm": [
+                  64.79298782348633,
+                  31.009997367858887,
+                  0
+                ]
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.",
+          "Check brim, prime tower, exclusion zones, and filament assignments in Bambu Studio."
+        ],
+        "physically_tested": false,
+        "pieces": [
+          {
+            "id": "r01-c01",
+            "row": 1,
+            "column": 1,
+            "assembly_origin_mm": [
+              26.792991638183594,
+              -6.989999771118164,
+              0.0
+            ],
+            "separated_origin_mm": [
+              0.0,
+              0.0,
+              0
+            ],
+            "extents_mm": [
+              126.414,
+              193.98,
+              4.0
+            ],
+            "volume_mm3": 40791.377,
+            "watertight": true,
+            "material_parts": 2,
+            "files": {
+              "3mf": "pieces/r01-c01/r01-c01.3mf",
+              "combined": "pieces/r01-c01/combined.stl",
+              "background": "pieces/r01-c01/background.stl",
+              "artwork": "pieces/r01-c01/artwork.stl"
+            }
+          }
+        ]
+      },
+      "artwork": {
+        "area": 6762.5868801254355,
+        "bounds": [
+          33.792991202346045,
+          0.01,
+          146.20700879765397,
+          179.98999999999998
+        ],
+        "regions": 2,
+        "holes": 4
+      }
+    }
+  ]
+}

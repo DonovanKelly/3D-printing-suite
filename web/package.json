@@ -1,0 +1,33 @@
+{
+  "name": "relief-studio-workbench",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "npm run build:wasm && npm run build:web",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "test:e2e": "playwright test",
+    "test:types": "tsc --noEmit -p tsconfig.test.json",
+    "build:wasm": "bash ../scripts/build-wasm.sh",
+    "start": "node ../scripts/serve.mjs",
+    "build:web": "tsc -b && vite build"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.6",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.2",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  }
+}

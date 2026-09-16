@@ -1,0 +1,16 @@
+{
+  "width_mm": 180,
+  "height_mm": 180,
+  "base_mm": 3,
+  "relief_mm": 1.2,
+  "margin_mm": 8,
+  "crop_to_artwork": true,
+  "frame": true,
+  "frame_width_mm": 4,
+  "frame_height_mm": 2,
+  "frame_profile": "rounded",
+  "corner_radius_mm": 12,
+  "hanging": "none",
+  "background_color": "#262626",
+  "artwork_color": "#D4A62A"
+}

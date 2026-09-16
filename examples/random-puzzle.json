@@ -1,0 +1,11 @@
+{
+  "width_mm": 180,
+  "height_mm": 180,
+  "layout": "puzzle",
+  "split_mode": "size",
+  "piece_size_mm": 90,
+  "puzzle_style": "random",
+  "puzzle_seed": 1,
+  "clearance_mm": 0.25,
+  "hanging": "none"
+}

@@ -1,0 +1,10 @@
+{
+  "width_mm": 80,
+  "height_mm": 40,
+  "layout": "puzzle",
+  "columns": 2,
+  "rows": 1,
+  "frame": false,
+  "base_mm": 2.4,
+  "clearance_mm": 0.25
+}

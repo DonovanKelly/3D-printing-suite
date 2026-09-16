@@ -1,0 +1,41 @@
+<!-- Original Alpine crest. Its closed outline gives the landscape and isolated sun one backing contour. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <path id="crest" d="M24 300C24 142 144 24 300 24S576 142 576 300V404C576 479 452 550 300 580C148 550 24 479 24 404Z"/>
+    <clipPath id="landscape"><use href="#crest"/></clipPath>
+    <path id="pine" d="M0 0 -12 28 -6 26 -22 48 -12 44 -32 70 -18 65 -40 94 -24 90 -48 121 -30 116 -52 143 -31 139 -56 161 -10 155 -10 179 10 179 10 155 56 161 31 139 52 143 30 116 48 121 24 90 40 94 18 65 32 70 12 44 22 48 6 26 12 28Z"/>
+  </defs>
+  <rect width="600" height="600" fill="white"/>
+  <g clip-path="url(#landscape)">
+    <g fill="black">
+      <circle cx="190" cy="115" r="46"/>
+      <path d="M8 327 109 194 140 222 169 210 219 261 332 137 360 174 378 166 421 223 445 204 592 339 592 380 8 380Z"/>
+    </g>
+    <g fill="white">
+      <path d="m42 316 67-109 19 33-12 29 25-8 47 58-65-38-23 28-19-14Z"/>
+      <path d="m141 275 28-52 41 48-19 12-19-24-8 27Z"/>
+      <path d="m212 313 120-161-24 71 20 28-31-5-23 26 17 4-39 60Z"/>
+      <path d="m335 168 21 17 13-6 41 56-9 6-22-28 5 46 36 56-14 10-46-79 4-29-17-21Z"/>
+      <path d="m361 268 17 13 14 53 37 23-6 9-48-14-27-76Z"/>
+      <path d="m423 258 22-41 98 91-49-27-8 9-34-42-8 26Z"/>
+      <path d="m72 347 51-29 56 46-62-24Z"/>
+    </g>
+    <g fill="black">
+      <path d="M8 387q62-36 126-14t98 8q37-17 99-6t128-3q61-12 133 21v199H8Z"/>
+    </g>
+    <g fill="white">
+      <path d="M234 392q78-12 178 8l-97 7 39 12-121 10 176 15-79 17 41 9-148 29 232 48 73 45H159l52-52-79-27 122-39-92-21 115-30-45-13 81-12Z"/>
+    </g>
+    <g fill="black">
+      <use href="#pine" transform="translate(64 267) scale(1.28)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+      <use href="#pine" transform="translate(131 329) scale(.76)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+      <use href="#pine" transform="translate(31 359) scale(.92)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+      <use href="#pine" transform="translate(534 325) scale(1.17)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+      <use href="#pine" transform="translate(463 406) scale(.83)" stroke="white" stroke-width="8" stroke-linejoin="round"/>
+      <use href="#pine" transform="translate(199 425) scale(.51)"/>
+      <use href="#pine" transform="translate(372 508) scale(.49)"/>
+      <use href="#pine" transform="translate(330 528) scale(.36)"/>
+    </g>
+  </g>
+  <use href="#crest" fill="none" stroke="black" stroke-width="12" stroke-linejoin="round"/>
+</svg>

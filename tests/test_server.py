@@ -1,0 +1,242 @@
+"""Verify local upload, preview, durable export, and download boundaries end to end."""
+
+import io
+import json
+from pathlib import Path
+from uuid import uuid4
+from xml.etree import ElementTree as ET
+from zipfile import ZipFile
+
+import pytest
+from fastapi.testclient import TestClient
+
+from relief_studio.cli import sample_bytes
+from relief_studio.exports import CORE
+from relief_studio.server import create_app
+
+
+@pytest.fixture
+def client(tmp_path):
+    return TestClient(create_app(tmp_path / "exports"))
+
+
+def test_upload_preview_export_and_download(client, tmp_path):
+    response = client.post(
+        "/api/preview",
+        data={"settings": json.dumps({"width_mm": 100})},
+        files={"image": ("sample.svg", sample_bytes(), "image/svg+xml")},
+    )
+    assert response.status_code == 200, response.text
+    preview = response.json()
+    assert preview["manifest"]["settings"]["width_mm"] == 100
+    assert len(preview["meshes"]) == 2
+    assert not (tmp_path / "exports").exists()  # Changing controls is not a durable write.
+    response = client.post(f"/api/export/{preview['id']}")
+    assert response.status_code == 200
+    download = client.get(response.json()["download_url"])
+    assert download.status_code == 200
+    with ZipFile(io.BytesIO(download.content)) as archive:
+        assert "project.json" in archive.namelist()
+        assert json.loads(archive.read("manifest.json"))["piece_count"] == 1
+    assert client.post(f"/api/export/{preview['id']}").json() == response.json()
+
+
+def test_invalid_geometry_and_json_are_actionable(client):
+    for config in ("no-json", '{"width_mm":300}', '{"base_mm":0}'):
+        response = client.post("/api/preview", data={"settings": config})
+        assert response.status_code == 422
+        assert isinstance(response.json()["detail"], str)
+
+
+def test_input_and_origin_restrictions(client):
+    response = client.post("/api/preview", files={"image": ("bad.png", b"broken", "image/png")})
+    assert response.status_code == 422
+    assert client.post("/api/preview", content=b"x" * (13 * 1024 * 1024)).status_code == 413
+    assert (
+        client.post("/api/preview", headers={"Origin": "https://example.invalid"}).status_code
+        == 403
+    )
+
+
+def test_only_exported_known_files_can_be_downloaded(client):
+    identifier = str(uuid4())
+    assert client.post(f"/api/export/{identifier}").status_code == 410
+    assert client.get(f"/api/files/{identifier}/anything.env").status_code == 404
+    assert client.get("/api/files/not-a-uuid/print-pack.zip").status_code == 422
+    assert client.get(f"/api/files/{identifier}/print-pack.zip").status_code == 404
+
+
+def test_explicit_public_origin_supports_proxy_preview_and_export(tmp_path):
+    origin = "https://sample-api-ws1.local"
+    client = TestClient(create_app(tmp_path / "exports", public_origin=origin))
+    headers = {"Origin": origin}
+    preview = client.post("/api/preview", headers=headers, data={"settings": "{}"})
+    assert preview.status_code == 200, preview.text
+    exported = client.post(f"/api/export/{preview.json()['id']}", headers=headers)
+    assert exported.status_code == 200
+    for other in ("https://other.local", "http://sample-api-ws1.local", origin + ":9999"):
+        rejected = client.post(
+            "/api/preview", headers={"Origin": other, "X-Forwarded-Host": "sample-api-ws1.local"}
+        )
+        assert rejected.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "origin",
+    ["*", "https://sample.local/path", "https://user@sample.local", "https://sample.local#x"],
+)
+def test_public_origin_must_be_explicit_origin(origin):
+    with pytest.raises(ValueError, match="Public origin"):
+        create_app(public_origin=origin)
+
+
+def test_server_exposes_defaults_and_health(client):
+    assert client.get("/api/health").json()["processing"] == "local"
+    assert client.get("/api/defaults").json()["bed_width_mm"] == 230
+    assert client.get("/api/sample").content == sample_bytes()
+
+
+@pytest.mark.parametrize(
+    ("setting", "value", "label"),
+    [
+        ("width_mm", 1, "Width (mm)"),
+        ("frame_width_mm", 0.1, "Border width (mm)"),
+        ("relief_mm", 0.1, "Image thickness (mm)"),
+        ("margin_mm", 50, "Padding (mm)"),
+    ],
+)
+def test_setting_errors_identify_the_control_to_fix(client, setting, value, label):
+    response = client.post("/api/preview", data={"settings": json.dumps({setting: value})})
+    assert response.status_code == 422
+    assert response.json()["detail"].startswith(f"{label}:")
+
+
+def test_empty_selection_has_recovery_code_and_reset_restores_export(client):
+    svg = (Path(__file__).parent / "fixtures/gold-cutout.svg").read_bytes()
+    files = {"image": ("gold.svg", svg, "image/svg+xml")}
+    response = client.post(
+        "/api/preview", files=files, data={"settings": json.dumps({"foreground": "light"})}
+    )
+    assert response.status_code == 422
+    assert response.json()["code"] == "image_selection"
+    assert "Light pixels at threshold 128" in response.json()["detail"]
+    recovered = client.post("/api/preview", files=files, data={"settings": "{}"})
+    assert recovered.status_code == 200
+    export = client.post(f"/api/export/{recovered.json()['id']}")
+    assert export.status_code == 200
+    assert client.get(export.json()["model_url"]).status_code == 200
+
+
+def test_colored_svg_controls_and_direct_two_material_3mf(client):
+    from xml.etree import ElementTree as ET
+
+    import numpy as np
+    import trimesh
+
+    from relief_studio.exports import CORE
+
+    svg = (
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        b'<path fill="#D4A62A" fill-rule="evenodd" '
+        b'd="M10 10H90V90H10Z M30 30H70V70H30Z"/></svg>'
+    )
+    config = {
+        "base_mm": 4,
+        "relief_mm": 1.6,
+        "margin_mm": 9,
+        "frame": False,
+        "corner_radius_mm": 10,
+        "background_color": "#123456",
+        "artwork_color": "#D4A62A",
+    }
+    response = client.post(
+        "/api/preview",
+        data={"settings": json.dumps(config)},
+        files={"image": ("colored.svg", svg, "image/svg+xml")},
+    )
+    assert response.status_code == 200, response.text
+    preview = response.json()
+    assert len(preview["meshes"]) == 2
+    for key, value in config.items():
+        assert preview["manifest"]["settings"][key] == value
+    result = client.post(f"/api/export/{preview['id']}").json()
+    download = client.get(result["model_url"])
+    assert download.status_code == 200
+    assert download.headers["content-type"] == "model/3mf"
+    scene = trimesh.load_scene(io.BytesIO(download.content), file_type="3mf")
+    meshes = sorted(scene.geometry.values(), key=lambda m: m.bounds[0, 2])
+    assert len(meshes) == 2 and all(m.is_volume for m in meshes)
+    assert meshes[0].bounds[:, 2] == pytest.approx([0, 4])
+    assert meshes[1].bounds[:, 2] == pytest.approx([4, 5.6])
+    assert np.all(meshes[1].bounds[:, :2] >= 0)
+    with ZipFile(io.BytesIO(download.content)) as archive:
+        root = ET.fromstring(archive.read("3D/3dmodel.model"))
+        ns = {"c": CORE}
+        assert len(root.findall(".//c:component", ns)) == 2
+        colors = [e.attrib["displaycolor"] for e in root.findall(".//c:base", ns)]
+        assert colors == ["#123456", "#D4A62A"]
+        config = json.loads(archive.read("Metadata/project_settings.config"))
+        assert config["filament_colour"] == colors
+        assert config["nozzle_diameter"] == ["0.4"]
+        model_config = ET.fromstring(archive.read("Metadata/model_settings.config"))
+        assert [
+            p.attrib["value"] for p in model_config.findall("object/part/metadata[@key='extruder']")
+        ] == ["1", "2"]
+
+
+def test_multi_piece_export_uses_pack_and_piece_downloads_are_bounded(client):
+    preview = client.post(
+        "/api/preview",
+        data={
+            "settings": json.dumps(
+                {
+                    "layout": "puzzle",
+                    "columns": 2,
+                    "rows": 1,
+                }
+            )
+        },
+    ).json()
+    result = client.post(f"/api/export/{preview['id']}").json()
+    assert result["model_url"].endswith("/plates/plate-01.3mf")
+    assert len(result["plate_urls"]) == 1
+    assert client.get(result["download_url"]).status_code == 200
+    for filename in ("anything.env", "r99-c99.3mf", "r01-c01.stl"):
+        assert client.get(f"/api/files/{preview['id']}/pieces/{filename}").status_code == 404
+
+
+def test_multiple_plate_downloads_include_each_piece_once(client):
+    preview = client.post(
+        "/api/preview",
+        data={
+            "settings": json.dumps(
+                {
+                    "layout": "puzzle",
+                    "width_mm": 360,
+                    "piece_size_mm": 60,
+                }
+            )
+        },
+    ).json()
+    manifest = preview["manifest"]
+    assert manifest["piece_count"] > 16
+    assert manifest["plate_count"] > 1
+    result = client.post(f"/api/export/{preview['id']}").json()
+    assert result["model_url"] is None
+    assert len(result["plate_urls"]) == manifest["plate_count"]
+    piece_names = []
+    for url in result["plate_urls"]:
+        downloaded = client.get(url)
+        assert downloaded.status_code == 200
+        with ZipFile(io.BytesIO(downloaded.content)) as archive:
+            assert archive.testzip() is None
+            root = ET.fromstring(archive.read("3D/3dmodel.model"))
+            ns = {"c": CORE}
+            objects = {o.attrib["id"]: o for o in root.findall("c:resources/c:object", ns)}
+            piece_names.extend(
+                objects[item.attrib["objectid"]].attrib["name"]
+                for item in root.findall("c:build/c:item", ns)
+            )
+    assert sorted(piece_names) == sorted(piece["id"] for piece in manifest["pieces"])
+    assert client.get(f"/api/files/{preview['id']}/plates/plate-99.3mf").status_code == 404
+    assert client.get(f"/api/files/{preview['id']}/plates/project.json").status_code == 404
