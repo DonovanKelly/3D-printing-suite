@@ -124,10 +124,17 @@ export function Controls({
               <input
                 type="checkbox"
                 role="switch"
+                aria-describedby={contour ? "contour-inversion-hint" : undefined}
                 checked={s.invert}
                 onChange={(event) => update("invert", event.target.checked)}
               />
             </label>
+            {contour && (
+              <p id="contour-inversion-hint" className="hint control-hint">
+                Reverse the raised and empty areas inside the image contour.
+                The backing, border, and hanging keep their shape.
+              </p>
+            )}
             <label className="field-row">
               <span>Detail</span>
               <select

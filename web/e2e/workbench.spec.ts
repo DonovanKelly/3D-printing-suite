@@ -540,6 +540,40 @@ test("cached workbench reloads, imports, generates and downloads offline without
   expect(requests).toEqual([]);
 });
 
+test("inverting a contour keeps its outline, swaps the relief, and restores cleanly", async ({ page }, info) => {
+  const icon = fileURLToPath(new URL("../../tests/fixtures/contour-icon.svg", import.meta.url));
+  await upload(page, icon);
+  await rebuild(page, () => page.getByRole("combobox", { name: "Backing shape", exact: true }).selectOption("contour"));
+  const normal: Preview = await rebuild(page, () =>
+    page.getByRole("combobox", { name: "Hanging", exact: true }).selectOption("loops"),
+  );
+  await page.getByText("Image selection", { exact: true }).click();
+  const toggle = page.getByRole("switch", { name: "Invert artwork", exact: true });
+  await page.getByRole("button", { name: "View from top", exact: true }).click();
+  await page.screenshot({ path: info.outputPath("original-contour.png"), fullPage: true });
+  const inverted: Preview = await rebuild(page, () => toggle.check());
+  await expect(toggle).toBeChecked();
+  expect(inverted.manifest.settings.invert).toBe(true);
+  expect(inverted.meshes.find((m) => m.material === "background")).toEqual(normal.meshes.find((m) => m.material === "background"));
+  expect(inverted.manifest.pieces[0].extents_mm).toEqual(normal.manifest.pieces[0].extents_mm);
+  expect(inverted.vector_svg).not.toBe(normal.vector_svg);
+  expect(inverted.meshes.find((m) => m.material === "artwork")).not.toEqual(normal.meshes.find((m) => m.material === "artwork"));
+  await page.getByRole("button", { name: "View from top", exact: true }).click();
+  await page.screenshot({ path: info.outputPath("inverted-contour.png"), fullPage: true });
+  const downloaded = page.waitForEvent("download");
+  await primary(page).click();
+  const file = await downloaded;
+  expect(file.suggestedFilename()).toBe("relief.3mf");
+  const path = info.outputPath("inverted-contour.3mf");
+  await file.saveAs(path);
+  execFileSync(python, ["-c", "import sys, trimesh; s=trimesh.load_scene(sys.argv[1], file_type='3mf'); assert len(s.geometry)==2; assert all(m.is_volume for m in s.geometry.values())", path]);
+  const restored: Preview = await rebuild(page, () => toggle.uncheck());
+  expect(restored.vector_svg).toBe(normal.vector_svg);
+  expect(restored.meshes).toEqual(normal.meshes);
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Download again", exact: true })).toHaveCount(0);
+});
+
 test("64 pieces stay responsive and an oversized grid recovers", async ({ page }) => {
   await rebuild(page, () => page.getByRole("button", { name: "Tiles", exact: true }).click());
   await rebuild(page, () => page.getByRole("combobox", { name: "Split", exact: true }).selectOption("manual"));

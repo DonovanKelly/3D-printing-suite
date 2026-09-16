@@ -186,3 +186,52 @@ def test_native_rejects_raster_pixel_bomb_before_geometry(tmp_path):
     Image.new("L", (5000, 5000), "black").save(source)
     result = native_request({"input": str(source)})
     assert "24 megapixel" in result["error"]["detail"]
+
+
+@pytest.mark.parametrize("profile,hanging", [
+    ("flat", "none"), ("rounded", "loops"), ("beaded", "none"), ("flat", "keyholes"),
+])
+def test_inverted_contour_exports_preserve_backing_and_material_alignment(
+    tmp_path, profile, hanging,
+):
+    settings = {
+        "shape": "contour", "width_mm": 120, "height_mm": 180,
+        "frame_profile": profile, "hanging": hanging, "base_mm": 5,
+    }
+    packs = []
+    for invert in [False, True, False]:
+        pack = tmp_path / f"contour-{len(packs)}.zip"
+        result = native_request({
+            "input": str(ROOT / "tests/fixtures/contour-icon.svg"),
+            "settings": {**settings, "invert": invert}, "output": str(pack),
+        })
+        assert "error" not in result, result
+        with ZipFile(pack) as archive:
+            piece = result["manifest"]["pieces"][0]
+            meshes = {
+                name: trimesh.load_mesh(
+                    io.BytesIO(archive.read(piece["files"][name])), file_type="stl",
+                )
+                for name in ["background", "artwork", "combined"]
+            }
+            assert all(mesh.is_volume for mesh in meshes.values())
+            assert meshes["combined"].body_count == 1
+            assert meshes["artwork"].bounds[0, 2] == pytest.approx(settings["base_mm"])
+            assert meshes["combined"].volume == pytest.approx(
+                meshes["background"].volume + meshes["artwork"].volume, rel=1e-5,
+            )
+            for name in [n for n in archive.namelist() if n.endswith(".3mf")]:
+                scene = trimesh.load_scene(io.BytesIO(archive.read(name)), file_type="3mf")
+                assert all(mesh.is_volume for mesh in scene.geometry.values())
+                with ZipFile(io.BytesIO(archive.read(name))) as project:
+                    config = ET.fromstring(project.read("Metadata/model_settings.config"))
+                    assert {part.find("metadata[@key='extruder']").attrib["value"]
+                            for part in config.findall("object/part")} == {"1", "2"}
+            packs.append((result, archive.read(piece["files"]["background"])))
+    normal, inverted, restored = packs
+    assert normal[1] == inverted[1] == restored[1]
+    assert normal[0] == restored[0]
+    assert inverted[0]["artwork"]["area"] != normal[0]["artwork"]["area"]
+    assert inverted[0]["manifest"]["pieces"][0]["extents_mm"] == pytest.approx(
+        normal[0]["manifest"]["pieces"][0]["extents_mm"], abs=1e-5,
+    )

@@ -21,10 +21,11 @@ fn svg_color_opacity_contrast_and_manual_boundaries() {
                     .replace("<path ", &format!("<path opacity=\"{opacity}\" "));
                 let mut values = base.clone();
                 values["threshold"] = json!(threshold);
-                let (shape, _) = artwork::trace(svg.as_bytes(), &settings(values)).unwrap();
-                assert!(covers(&shape, 12.0, 70.0));
-                assert!(!covers(&shape, 30.0, 70.0));
-                assert!(covers(&shape, 50.0, 70.0));
+                let traced = artwork::trace(svg.as_bytes(), &settings(values)).unwrap();
+                let shape = traced.relief();
+                assert!(covers(shape, 12.0, 70.0));
+                assert!(!covers(shape, 30.0, 70.0));
+                assert!(covers(shape, 50.0, 70.0));
             }
         }
     }
@@ -42,10 +43,11 @@ fn svg_color_opacity_contrast_and_manual_boundaries() {
                 );
             let mut values = base.clone();
             values["threshold"] = json!(threshold);
-            let (shape, _) = artwork::trace(svg.as_bytes(), &settings(values)).unwrap();
-            assert!(covers(&shape, 12.0, 70.0));
-            assert!(!covers(&shape, 30.0, 70.0));
-            assert!(covers(&shape, 50.0, 70.0));
+            let traced = artwork::trace(svg.as_bytes(), &settings(values)).unwrap();
+            let shape = traced.relief();
+            assert!(covers(shape, 12.0, 70.0));
+            assert!(!covers(shape, 30.0, 70.0));
+            assert!(covers(shape, 50.0, 70.0));
         }
     }
     for foreground in ["dark", "light"] {
@@ -202,9 +204,92 @@ fn extreme_beads_and_rounded_loops_remain_closed() {
 #[test]
 fn touching_pixel_contours_do_not_fill_negative_space() {
     let data = include_bytes!("../../../tests/fixtures/pixel-contacts.png");
-    let (region,_)=artwork::trace(data,&settings(json!({"shape":"contour","width_mm":90,"height_mm":90,"min_area_mm2":0,"frame":false,"margin_mm":0}))).unwrap();
+    let traced = artwork::trace(data,&settings(json!({"shape":"contour","width_mm":90,"height_mm":90,"min_area_mm2":0,"frame":false,"margin_mm":0}))).unwrap();
+    let region = traced.relief();
     let gray = image::load_from_memory(data).unwrap().to_luma8();
     let foreground = gray.pixels().filter(|p| p[0] < 128).count() as f64;
     assert!(region.area() > 0.0);
     assert!(region.area() < foreground * (90.0_f64 / 29.0).powi(2));
+}
+
+#[test]
+fn contour_inversion_keeps_the_silhouette_and_reverses_only_its_interior() {
+    let black = String::from_utf8_lossy(ICON).replace("#b78e45", "#000000");
+    let mut png = std::io::Cursor::new(Vec::new());
+    artwork::render_svg(black.as_bytes(), 384)
+        .unwrap()
+        .write_to(&mut png, image::ImageFormat::Png)
+        .unwrap();
+    for source in [ICON, artwork::SAMPLE, png.get_ref().as_slice()] {
+        let mut values = json!({"shape":"contour","width_mm":120,"height_mm":180,"frame":false,"margin_mm":0,"min_area_mm2":0,"detail":"draft"});
+        let normal = geometry::build(source, settings(values.clone())).unwrap();
+        values["invert"] = json!(true);
+        let inverted = geometry::build(source, settings(values.clone())).unwrap();
+        let outline = &normal.pieces[0].tile.shape;
+        let inverted_outline = &inverted.pieces[0].tile.shape;
+        assert!(outline.difference(inverted_outline).area() < 1e-7);
+        assert!(inverted_outline.difference(outline).area() < 1e-7);
+        assert!(normal.vector.intersection(&inverted.vector).area() < 1e-7);
+        assert!(
+            outline
+                .difference(&normal.vector.union(&inverted.vector))
+                .area()
+                < 1e-7
+        );
+        assert!(inverted.vector.difference(outline).area() < 1e-7);
+        assert!((normal.pieces[0].base.volume() - inverted.pieces[0].base.volume()).abs() < 1e-5);
+        assert!(!inverted.vector.is_empty());
+        if source == ICON {
+            assert!(covers(&normal.vector, 60.0, 170.0));
+            assert!(!covers(&inverted.vector, 60.0, 170.0));
+            assert!(!covers(&normal.vector, 60.0, 150.0));
+            assert!(covers(&inverted.vector, 60.0, 150.0));
+            assert!(covers(&normal.vector, 60.0, 52.0));
+            assert!(!covers(&inverted.vector, 60.0, 52.0));
+        }
+        values["invert"] = json!(false);
+        let restored = geometry::build(source, settings(values)).unwrap();
+        assert!(
+            (normal.pieces[0].combined.volume() - restored.pieces[0].combined.volume()).abs()
+                < 1e-5
+        );
+    }
+}
+
+#[test]
+fn contour_inversion_preserves_empty_relief_and_island_recovery() {
+    let solid = br#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="30"/></svg>"#;
+    let mut values = json!({"shape":"contour","frame":false,"margin_mm":0,"invert":true});
+    let inverted = geometry::build(solid, settings(values.clone())).unwrap();
+    assert!(inverted.vector.is_empty());
+    assert!(inverted.pieces[0].artwork.is_none());
+    assert!(
+        inverted
+            .warnings
+            .iter()
+            .any(|s| s.contains("no enclosed negative space"))
+    );
+    assert!(relief_core::exports::export(&inverted).is_ok());
+    values["invert"] = json!(false);
+    let restored = geometry::build(solid, settings(values.clone())).unwrap();
+    assert!(restored.pieces[0].artwork.is_some());
+    assert_eq!(
+        restored.pieces[0].base.vertices,
+        inverted.pieces[0].base.vertices
+    );
+
+    let islands = br#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="50" r="20"/><circle cx="75" cy="50" r="20"/></svg>"#;
+    for invert in [true, false] {
+        values["invert"] = json!(invert);
+        values["margin_mm"] = json!(0);
+        assert!(
+            geometry::build(islands, settings(values.clone()))
+                .err()
+                .unwrap()
+                .detail
+                .contains("disconnected islands")
+        );
+        values["margin_mm"] = json!(12);
+        assert!(geometry::build(islands, settings(values.clone())).is_ok());
+    }
 }

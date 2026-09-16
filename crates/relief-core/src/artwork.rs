@@ -1,4 +1,6 @@
 /*! Decode bounded local images and trace foreground rings, preserving shell/hole roles.
+Contour inversion reverses the relief within the original silhouette, which stays
+independent of the selected relief so backing dimensions and mounting remain fixed.
 SVG is rasterized with no resource resolver or script engine. Pixel y is reflected
 once into model coordinates; offsets and all later operations use millimeters. */
 use crate::{EngineError, Result, settings::*};
@@ -9,6 +11,23 @@ use std::io::Cursor;
 
 pub const MAX_INPUT_BYTES: usize = 12 * 1024 * 1024;
 pub const SAMPLE: &[u8] = include_bytes!("../../../src/relief_studio/assets/alpine.svg");
+
+pub struct TracedArtwork {
+    relief: CrossSection,
+    outline: CrossSection,
+    warnings: Vec<String>,
+}
+impl TracedArtwork {
+    pub fn relief(&self) -> &CrossSection {
+        &self.relief
+    }
+    pub fn outline(&self) -> &CrossSection {
+        &self.outline
+    }
+    pub fn warnings(&self) -> &[String] {
+        &self.warnings
+    }
+}
 
 pub fn region(rings: &[Vec<[f64; 2]>]) -> CrossSection {
     CrossSection::from_polygons_with_fill_rule(rings, FillRule::EvenOdd)
@@ -212,7 +231,7 @@ pub fn load_image(data: &[u8], s: &Settings) -> Result<(RgbaImage, bool)> {
     };
     Ok((image.to_rgba8(), false))
 }
-pub fn trace(data: &[u8], s: &Settings) -> Result<(CrossSection, Vec<String>)> {
+pub fn trace(data: &[u8], s: &Settings) -> Result<TracedArtwork> {
     let (rgba, is_svg) = load_image(data, s)?;
     let (w, h) = rgba.dimensions();
     let mut strength = vec![0f64; (w * h) as usize];
@@ -283,7 +302,7 @@ pub fn trace(data: &[u8], s: &Settings) -> Result<(CrossSection, Vec<String>)> {
             if s.foreground == Foreground::Light {
                 selected = !selected;
             }
-            if s.invert {
+            if s.invert && s.shape != Shape::Contour {
                 selected = !selected;
             }
             mask.put_pixel(x + 1, y + 1, image::Luma([if selected { 255 } else { 0 }]));
@@ -371,6 +390,31 @@ pub fn trace(data: &[u8], s: &Settings) -> Result<(CrossSection, Vec<String>)> {
             "Artwork is too thin after contact cleanup. Increase its line weight.",
         ));
     }
+    // Preserve the source silhouette and its scale before reversing the relief.
+    // Reversing the raster first would promote the surrounding canvas to a backing.
+    let outline = silhouette(&shape);
+    let shape = if s.invert && s.shape == Shape::Contour {
+        let negative = outline.difference(&shape);
+        let parts = negative.decompose();
+        let kept: Vec<_> = parts
+            .iter()
+            .filter(|p| p.area() >= s.min_area_mm2)
+            .cloned()
+            .collect();
+        if kept.len() != parts.len() {
+            notes.push(format!(
+                "Removed {} tiny inverted artwork regions below the area filter.",
+                parts.len() - kept.len()
+            ));
+        }
+        let negative = CrossSection::batch_union(&kept);
+        if negative.is_empty() {
+            notes.push("This contour has no enclosed negative space to raise after inversion; only the backing and any border remain.".into());
+        }
+        negative
+    } else {
+        shape
+    };
     if shape.difference(&offset(&offset(&shape, -0.2), 0.2)).area() > (shape.area() * 0.03).max(1.0)
     {
         notes.push(
@@ -378,5 +422,9 @@ pub fn trace(data: &[u8], s: &Settings) -> Result<(CrossSection, Vec<String>)> {
                 .into(),
         );
     }
-    Ok((shape, notes))
+    Ok(TracedArtwork {
+        relief: shape,
+        outline,
+        warnings: notes,
+    })
 }

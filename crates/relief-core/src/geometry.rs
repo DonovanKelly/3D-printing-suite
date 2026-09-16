@@ -71,9 +71,11 @@ fn keyholes(tile: &Tile, s: &Settings, columns: usize, rows: usize) -> Result<Ve
     Ok(cutters)
 }
 pub fn build(data: &[u8], s: Settings) -> Result<Project> {
-    let (vector, mut notes) = artwork::trace(data, &s)?;
+    let traced = artwork::trace(data, &s)?;
+    let vector = traced.relief().clone();
+    let mut notes = traced.warnings().to_vec();
     let (tiles, columns, rows, outer, inner) = if s.shape == Shape::Contour {
-        let (tiles, outer, inner) = layout::contour(&vector, &s)?;
+        let (tiles, outer, inner) = layout::contour(traced.outline(), &s)?;
         (tiles, 1, 1, outer, inner)
     } else {
         let (tiles, c, r) = layout::choose(&s)?;
@@ -148,7 +150,12 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
         });
     }
     if s.shape == Shape::Contour {
-        notes.push("Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes; the raised artwork preserves them.".into());
+        notes.push("Width and height bound the image; padding and bezel expand outward. The backing fills enclosed image holes.".into());
+        if s.invert {
+            notes.push("Inversion reverses the artwork inside the original image contour; its backing, bezel, and mounting keep the same shape.".into());
+        } else {
+            notes.push("The raised artwork preserves the image holes.".into());
+        }
         if s.frame && s.frame_profile == FrameProfile::Rounded {
             notes.push("Rounded contour bezels use height bands no taller than 0.1 mm.".into());
         }

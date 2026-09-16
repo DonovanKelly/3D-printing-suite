@@ -23,6 +23,11 @@ behavioral reference; see [its architecture](architecture-v1.md).
 - `artwork.rs`: bounded PNG/JPEG/WebP decoding and EXIF orientation, restricted
   self-contained SVG rasterization through resvg, opacity/perimeter contrast,
   manual threshold/inversion, nested contour tracing, filtering, and scaling.
+  The traced result keeps relief and outer silhouette separate. Contour inversion
+  complements the relief within the uninverted silhouette after scaling/cleanup;
+  layout uses that retained silhouette, including when the inverted relief is empty.
+  Rectangle mode still inverts the raster before tracing. This contour behavior
+  intentionally corrects v1's canvas-shaped backing after inversion.
   A bundled DejaVu font supplies offline SVG text; convert text to paths when
   an exact custom typeface matters.
 - `layout.rs` / `random.rs`: rounded footprints, outward contour offsets, centered

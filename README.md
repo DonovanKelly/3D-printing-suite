@@ -147,6 +147,10 @@ frontend, and Python reference dependencies. The full verification command is
    closed curved outline, so it works even with no bezel and zero padding.
    The backing follows the outside of the selected artwork. Enclosed holes get
    background beneath them; the raised image keeps its cutouts and interior details.
+   **Image selection → Invert artwork** reverses the raised and empty areas inside
+   that same outer silhouette. The backing, border, and hanging keep their shape;
+   surrounding canvas space stays outside the contour. A solid silhouette with
+   no enclosed negative space becomes a plain backing when inverted.
 2. **Width / Height** limit the image itself in this mode, preserving its aspect
    ratio and centering it. Empty canvas margins are trimmed automatically.
    **Padding** expands the backing around the image; **Border width** expands it
