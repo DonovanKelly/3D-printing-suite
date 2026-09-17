@@ -33,6 +33,11 @@ behavioral reference; see [its architecture](architecture-v1.md).
 - `layout.rs` / `random.rs`: rounded footprints, outward contour offsets, centered
   loops, complementary puzzle seams, internal clearance, automatic grid choice,
   and Python-compatible integer-seeded MT19937 patterns.
+  Contour grids span the expanded silhouette's actual bounds, including negative
+  coordinates from padding. Clearance is applied to internal grid seams before
+  clipping to the silhouette. Empty cells are omitted; connected fragments get
+  stable `rNN-cNN-pNN` IDs. The 64-piece limit includes all fragments. Loops attach
+  to the uppermost occupied fragment per column and cannot overlap another piece.
 - `geometry.rs` / `solids.rs`: Manifold cross-sections, extrusion, booleans,
   rectangle border lofts, contour height bands, decorative beads, rear mounting,
   and triangle validation after conversion to STL's float32 representation.
@@ -42,6 +47,8 @@ behavioral reference; see [its architecture](architecture-v1.md).
   Closed opposite edges, finite coordinates, and positive volume are required.
 - `packing.rs`: stable shelf packing with 3 mm gaps, aligned material placement,
   and P1S front-left exclusion-zone checks.
+  Separated maps stack same-cell fragments without overlap; assembly views use
+  their original coordinates and bounds across every piece.
 - `exports.rs`: preview DTOs, maps, PNG, source hashes, manifests, aligned STL,
   Bambu two/three-filament 3MF projects, and ZIP packs produced in memory.
 - `wasm.rs`: owned-buffer ABI. JavaScript copies results before the next call;
@@ -87,5 +94,7 @@ regions can differ; geometric comparisons use stated millimeter/volume bounds.
 Synthetic nested holes retain exact topology. The existing 12 MiB input, 24 MP
 raster, 5,000-region, and 64-piece limits remain. Physical joint fit, mounting
 strength, actual AMS tray assignment, and final slicing still require inspection.
+Contour Tiles/Puzzle intentionally extend the v1 single-piece restriction; its
+frozen rejection case is exercised as a successful native split and export.
 
 Build decisions and migration reference: [browser v2](browser-v2.md).

@@ -1,5 +1,7 @@
 /*! Complementary partitions transfer each seam exactly once between neighboring cells.
 Clearance removes internal seams only; original outer dimensions remain exact.
+Contour cuts use the expanded silhouette's bounds. Empty cells disappear and
+disconnected fragments become separate named pieces; no fragment is discarded.
 Fit checks use actual polygons including tabs, rounded corners, and hanging loops. */
 use crate::{
     EngineError, Result,
@@ -10,14 +12,22 @@ use crate::{
 use manifold_csg::CrossSection;
 use std::f64::consts::PI;
 
+/** One connected printable backing in assembly coordinates (mm). Row and column
+identify its cutting cell, counted from the top left. A cell split by a concavity
+has numbered fragments; None preserves the ordinary rNN-cNN name. */
 pub struct Tile {
     pub row: usize,
     pub column: usize,
+    pub fragment: Option<usize>,
     pub shape: CrossSection,
 }
 impl Tile {
     pub fn name(&self) -> String {
-        format!("r{:02}-c{:02}", self.row + 1, self.column + 1)
+        let cell = format!("r{:02}-c{:02}", self.row + 1, self.column + 1);
+        match self.fragment {
+            Some(n) => format!("{cell}-p{n:02}"),
+            None => cell,
+        }
     }
 }
 pub fn rect(x0: f64, y0: f64, x1: f64, y1: f64) -> CrossSection {
@@ -75,9 +85,18 @@ pub fn add_loop(shape: &CrossSection, left: f64, right: f64) -> Result<CrossSect
         .difference(&circle(x, top + 3.0, 2.5)))
 }
 pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>> {
-    let cw = s.width_mm / columns as f64;
-    let ch = s.height_mm / rows as f64;
-    if cw.min(ch) < 24.0 {
+    partition_outline(s, columns, rows, &outline(s, 0.0))
+}
+fn partition_outline(
+    s: &Settings,
+    columns: usize,
+    rows: usize,
+    footprint: &CrossSection,
+) -> Result<Vec<Tile>> {
+    let [x0, y0, x1, y1] = bounds(footprint);
+    let cw = (x1 - x0) / columns as f64;
+    let ch = (y1 - y0) / rows as f64;
+    if !valid_cell_size(s, cw, ch, columns, rows) {
         return Err(EngineError::input(
             "Each grid cell must be at least 24 mm wide and tall.",
         ));
@@ -86,10 +105,10 @@ pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>>
         .flat_map(|r| {
             (0..columns).map(move |c| {
                 rect(
-                    c as f64 * cw,
-                    r as f64 * ch,
-                    (c + 1) as f64 * cw,
-                    (r + 1) as f64 * ch,
+                    x0 + c as f64 * cw,
+                    y0 + r as f64 * ch,
+                    x0 + (c + 1) as f64 * cw,
+                    y0 + (r + 1) as f64 * ch,
                 )
             })
         })
@@ -133,8 +152,8 @@ pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>>
                 seam(
                     r * columns + c,
                     r * columns + c + 1,
-                    (c + 1) as f64 * cw,
-                    r as f64 * ch,
+                    x0 + (c + 1) as f64 * cw,
+                    y0 + r as f64 * ch,
                     ch,
                     true,
                     if (r + c) % 2 == 0 { 1.0 } else { -1.0 },
@@ -146,8 +165,8 @@ pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>>
                 seam(
                     r * columns + c,
                     (r + 1) * columns + c,
-                    c as f64 * cw,
-                    (r + 1) as f64 * ch,
+                    x0 + c as f64 * cw,
+                    y0 + (r + 1) as f64 * ch,
                     cw,
                     false,
                     if (r + c) % 2 == 1 { 1.0 } else { -1.0 },
@@ -155,7 +174,6 @@ pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>>
             }
         }
     }
-    let footprint = outline(s, 0.0);
     let mut tiles = Vec::new();
     for r in 0..rows {
         for c in 0..columns {
@@ -169,12 +187,10 @@ pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>>
                         .zip(ring.iter().cycle().skip(1))
                         .take(ring.len())
                     {
-                        let outer = (a[0].abs() < 1e-7 && b[0].abs() < 1e-7)
-                            || ((a[0] - s.width_mm).abs() < 1e-7
-                                && (b[0] - s.width_mm).abs() < 1e-7)
-                            || (a[1].abs() < 1e-7 && b[1].abs() < 1e-7)
-                            || ((a[1] - s.height_mm).abs() < 1e-7
-                                && (b[1] - s.height_mm).abs() < 1e-7);
+                        let outer = ((a[0] - x0).abs() < 1e-7 && (b[0] - x0).abs() < 1e-7)
+                            || ((a[0] - x1).abs() < 1e-7 && (b[0] - x1).abs() < 1e-7)
+                            || ((a[1] - y0).abs() < 1e-7 && (b[1] - y0).abs() < 1e-7)
+                            || ((a[1] - y1).abs() < 1e-7 && (b[1] - y1).abs() < 1e-7);
                         if !outer {
                             cuts.push(
                                 circle(a[0], a[1], half)
@@ -186,24 +202,77 @@ pub fn partition(s: &Settings, columns: usize, rows: usize) -> Result<Vec<Tile>>
                 }
                 shape = shape.difference(&CrossSection::batch_union(&cuts));
             }
-            shape = shape.intersection(&footprint);
-            if s.hanging == Hanging::Loops && r == rows - 1 {
-                shape = add_loop(&shape, c as f64 * cw, (c + 1) as f64 * cw)?;
+            shape = shape.intersection(footprint);
+            if s.shape == Shape::Contour && shape.is_empty() {
+                continue;
             }
-            if shape.is_empty() || shape.decompose().len() != 1 {
+            let mut fragments = shape.decompose();
+            if s.shape == Shape::Rectangle && fragments.len() != 1 {
                 return Err(EngineError::input(
                     "Layout disconnected a piece. Reduce clearance or use larger pieces.",
                 ));
             }
-            tiles.push(Tile {
-                row: rows - r - 1,
-                column: c,
-                shape,
+            // Stable spatial order makes filenames repeatable across builds.
+            fragments.sort_by(|a, b| {
+                let a = bounds(a);
+                let b = bounds(b);
+                b[3].total_cmp(&a[3]).then(a[0].total_cmp(&b[0]))
             });
+            let fragmented = fragments.len() > 1;
+            for (i, shape) in fragments.into_iter().enumerate() {
+                tiles.push(Tile {
+                    row: rows - r - 1,
+                    column: c,
+                    fragment: fragmented.then_some(i + 1),
+                    shape,
+                });
+            }
         }
     }
-    tiles.sort_by_key(|t| (t.row, t.column));
+    tiles.sort_by_key(|t| (t.row, t.column, t.fragment));
+    if tiles.len() > 64 {
+        return Err(EngineError::input(
+            "The contour split creates more than 64 pieces, including separate fragments. Use larger pieces or fewer grid cells.",
+        ));
+    }
+    if s.hanging == Hanging::Loops {
+        for c in 0..columns {
+            // Only the uppermost occupied fragment in each column receives a loop.
+            let Some(i) = tiles.iter().position(|t| t.column == c) else {
+                continue;
+            };
+            let b = bounds(&tiles[i].shape);
+            let (left, right) = if s.shape == Shape::Contour {
+                (b[0], b[2])
+            } else {
+                (x0 + c as f64 * cw, x0 + (c + 1) as f64 * cw)
+            };
+            let mounted = add_loop(&tiles[i].shape, left, right)?;
+            if mounted.decompose().len() != 1 {
+                return Err(EngineError::input(
+                    "The top loop is unsupported. Increase Padding or choose no hanging.",
+                ));
+            }
+            if tiles
+                .iter()
+                .enumerate()
+                .any(|(j, other)| i != j && mounted.intersection(&other.shape).area() > 1e-7)
+            {
+                return Err(EngineError::input(
+                    "A top loop overlaps another piece. Change the grid, use rear keyholes, or choose no hanging.",
+                ));
+            }
+            tiles[i].shape = mounted;
+        }
+    }
     Ok(tiles)
+}
+fn valid_cell_size(s: &Settings, cw: f64, ch: f64, columns: usize, rows: usize) -> bool {
+    if s.shape == Shape::Contour {
+        (columns == 1 || cw >= 24.0) && (rows == 1 || ch >= 24.0)
+    } else {
+        cw.min(ch) >= 24.0
+    }
 }
 pub fn fits(tiles: &[Tile], s: &Settings, size_limit: bool) -> bool {
     let w = if size_limit {
@@ -222,11 +291,24 @@ pub fn fits(tiles: &[Tile], s: &Settings, size_limit: bool) -> bool {
     })
 }
 pub fn choose(s: &Settings) -> Result<(Vec<Tile>, usize, usize)> {
+    choose_outline(s, &outline(s, 0.0))
+}
+pub fn choose_outline(s: &Settings, footprint: &CrossSection) -> Result<(Vec<Tile>, usize, usize)> {
     if s.layout == Layout::Plaque || s.columns > 0 {
         let c = s.columns.max(1) as usize;
         let r = s.rows.max(1) as usize;
-        let tiles = partition(s, c, r)?;
+        let tiles = partition_outline(s, c, r, footprint)?;
+        if s.layout != Layout::Plaque && tiles.len() < 2 {
+            return Err(EngineError::input(
+                "The grid cuts fewer than two pieces of the contour. Increase the grid or choose Plaque.",
+            ));
+        }
         if !fits(&tiles, s, false) {
+            if s.shape == Shape::Contour && s.layout == Layout::Plaque {
+                return Err(EngineError::input(
+                    "Image contour exceeds the usable build plate, including its bezel and loop. Choose Tiles or Puzzle to split it, or reduce Width or Height.",
+                ));
+            }
             return Err(EngineError::input(
                 "A piece exceeds the usable build plate. Choose automatic Tiles/Puzzle or increase the grid count; tabs and loops also need room.",
             ));
@@ -244,65 +326,49 @@ pub fn choose(s: &Settings) -> Result<(Vec<Tile>, usize, usize)> {
     } else {
         s.bed_height_mm
     };
-    let mut candidates: Vec<_> = ((s.width_mm / w).ceil() as usize..=12)
-        .flat_map(|c| ((s.height_mm / h).ceil() as usize..=12).map(move |r| (c, r)))
+    let [x0, y0, x1, y1] = bounds(footprint);
+    let width = x1 - x0;
+    let height = y1 - y0;
+    let mut candidates: Vec<_> = ((width / w).ceil() as usize..=12)
+        .flat_map(|c| ((height / h).ceil() as usize..=12).map(move |r| (c, r)))
         .filter(|&(c, r)| {
             (2..=64).contains(&(c * r))
-                && (s.width_mm / c as f64).min(s.height_mm / r as f64) >= 24.0
+                && valid_cell_size(s, width / c as f64, height / r as f64, c, r)
         })
         .collect();
     candidates.sort_by(|&(c, r), &(c2, r2)| {
         (c * r).cmp(&(c2 * r2)).then_with(|| {
-            (s.width_mm / c as f64 - s.height_mm / r as f64)
+            (width / c as f64 - height / r as f64)
                 .abs()
-                .total_cmp(&(s.width_mm / c2 as f64 - s.height_mm / r2 as f64).abs())
+                .total_cmp(&(width / c2 as f64 - height / r2 as f64).abs())
         })
     });
     for (c, r) in candidates {
-        let tiles = partition(s, c, r)?;
-        if fits(&tiles, s, size) {
+        let Ok(tiles) = partition_outline(s, c, r, footprint) else {
+            continue;
+        };
+        if tiles.len() >= 2 && fits(&tiles, s, size) {
             return Ok((tiles, c, r));
         }
     }
     Err(EngineError::input(
-        "No split fits the piece size and build plate within 64 pieces (minimum cell 24 mm). Increase Max piece size, use Largest panels, or adjust the finished dimensions.",
+        "No split fits the piece size and build plate within 64 pieces (minimum cut spacing 24 mm). Increase Max piece size, use Largest panels, adjust the dimensions, or choose no hanging.",
     ))
 }
-pub fn contour(
+pub fn contour_outline(
     vector: &CrossSection,
     s: &Settings,
-) -> Result<(Vec<Tile>, CrossSection, CrossSection)> {
+) -> Result<(CrossSection, CrossSection)> {
     let silhouette = silhouette(vector);
     let inner = crate::artwork::silhouette(&offset(&silhouette, s.margin_mm));
     let outer = crate::artwork::silhouette(&offset(
         &silhouette,
         s.margin_mm + if s.frame { s.frame_width_mm } else { 0.0 },
     ));
-    if outer.decompose().len() != 1 {
+    if s.layout == Layout::Plaque && outer.decompose().len() != 1 {
         return Err(EngineError::input(
             "Image contour has disconnected islands. Increase Padding or Border width to join them, or choose Rectangle.",
         ));
     }
-    let shape = if s.hanging == Hanging::Loops {
-        let b = bounds(&outer);
-        add_loop(&outer, b[0], b[2])?
-    } else {
-        outer.clone()
-    };
-    if shape.decompose().len() != 1 {
-        return Err(EngineError::input(
-            "The top loop is unsupported. Increase Padding or choose no hanging.",
-        ));
-    }
-    let tiles = vec![Tile {
-        row: 0,
-        column: 0,
-        shape,
-    }];
-    if !fits(&tiles, s, false) {
-        return Err(EngineError::input(
-            "Image contour exceeds the usable build plate, including its bezel and loop. Reduce Width or Height, or remove the top loop.",
-        ));
-    }
-    Ok((tiles, outer, inner))
+    Ok((outer, inner))
 }

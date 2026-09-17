@@ -77,8 +77,9 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
     let vector = traced.relief().clone();
     let mut notes = traced.warnings().to_vec();
     let (tiles, columns, rows, outer, inner) = if s.shape == Shape::Contour {
-        let (tiles, outer, inner) = layout::contour(traced.outline(), &s)?;
-        (tiles, 1, 1, outer, inner)
+        let (outer, inner) = layout::contour_outline(traced.outline(), &s)?;
+        let (tiles, c, r) = layout::choose_outline(&s, &outer)?;
+        (tiles, c, r, outer, inner)
     } else {
         let (tiles, c, r) = layout::choose(&s)?;
         (
@@ -176,6 +177,12 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
         if s.frame && s.frame_profile == FrameProfile::Rounded {
             notes.push("Rounded contour bezels use height bands no taller than 0.1 mm.".into());
         }
+        if pieces.len() > 1 {
+            notes.push("Contour cuts keep the outside silhouette. Empty grid cells are omitted; separate fragments have their own piece labels. Use the assembly map to position every piece.".into());
+        }
+    }
+    if pieces.len() > 1 {
+        notes.push("For assembly, use a suitable adhesive or mount pieces individually. Puzzle tabs provide alignment, not a load-bearing connection. Physical fit, adhesive strength, and wall mounting have not been tested.".into());
     }
     if s.layout == Layout::Puzzle && pieces.len() > 1 {
         notes.push(

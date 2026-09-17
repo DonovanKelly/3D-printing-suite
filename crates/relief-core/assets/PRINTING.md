@@ -20,10 +20,17 @@
    puzzle_seed and puzzle_style reproduce the cut pattern. Tabs and loops are
    included in size-based splitting; a custom grid overrides maximum piece size.
 6. Width/height constrain the image in contour mode: padding, bezel, and hanging
-   expand the finished piece. Use manifest.json for actual piece extents.
+   expand the finished assembly. Contour cuts omit empty cells and keep separate
+   fragments as individually named pieces (for example r01-c01-p01). Follow the
+   labeled map, including every fragment. Use manifest.json for actual extents.
+7. Straight tile seams can be glued with a suitable adhesive or placed separately
+   on the wall. Zero clearance gives matching edges; positive clearance leaves a
+   gap. Puzzle tabs only align the portions of a seam that meet the contour, so
+   some narrow edges have no tab. Check a small pair before a full assembly.
 
 Material volumes touch without overlapping. combined.stl is a boolean union.
 Puzzle fit has NOT been physically calibrated. Print a small fit pair first.
+Adhesive bonds and mounting strength have not been tested.
 Tabs align pieces in-plane and do not replace individual panel mounting.
 Hanging features are experimental and not load-rated. Rear keyholes may need
 bridging/support tuning. Do not rely on top-row loops to hold a large assembly.

@@ -81,11 +81,15 @@ pub fn svg(p: &Project, assembly: bool, separated: bool) -> String {
     let mut min_x = 0.0;
     let mut min_y = 0.0;
     if s.shape == Shape::Contour {
-        let b = bounds(&p.pieces[0].tile.shape);
-        min_x = b[0];
-        min_y = b[1];
-        width = b[2] - b[0];
-        height = b[3] - b[1];
+        let all: Vec<_> = p
+            .pieces
+            .iter()
+            .map(|piece| bounds(&piece.tile.shape))
+            .collect();
+        min_x = all.iter().map(|b| b[0]).fold(f64::INFINITY, f64::min);
+        min_y = all.iter().map(|b| b[1]).fold(f64::INFINITY, f64::min);
+        width = all.iter().map(|b| b[2]).fold(f64::NEG_INFINITY, f64::max) - min_x;
+        height = all.iter().map(|b| b[3]).fold(f64::NEG_INFINITY, f64::max) - min_y;
     }
     let (places, extent) = packing::separated(p);
     if separated {
@@ -121,19 +125,21 @@ pub fn svg(p: &Project, assembly: bool, separated: bool) -> String {
             );
             if s.shape != Shape::Contour || p.pieces.len() > 1 {
                 let b = bounds(&piece.tile.shape);
-                let x = (b[0] + b[2]) / 2.0 + dx;
-                let y = height - ((b[1] + b[3]) / 2.0 + dy);
+                let x = (b[0] + b[2]) / 2.0 + dx - min_x;
+                let y = height + min_y - ((b[1] + b[3]) / 2.0 + dy);
                 let size = (width / p.columns as f64).min(height / p.rows as f64) * 0.06;
+                let name = piece.tile.name();
+                let label_width = size * (name.len() as f64 * 0.65 + 1.0);
                 let _ = write!(
                     labels,
                     "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\" fill=\"#fcfcfa\" stroke=\"#859184\" stroke-width=\"{}\"/><text x=\"{x}\" y=\"{y}\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"{size}\" fill=\"#285f49\">{}</text>",
-                    x - size * 2.5,
+                    x - label_width / 2.0,
                     y - size,
-                    size * 5.0,
+                    label_width,
                     size * 1.5,
                     size * 0.25,
                     size * 0.04,
-                    piece.tile.name()
+                    name
                 );
             }
         }

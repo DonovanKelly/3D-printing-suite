@@ -5,9 +5,10 @@ or a self-contained SVG, tune its black-and-white conversion, then make a raised
 plaque, large tiled panels, or an interlocking puzzle. A browser workbench and
 native Rust CLI share the same geometry engine.
 
-**Image contour** makes a single icon-shaped print with an optional flat,
-rounded, or beaded bezel. Padding and bezel width expand outward around the
-image; no rectangular backing is required.
+**Image contour** makes an icon-shaped print or splits a large irregular design
+into tiles or puzzle pieces, with an optional flat, rounded, or beaded bezel.
+Padding and bezel width expand outward around the image; no rectangular backing
+is required.
 
 Implemented: threshold/inversion, preserved negative-space holes, configurable
 dimensions and colors, raised borders, top hanging loops, rear keyhole recesses,
@@ -188,20 +189,44 @@ See [workspace files](docs/workspace-files.md) for behavior and format details.
    rear keyhole placed down the centerline where enough backing supports it.
    Rear keyholes need a 5 mm backing and sufficient local width. Increase the
    image size or padding when a narrow icon cannot accommodate the recess.
-5. Download a 3MF or full print pack. Contour mode is one piece; Tiles/Puzzle
-   are disabled. Bezel, padding, and loop must all fit the usable plate. Reduce
-   the image dimensions if the app reports overflow.
+5. Choose **Plaque** for one piece, or **Tiles / Puzzle** to split the contour
+   across printable pieces. **By piece size** limits actual piece extents,
+   **Largest panels** uses the usable bed, and **Custom grid** sets the cuts.
+   The grid covers the actual expanded backing, including padding and bezel.
+   Empty cells are omitted. When a cut crosses separate arms of a concave shape,
+   each fragment becomes its own piece, named like `r01-c01-p01` and `r01-c01-p02`.
+   The 64-piece limit includes these fragments.
+6. Use **Pieces** to inspect the cuts and **Relief / Assembly** for the finished
+   arrangement. Download a 3MF or full print pack with the labeled assembly map.
+   **Tiles** has straight seams for gluing or placing panels independently;
+   set **Clearance** to 0 for matching edges. **Puzzle** adds alignment tabs
+   wherever the contour intersects the puzzle seams; very narrow edges may have
+   no tab. It does not add load-bearing connectors. Test fit and adhesive choice
+   on a small pair before assembling a large print.
 
-Disconnected shapes need enough padding or bezel width to join into one backing;
-otherwise the app reports the islands instead of silently dropping them. Select
-Rectangle when a common rectangular backing is more appropriate. Rectangular
+In Plaque mode, disconnected shapes need enough padding or bezel width to join
+into one backing; otherwise the app reports the islands. Tiles/Puzzle retain
+disconnected shapes as separately labeled pieces. Select Rectangle when a common
+rectangular backing is more appropriate. Rectangular
 corner radius and source-canvas margin controls do not affect contour mode.
-Mounting strength and Bambu Studio import still require physical/slicer checks.
+For split contours, loops go on the uppermost piece in each occupied column;
+keyholes require enough width on every piece. If a mount cannot be supported or
+overlaps a neighboring piece, change the grid or choose no hanging. Support every
+wall panel independently. Mounting strength and Bambu Studio import still require
+physical/slicer checks.
 
 ```sh
 relief generate icon.svg --shape contour --width 120 --height 180 \
   --margin 3 --frame-width 6 --frame-height 3 --frame-profile rounded \
   --hanging loops --output output/contour-icon
+```
+
+The shared native Rust engine can also reproduce a large split contour:
+
+```sh
+cargo run --release --bin relief-native -- \
+  --input tests/fixtures/contour-fork.svg \
+  --settings examples/contour-panels.json --output output/contour-panels.zip
 ```
 
 ## Make tiles or a random puzzle
@@ -210,12 +235,14 @@ Choose **Tiles** or **Puzzle** under **Print format**. Both now split even artwo
 that already fits the printer: the 180 mm sample defaults to four tiles or nine
 puzzle pieces. **Pieces** opens automatically and shows the cuts with visible
 gaps; **Relief** and **Assembly** show how the finished artwork fits together.
+These controls work with both Rectangle and Image contour backings.
 
 - **By piece size** sets a maximum width and height in millimeters, including
   puzzle tabs and hanging loops. The default is 90 mm; choosing 60 mm makes a
   16-piece sample puzzle. Actual pieces can be smaller, especially at corners.
-- **Largest panels** makes the fewest panels that fit your usable build plate,
-  with at least two pieces. Use this for large wall art and fewer assembly steps.
+- **Largest panels** chooses the coarsest grid that fits your usable build plate,
+  with at least two pieces. Concave cuts can create extra fragments. Use this
+  for large wall art and fewer assembly steps.
 - **Custom grid** sets the row/column count and overrides Max piece size.
   Actual pieces must still fit the usable bed. A 1 × 1 grid is rejected; use
   Plaque for a single object.

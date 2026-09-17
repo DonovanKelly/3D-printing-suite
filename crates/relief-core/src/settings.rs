@@ -254,9 +254,7 @@ impl Settings {
                 return Err(EngineError::settings("Filament colors must use #RRGGBB."));
             }
         }
-        let error = if s.shape == Shape::Contour && s.layout != Layout::Plaque {
-            Some("Image contour is a single piece. Choose Plaque or a rectangular shape.")
-        } else if s.shape == Shape::Rectangle
+        let error = if s.shape == Shape::Rectangle
             && s.corner_radius_mm > s.width_mm.min(s.height_mm) / 2.0
         {
             Some("Corner radius cannot exceed half the shorter side.")

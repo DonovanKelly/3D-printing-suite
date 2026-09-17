@@ -368,16 +368,13 @@ test("built-in sample supports contour directly and recovers from disconnected a
   expect((await readFile(path)).subarray(0, 2).toString()).toBe("PK");
 });
 
-test("contour bezels expand the icon, keep one piece, and recover from bed overflow", async ({
+test("contour plaque bezels expand the icon and recover from bed overflow", async ({
   page,
 }, info) => {
   const icon = fileURLToPath(
     new URL("../../tests/fixtures/contour-icon.svg", import.meta.url),
   );
   await upload(page, icon);
-  await rebuild(page, () =>
-    page.getByRole("button", { name: "Puzzle", exact: true }).click(),
-  );
   const initial: Preview = await rebuild(page, () =>
     page
       .getByRole("combobox", { name: "Backing shape", exact: true })
@@ -387,10 +384,10 @@ test("contour bezels expand the icon, keep one piece, and recover from bed overf
   expect(initial.manifest.settings.layout).toBe("plaque");
   await expect(
     page.getByRole("button", { name: "Tiles", exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page.getByRole("button", { name: "Puzzle", exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page.getByRole("spinbutton", { name: "Corner radius (mm)", exact: true }),
   ).toHaveCount(0);

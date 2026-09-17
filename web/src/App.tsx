@@ -165,9 +165,11 @@ export default function App() {
             <span>
               {preview
                 ? preview.manifest.settings.shape === "contour"
-                  ? `${preview.manifest.pieces[0].extents_mm
-                      .slice(0, 2)
-                      .map((v) => v.toFixed(1))
+                  ? `${[0, 1]
+                      .map((axis) => (
+                        Math.max(...preview.manifest.pieces.map((p) => p.assembly_origin_mm[axis] + p.extents_mm[axis]))
+                        - Math.min(...preview.manifest.pieces.map((p) => p.assembly_origin_mm[axis]))
+                      ).toFixed(1))
                       .join(" × ")} mm · finished`
                   : `${preview.manifest.settings.width_mm} × ${preview.manifest.settings.height_mm} mm`
                 : ""}

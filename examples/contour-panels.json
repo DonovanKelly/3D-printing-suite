@@ -1,0 +1,11 @@
+{
+  "shape": "contour",
+  "width_mm": 540,
+  "height_mm": 540,
+  "layout": "tiles",
+  "split_mode": "bed",
+  "clearance_mm": 0,
+  "margin_mm": 3,
+  "frame_width_mm": 4,
+  "hanging": "none"
+}
