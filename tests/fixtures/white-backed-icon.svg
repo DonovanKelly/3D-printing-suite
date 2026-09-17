@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Original regression icon: the opaque backing hides its holes from alpha selection. -->
+  <path id="white-backing" fill="#ffffff" d="M10 10H90V90H10Z"/>
+  <path fill="#000000" fill-rule="evenodd"
+    d="M10 10H90V90H10Z M20 20H80V80H20Z M50 34L66 50L50 66L34 50Z"/>
+</svg>
