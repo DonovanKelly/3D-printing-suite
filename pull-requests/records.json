@@ -1,0 +1,250 @@
+[
+  {
+    "number": 1,
+    "title": "feat: build Relief Studio with a persistent development preview",
+    "body": "Build Relief Studio: import raster artwork or SVG, prepare a two-tone relief, configure raised frames and hanging features, split larger pieces into panels or interlocking puzzles, and export grouped 3MF or aligned STL print packs. The browser workbench and CLI share one validated geometry pipeline, with reproducible starter artwork, print collections, and usage documentation.\n\nThe development workspace now starts a supervised UI/API service automatically through Compose and DevPod hooks, rebuilds frontend assets after edits, and retains exported packs in shared storage. The supervisor lives in the pinned project environment, and an explicit public origin permits generation behind the local HTTPS proxy without trusting arbitrary forwarding headers.\n\nValidation: 40 Python tests, Ruff, and TypeScript/Vite build pass. The original collection passed independent mesh reload checks for all 26 pieces. The installed development service passed exact-workspace recreation, ordinary container restart, HTTPS preview generation, export, and ZIP integrity checks. The original workbench was visually checked at desktop, tablet, and mobile sizes. Physical fit, mounting strength, and Bambu Studio import remain to be tested; optional Replicate processing is separate follow-up work.\n\nDJE-58 and DJE-62. No printer jobs are dispatched.",
+    "state": "open",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/1",
+    "created_at": "2026-09-12T21:09:24Z",
+    "updated_at": "2026-09-12T21:09:25Z",
+    "closed_at": null,
+    "merged": false,
+    "merged_at": null,
+    "merge_commit_sha": null,
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "main",
+      "sha": "2d481e375fd9aee74e742c4294fe7e8c028691d2",
+      "label": "main"
+    },
+    "head": {
+      "ref": "codex/dje-58-relief-studio",
+      "sha": "a41bc0c719444ed06f8b3655b2da5ca856459c7b",
+      "label": "codex/dje-58-relief-studio"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 2,
+    "title": "fix: recover image selections and add regression coverage (DJE-66)",
+    "body": "",
+    "state": "open",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/2",
+    "created_at": "2026-09-14T20:40:36Z",
+    "updated_at": "2026-09-15T18:53:17Z",
+    "closed_at": null,
+    "merged": false,
+    "merged_at": null,
+    "merge_commit_sha": null,
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "main",
+      "sha": "2d481e375fd9aee74e742c4294fe7e8c028691d2",
+      "label": "main"
+    },
+    "head": {
+      "ref": "codex/dje-66-regression-suite",
+      "sha": "fd4a8a0667f1d4c9e89b047054b6479c2d7c5a0c",
+      "label": "codex/dje-66-regression-suite"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 3,
+    "title": "feat: add contour icons with optional decorative bezels (DJE-80)",
+    "body": "Image contour follows an image\u2019s outer silhouette to create one printable icon. Padding and flat, rounded, or beaded bezels expand outward while the artwork retains its size and interior cutouts. Optional top loops and supported rear keyholes share the same geometry pipeline in the browser and CLI; preview and exports use the finished extents for build-plate checks.\n\nThe built-in Alpine sample now has an enclosing curved crest, so selecting Image contour works immediately, including with no bezel and zero padding. Disconnected uploads still produce an actionable error, and Use sample artwork restores a valid downloadable project. Structural contour repair preserves detailed SVG negative space, and the 3D viewer redraws when the scene or camera changes.\n\nValidation: `bash scripts/check.sh` with the optional private artwork passed Ruff, 296 Python tests, TypeScript checks, the production build, and 24 desktop/mobile browser tests. Regressions cover direct sample selection, all trace details without padding, decorative bezels and mounts, disconnected-art recovery, and actual 3MF download. Private artwork and generated review packs remain outside Git. Geometry is computationally validated; physical fit, mounting strength, and Bambu Studio behavior still need print/slicer validation.\n\nBased on #2 to isolate this feature from the existing regression-suite work. Tracks DJE-80.\n",
+    "state": "open",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/3",
+    "created_at": "2026-09-15T17:34:12Z",
+    "updated_at": "2026-09-15T20:04:04Z",
+    "closed_at": null,
+    "merged": false,
+    "merged_at": null,
+    "merge_commit_sha": null,
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "codex/dje-66-regression-suite",
+      "sha": "fd4a8a0667f1d4c9e89b047054b6479c2d7c5a0c",
+      "label": "codex/dje-66-regression-suite"
+    },
+    "head": {
+      "ref": "codex/dje-80-contour-bezels",
+      "sha": "557057bc884fbc889c2a29b8ed4b9d0fba6eace9",
+      "label": "codex/dje-80-contour-bezels"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 4,
+    "title": "fix: preserve two filaments in Bambu Studio 3MF exports (DJE-83)",
+    "body": "",
+    "state": "closed",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/4",
+    "created_at": "2026-09-15T19:45:43Z",
+    "updated_at": "2026-09-15T20:04:04Z",
+    "closed_at": "2026-09-15T20:04:02Z",
+    "merged": true,
+    "merged_at": "2026-09-15T20:04:02Z",
+    "merge_commit_sha": "557057bc884fbc889c2a29b8ed4b9d0fba6eace9",
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "codex/dje-80-contour-bezels",
+      "sha": "557057bc884fbc889c2a29b8ed4b9d0fba6eace9",
+      "label": "codex/dje-80-contour-bezels"
+    },
+    "head": {
+      "ref": "refs/pull/4/head",
+      "sha": "9d79cce18c4fe59a4a9f53c8c59d7718dc5bb1dc",
+      "label": "codex/dje-83-bambu-3mf"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 5,
+    "title": "feat: run Relief Studio v2 entirely in the browser (DJE-86)",
+    "body": "",
+    "state": "closed",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/5",
+    "created_at": "2026-09-16T01:09:14Z",
+    "updated_at": "2026-09-16T14:12:00Z",
+    "closed_at": "2026-09-16T14:11:59Z",
+    "merged": true,
+    "merged_at": "2026-09-16T14:11:59Z",
+    "merge_commit_sha": "2d481e375fd9aee74e742c4294fe7e8c028691d2",
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "main",
+      "sha": "2d481e375fd9aee74e742c4294fe7e8c028691d2",
+      "label": "main"
+    },
+    "head": {
+      "ref": "refs/pull/5/head",
+      "sha": "6ea16f9c47a2881ba99d07822c16094af07396b5",
+      "label": "codex/dje-86-browser-rust-v2"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 6,
+    "title": "feat: save local workspaces and choose border colors (DJE-89, DJE-91)",
+    "body": "Projects can now be renamed, saved as portable `.print-workspace` files, and reopened entirely on the client. Files embed the original artwork, settings, project name, and selected preview tab. An optional Restore on return setting keeps the latest workspace in this browser using IndexedDB. Downloads follow the editable project name; no server storage is required.\n\nThe border can use the image filament, the background filament, or a third configurable color. Linked borders follow color changes. Independent borders are separate, aligned material parts in the preview, STL pack, and 3MF, with consistent Bambu logical filament assignments: background 1, artwork 2, border 3. All border profiles preserve the original combined shape and dimensions. Removing a border preserves its selection but omits its extra material.\n\nWorkspace format version 2 preserves the new border settings; version 1 files and browser recovery records migrate to the original image-colored border. Invalid documents leave the current project intact. Application branding remains unchanged pending a name choice.\n\nValidation: `bash scripts/check.sh` passes Rust formatting/Clippy and 12 Rust tests, Ruff and 366 Python tests, TypeScript checks, the production Wasm/web build, and 46 desktop/mobile browser tests. The 18 pre-existing optional Python cases remain skipped because their external artwork/slicer prerequisites are unavailable. New checks independently reopen material STLs/3MFs, verify closed non-overlapping parts and preserved total volume, inspect Bambu filament metadata, and exercise workspace migration and browser recovery. Screenshots, a saved workspace, a three-color 3MF, a full print pack, and verification reports are preserved in shared review storage outside Git.\n\nActual AMS tray mapping, desktop Bambu Studio slicing, physical fit, and mounting strength remain manual checks. No printer jobs are dispatched.\n\nTracks [DJE-89](https://linear.app/djelly/issue/DJE-89) and [DJE-91](https://linear.app/djelly/issue/DJE-91).\n",
+    "state": "open",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/6",
+    "created_at": "2026-09-16T14:36:29Z",
+    "updated_at": "2026-09-17T20:38:47Z",
+    "closed_at": null,
+    "merged": false,
+    "merged_at": null,
+    "merge_commit_sha": null,
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "main",
+      "sha": "2d481e375fd9aee74e742c4294fe7e8c028691d2",
+      "label": "main"
+    },
+    "head": {
+      "ref": "codex/local-workspace-files",
+      "sha": "f8a79a1d27064be59f4dbd499aa5be95cafdf9d8",
+      "label": "codex/local-workspace-files"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 7,
+    "title": "test: cover SVG backing and contour recovery (DJE-94)",
+    "body": "",
+    "state": "open",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/7",
+    "created_at": "2026-09-17T15:37:26Z",
+    "updated_at": "2026-09-17T20:38:47Z",
+    "closed_at": null,
+    "merged": false,
+    "merged_at": null,
+    "merge_commit_sha": null,
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "codex/local-workspace-files",
+      "sha": "f8a79a1d27064be59f4dbd499aa5be95cafdf9d8",
+      "label": "codex/local-workspace-files"
+    },
+    "head": {
+      "ref": "codex/dje-94-svg-selection-recovery",
+      "sha": "d59d393987e42989c852e92c8c9c3c626a60215b",
+      "label": "codex/dje-94-svg-selection-recovery"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  },
+  {
+    "number": 8,
+    "title": "feat: split contour artwork into printable pieces (DJE-99)",
+    "body": "",
+    "state": "open",
+    "html_url": "https://gitea.donovankelly.xyz/dkelly/3D-printing-suite/pulls/8",
+    "created_at": "2026-09-17T20:38:47Z",
+    "updated_at": "2026-09-17T20:38:48Z",
+    "closed_at": null,
+    "merged": false,
+    "merged_at": null,
+    "merge_commit_sha": null,
+    "draft": false,
+    "labels": [],
+    "milestone": null,
+    "comments": 0,
+    "author": "dkelly",
+    "base": {
+      "ref": "main",
+      "sha": "2d481e375fd9aee74e742c4294fe7e8c028691d2",
+      "label": "main"
+    },
+    "head": {
+      "ref": "codex/dje-99-contour-splitting",
+      "sha": "886efea67b3ccee6286b2bd8771604540850baf8",
+      "label": "codex/dje-99-contour-splitting"
+    },
+    "discussion": [],
+    "reviews": [],
+    "review_comments": {}
+  }
+]
