@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Original concave test artwork: one backing becomes two arms above a cut. -->
+  <path fill="#252b28" fill-rule="evenodd"
+    d="M10 10H50V130H130V10H170V170H10Z
+       M22 30H38V95H22Z M142 30H158V95H142Z"/>
+</svg>

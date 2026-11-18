@@ -50,13 +50,20 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
     const settings = preview.manifest.settings;
     const separated = view === "pieces";
     const contour = settings.shape === "contour";
+    const pieces = preview.manifest.pieces;
+    const minX = contour && !separated ? Math.min(...pieces.map((p) => p.assembly_origin_mm[0])) : 0;
+    const minY = contour && !separated ? Math.min(...pieces.map((p) => p.assembly_origin_mm[1])) : 0;
     const width =
-      separated || contour
+      separated
         ? preview.manifest.separated_extents_mm[0]
+        : contour
+          ? Math.max(...pieces.map((p) => p.assembly_origin_mm[0] + p.extents_mm[0])) - minX
         : settings.width_mm;
     const height =
-      separated || contour
+      separated
         ? preview.manifest.separated_extents_mm[1]
+        : contour
+          ? Math.max(...pieces.map((p) => p.assembly_origin_mm[1] + p.extents_mm[1])) - minY
         : settings.height_mm;
     const size = Math.max(width, height);
     const camera = new THREE.OrthographicCamera(
@@ -93,18 +100,20 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         color:
           data.material === "background"
             ? settings.background_color
-            : settings.artwork_color,
+            : data.material === "border"
+              ? settings.border_color
+              : settings.artwork_color,
         roughness: 0.84,
         metalness: 0,
         flatShading: true,
       });
       const mesh = new THREE.Mesh(geometry, material);
       const origin =
-        separated || contour
+        separated
           ? preview.manifest.pieces.find((piece) => piece.id === data.piece)!
               .separated_origin_mm
           : data.origin;
-      mesh.position.set(origin[0] - width / 2, origin[1] - height / 2, 0);
+      mesh.position.set(origin[0] - minX - width / 2, origin[1] - minY - height / 2, 0);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);

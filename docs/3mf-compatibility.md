@@ -1,7 +1,8 @@
 # 3MF and Bambu Studio compatibility
 
 Open exported 3MFs as **projects** in Bambu Studio. Background uses logical
-filament 1; Artwork + frame uses filament 2. The project starts with installed
+filament 1; artwork uses filament 2. The border either joins the background or
+artwork part, or uses a separate Border part on logical filament 3. The project starts with installed
 P1S / 0.4 mm nozzle / 0.20 mm Standard / Generic PLA profiles. Check those choices
 against your hardware and map the filaments to actual AMS trays before printing.
 Geometry-only import does not retain the supplied project settings.
@@ -27,9 +28,9 @@ the following layers:
 | Archive part | Purpose |
 | --- | --- |
 | `[Content_Types].xml`, `_rels/.rels` | OPC content types and relationship to the root model. Explicit XML/JSON content types cover the extra configuration parts. |
-| `3D/3dmodel.model` | Millimeter coordinates, outward-wound closed meshes, two base materials, one component group/build item per piece, and plate placement transforms. |
-| `Metadata/model_settings.config` | Piece names, mesh component IDs, `normal_part` types, filament numbers 1/2, and plate instance membership. |
-| `Metadata/project_settings.config` | Two configurable filament colors, PLA profiles, and **one** physical nozzle. |
+| `3D/3dmodel.model` | Millimeter coordinates, outward-wound closed meshes, two or three base materials, one component group/build item per piece, and plate placement transforms. |
+| `Metadata/model_settings.config` | Piece names, mesh component IDs, `normal_part` types, filament numbers 1/2/3, and plate instance membership. |
+| `Metadata/project_settings.config` | Two or three configurable filament colors, PLA profiles, and **one** physical nozzle. |
 
 Studio only reads project settings when the model's `Application` metadata
 starts with `BambuStudio-` followed by a parseable version. We use
@@ -40,7 +41,7 @@ reference the actual mesh objects. No painting, printer connection, toolpath,
 or physical AMS tray assignment is embedded.
 
 Preset names and `inherits_group` resolve Studio's installed system profiles;
-`different_settings_to_system` retains the two selected colors while allowing
+`different_settings_to_system` retains the selected colors while allowing
 the installed printer/material settings to supply their current defaults.
 The export does not copy machine start/end G-code into the project. Projects
 still require installed Bambu profiles and a slicer review before printing.
@@ -50,7 +51,15 @@ still require installed Bambu profiles and a slicer review before printing.
 Always-on Python tests inspect both piece and plate packages, colors, nozzle
 count, part IDs, plate references, and geometry. Coverage includes plaques,
 tiles, puzzles, identical display colors that must remain distinct filaments,
-and a background-only piece. The API tests check the actual downloaded file.
+and a background-only piece. Rust export checks cover independent border parts,
+all border profiles, contour shapes, hanging, and interior puzzle/tile pieces
+without a border. Every part retains its logical filament index, even when a
+piece has no artwork or border. Palette, preset, and inheritance arrays are sized
+consistently; there is still one physical nozzle. Pairwise material intersections
+have no volume, and their volumes sum to the unchanged combined mesh.
+The browser tests inspect a downloaded three-filament project and saved-workspace
+round trips. Actual AMS tray mapping and a fresh three-color desktop slicer/print
+check remain manual steps. The legacy API tests check two-color downloads.
 
 To also run the real Bambu Studio import/export regression:
 

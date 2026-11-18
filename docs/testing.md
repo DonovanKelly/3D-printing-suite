@@ -29,12 +29,15 @@ in `requirements-dev.lock`. The default interpreter is `.venv/bin/python`;
 
 | Layer | Failure cases covered |
 | --- | --- |
-| Image selection | Transparent SVG fills in black, white, gold, and gray; faint opacity; opaque low-contrast images; fractional viewport edges; nested holes and islands; threshold endpoints; dark/light selection and inversion; every trace detail. Touching pixel contours cannot flood negative space during repair. Blank input remains an explicit error. |
+| Image selection | Transparent SVG fills in black, white, gold, and gray; faint opacity; opaque low-contrast images; fractional viewport edges; nested holes and islands; threshold endpoints; dark/light selection and inversion; every trace detail. Closed SVGs with an opaque white backing reproduce a filled silhouette; Dark pixels and transparent-cutout reimport restore holes/islands, rendered detail, and closed positive-volume exports. A closed subpixel rim reproduces disconnected contour rejection and recovers when strengthened. Touching pixel contours cannot flood negative space during repair. Blank input remains an explicit error. |
 | Fabrication | 54 combinations of plaque/tiles/puzzle, no/flat/rounded border, no/loop/keyhole mounting, portrait/landscape dimensions, border width/height, backing/relief thickness, padding, radius, and random seed. Closed positive volumes, connected backing, aligned materials, and bed bounds are checked. |
 | Contour icons | Built-in Alpine crest with zero padding/no bezel at every detail, decorative bezels and mounts, direct browser selection and sample-button recovery after disconnected artwork. Synthetic concave icon with image holes; no/flat/rounded/beaded bezel and every mount; outward padding/width without image resizing; disconnected-island rejection and recovery; narrow rear mount rejection and recovery; bezel/loop bed overflow; single-piece validation; independent 3MF/STL reload and actual preview bounds. Optional private sources exercise each contour bezel. |
 | Partitions and exports | Default sample splitting, piece-size limits including tabs/loops, seed reproducibility, complementary seams, clearance, plate gaps, every piece exactly once, separate 3MF build objects, material transforms, independent 3MF/STL reloads, and bounded download paths. |
+| Contour splitting | Large contour overflow/recovery through Tiles/Puzzle; actual expanded bounds; automatic size/bed limits and custom grids; empty cells; multiple connected fragments per cell with unique labels; zero-clearance material reconstruction across all bezel profiles; clearance and inversion; loop/keyhole support; fragment count limit; separated/plate gaps; complete assembly SVG bounds and labels; independent STL/3MF reloads; desktop/mobile editing, downloads, and saved contour workspace round trips. |
 | Local API | Invalid settings/uploads, unsupported SVG resources, local-origin boundaries, empty-selection recovery, successful exports after errors, and multiple-plate downloads. |
 | Real browser | Fresh imports reset incompatible selection without changing geometry; empty selections offer recovery; numeric drafts and cancellation; invalid-export blocking; borders/loops; tiles/puzzles/size/shuffle; actual 3MF/ZIP downloads; out-of-order responses; serialized-worker queue; worker-error recovery; offline reload/import/download; 64-piece overflow/recovery; preview modes; desktop/mobile overflow. |
+| Border materials | Artwork/background/third-color assignment; closed, aligned, non-overlapping STL/3MF parts; unchanged combined geometry across profiles/shapes/mounting; logical Bambu filament IDs and palette arrays; empty/interior borders; identical display colors; browser controls and version-1 workspace migration. |
+| Workspace files | Editable/sanitized filenames; exact artwork/settings/tab round trips into a fresh offline tab; corrupt, oversized, and future-version documents preserve current work; replacement cancellation; optional reload/new-tab recovery and removal; unavailable browser storage; import with a focused name; unfinished settings save/open/repair. |
 
 The browser suite starts its own Node static server on port 8011. It has no
 geometry/upload/export endpoints; downloads are browser Blob bytes. It refuses to reuse an existing server, so it cannot
@@ -61,6 +64,9 @@ STLs and 3MFs. It requires `cargo build --release --bin relief-native` first;
 `.venv/bin/python scripts/reference_corpus.py`. Do not regenerate it to hide a
 port regression. Native tests in `crates/relief-core/tests` exercise additional
 selection, resource, mounting, and seam invariants.
+The frozen `invalid-contour-layout` case now asserts successful native splitting
+and passes the independent export checks: this feature intentionally extends the
+single-piece Python reference. The reference file and legacy pipeline stay frozen.
 
 ## Bambu Studio import
 

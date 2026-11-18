@@ -1,16 +1,18 @@
 1. Open plates/plate-01.3mf as a PROJECT in Bambu Studio. Open additional plate
-   files separately. Each named piece is a separate object; Background and
-   Artwork + frame remain grouped inside it, with their relative heights intact.
-   Plates have at least 3 mm between bounding boxes and avoid the P1S front-left
-   exclusion zone. Brims and prime towers still need space after slicing.
-2. The project uses P1S / 0.4 mm nozzle / 0.20 mm Standard and two Generic PLA
-   filaments. Background = filament 1; Artwork + frame = filament 2. Check the
-   profiles and map these logical filaments to actual AMS trays in Studio.
-3. If your slicer loses grouping, import background.stl and artwork.stl TOGETHER
-   as one object with multiple parts. Preserve shared coordinates; do not drop
-   artwork to the bed independently. Alternatively use combined.stl with a
-   filament change at the backing height recorded in project.json. Inspect the
-   sliced layer preview. STL is unitless; import in millimeters.
+   files separately. Each named piece is a separate object; its background,
+   artwork, and optional third-color border remain grouped with their relative
+   heights intact. Plates have at least 3 mm between bounding boxes and avoid
+   the P1S front-left exclusion zone. Brims and prime towers still need space.
+2. The project uses P1S / 0.4 mm nozzle / 0.20 mm Standard and Generic PLA
+   filaments. Background = filament 1; Artwork = filament 2. The border joins
+   the chosen background/artwork material, or uses filament 3 for a third color.
+   See the logical filament list above, check the profiles, and map the logical
+   filaments to actual AMS trays in Studio. An absent border adds no third slot.
+3. If your slicer loses grouping, import background.stl, artwork.stl and
+   border.stl (when present) TOGETHER as one object with multiple parts. Preserve
+   shared coordinates; do not drop raised parts to the bed independently.
+   combined.stl is a single-material fallback without color assignments.
+   Inspect the sliced layer preview. STL is unitless; import in millimeters.
 4. Lay the flat back on the bed. Inspect the first layer, small features, top
    surfaces, brim, and prime tower. Slice every piece before printing.
 5. Use assembly.svg/preview.png as a FRONT view. Row 01 is the top; labels are
@@ -18,10 +20,17 @@
    puzzle_seed and puzzle_style reproduce the cut pattern. Tabs and loops are
    included in size-based splitting; a custom grid overrides maximum piece size.
 6. Width/height constrain the image in contour mode: padding, bezel, and hanging
-   expand the finished piece. Use manifest.json for actual piece extents.
+   expand the finished assembly. Contour cuts omit empty cells and keep separate
+   fragments as individually named pieces (for example r01-c01-p01). Follow the
+   labeled map, including every fragment. Use manifest.json for actual extents.
+7. Straight tile seams can be glued with a suitable adhesive or placed separately
+   on the wall. Zero clearance gives matching edges; positive clearance leaves a
+   gap. Puzzle tabs only align the portions of a seam that meet the contour, so
+   some narrow edges have no tab. Check a small pair before a full assembly.
 
 Material volumes touch without overlapping. combined.stl is a boolean union.
 Puzzle fit has NOT been physically calibrated. Print a small fit pair first.
+Adhesive bonds and mounting strength have not been tested.
 Tabs align pieces in-plane and do not replace individual panel mounting.
 Hanging features are experimental and not load-rated. Rear keyholes may need
 bridging/support tuning. Do not rely on top-row loops to hold a large assembly.

@@ -368,16 +368,13 @@ test("built-in sample supports contour directly and recovers from disconnected a
   expect((await readFile(path)).subarray(0, 2).toString()).toBe("PK");
 });
 
-test("contour bezels expand the icon, keep one piece, and recover from bed overflow", async ({
+test("contour plaque bezels expand the icon and recover from bed overflow", async ({
   page,
 }, info) => {
   const icon = fileURLToPath(
     new URL("../../tests/fixtures/contour-icon.svg", import.meta.url),
   );
   await upload(page, icon);
-  await rebuild(page, () =>
-    page.getByRole("button", { name: "Puzzle", exact: true }).click(),
-  );
   const initial: Preview = await rebuild(page, () =>
     page
       .getByRole("combobox", { name: "Backing shape", exact: true })
@@ -387,10 +384,10 @@ test("contour bezels expand the icon, keep one piece, and recover from bed overf
   expect(initial.manifest.settings.layout).toBe("plaque");
   await expect(
     page.getByRole("button", { name: "Tiles", exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page.getByRole("button", { name: "Puzzle", exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
   await expect(
     page.getByRole("spinbutton", { name: "Corner radius (mm)", exact: true }),
   ).toHaveCount(0);
@@ -533,7 +530,7 @@ test("cached workbench reloads, imports, generates and downloads offline without
   const downloaded = page.waitForEvent("download");
   await primary(page).click();
   const file = await downloaded;
-  expect(file.suggestedFilename()).toBe("relief.3mf");
+  expect(file.suggestedFilename()).toBe("gold-cutout.3mf");
   await file.saveAs(info.outputPath("offline.3mf"));
   await page.getByRole("button", { name: "View from top", exact: true }).click();
   await page.screenshot({ path: info.outputPath("offline-workbench.png"), fullPage: true });
@@ -563,7 +560,7 @@ test("inverting a contour keeps its outline, swaps the relief, and restores clea
   const downloaded = page.waitForEvent("download");
   await primary(page).click();
   const file = await downloaded;
-  expect(file.suggestedFilename()).toBe("relief.3mf");
+  expect(file.suggestedFilename()).toBe("contour-icon.3mf");
   const path = info.outputPath("inverted-contour.3mf");
   await file.saveAs(path);
   execFileSync(python, ["-c", "import sys, trimesh; s=trimesh.load_scene(sys.argv[1], file_type='3mf'); assert len(s.geometry)==2; assert all(m.is_volume for m in s.geometry.values())", path]);
@@ -571,7 +568,7 @@ test("inverting a contour keeps its outline, swaps the relief, and restores clea
   expect(restored.vector_svg).toBe(normal.vector_svg);
   expect(restored.meshes).toEqual(normal.meshes);
   await expect(page.getByRole("alert")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Download again", exact: true })).toHaveCount(0);
+  await expect(page.locator(".download-again")).toHaveCount(0);
 });
 
 test("64 pieces stay responsive and an oversized grid recovers", async ({ page }) => {

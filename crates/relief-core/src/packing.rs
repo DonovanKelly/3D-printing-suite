@@ -1,4 +1,6 @@
 /*! Stable 3 mm shelf packing preserves each piece's shared material translation.
+Separated previews stack fragments within their original cutting cell so even
+concave contour cuts cannot overlap. Assembly coordinates remain unchanged.
 Bambu placement avoids its front-left exclusion zone and is included in manifests. */
 use crate::{EngineError, Result, geometry::Project};
 #[derive(Clone, Copy)]
@@ -10,10 +12,19 @@ pub struct Placement {
 pub fn separated(p: &Project) -> (Vec<Placement>, [f64; 2]) {
     let mut widths = vec![0.0f64; p.columns];
     let mut heights = vec![0.0f64; p.rows];
+    let mut cell_heights = vec![0.0f64; p.columns * p.rows];
     for piece in &p.pieces {
-        widths[piece.tile.column] = widths[piece.tile.column].max(piece.extents[0]);
-        heights[piece.tile.row] = heights[piece.tile.row].max(piece.extents[1]);
+        let c = piece.tile.column;
+        let r = piece.tile.row;
+        widths[c] = widths[c].max(piece.extents[0]);
+        let h = &mut cell_heights[r * p.columns + c];
+        if *h > 0.0 {
+            *h += 3.0;
+        }
+        *h += piece.extents[1];
+        heights[r] = heights[r].max(*h);
     }
+    let mut used_heights = vec![0.0; cell_heights.len()];
     let places = p
         .pieces
         .iter()
@@ -21,6 +32,9 @@ pub fn separated(p: &Project) -> (Vec<Placement>, [f64; 2]) {
         .map(|(i, piece)| {
             let c = piece.tile.column;
             let r = piece.tile.row;
+            let cell = r * p.columns + c;
+            let offset = cell_heights[cell] - used_heights[cell] - piece.extents[1];
+            used_heights[cell] += piece.extents[1] + 3.0;
             Placement {
                 piece: i,
                 x: widths[..c].iter().sum::<f64>()
@@ -28,7 +42,8 @@ pub fn separated(p: &Project) -> (Vec<Placement>, [f64; 2]) {
                     + (widths[c] - piece.extents[0]) / 2.0,
                 y: heights[r + 1..].iter().sum::<f64>()
                     + 3.0 * (p.rows - r - 1) as f64
-                    + (heights[r] - piece.extents[1]) / 2.0,
+                    + (heights[r] - cell_heights[cell]) / 2.0
+                    + offset,
             }
         })
         .collect();

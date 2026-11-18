@@ -1,13 +1,14 @@
 # Relief Studio · 3D Printing Suite
 
-Turn a local image into two-color printable wall art. Upload PNG, JPEG, WebP,
+Turn a local image into two- or three-color printable wall art. Upload PNG, JPEG, WebP,
 or a self-contained SVG, tune its black-and-white conversion, then make a raised
 plaque, large tiled panels, or an interlocking puzzle. A browser workbench and
 native Rust CLI share the same geometry engine.
 
-**Image contour** makes a single icon-shaped print with an optional flat,
-rounded, or beaded bezel. Padding and bezel width expand outward around the
-image; no rectangular backing is required.
+**Image contour** makes an icon-shaped print or splits a large irregular design
+into tiles or puzzle pieces, with an optional flat, rounded, or beaded bezel.
+Padding and bezel width expand outward around the image; no rectangular backing
+is required.
 
 Implemented: threshold/inversion, preserved negative-space holes, configurable
 dimensions and colors, raised borders, top hanging loops, rear keyhole recesses,
@@ -96,7 +97,7 @@ Run `setup` once if development dependencies are missing.
 frontend, and Python reference dependencies. The full verification command is
 `bash scripts/check.sh`; see [testing](docs/testing.md).
 
-## From SVG to two-color 3MF
+## From SVG to a multicolor 3MF
 
 1. Upload your SVG. **Automatic** foreground selection uses its filled shapes
    and transparent holes regardless of fill color. For an opaque SVG, it uses
@@ -108,6 +109,14 @@ frontend, and Python reference dependencies. The full verification command is
    **Reset image selection** recovers from an empty selection without changing
    your dimensions, border, or hanging settings. Automatic SVG selection also
    normalizes faint opacity and low contrast.
+   If a black-and-white SVG has a white backing inside a transparent canvas,
+   Automatic includes that backing and can show a solid silhouette instead of
+   the interior design. Choose **Image selection → Foreground → Dark pixels**,
+   or remove the SVG's white backing so its negative spaces are transparent.
+   This selection issue can occur even when every SVG path is closed.
+   Very thin closed rims can also break into disconnected pieces when traced.
+   Use **Fine** detail or strengthen the source rim; Padding or Border width
+   can join nearby pieces when making an Image contour backing.
 2. Under **Image & background**, set finished width/height, **Image thickness**
    (height above the backing), **Background thickness**, and **Padding** (the
    minimum space inside the border). **Trim empty image space** starts enabled;
@@ -117,8 +126,12 @@ frontend, and Python reference dependencies. The full verification command is
    or when you leave the field; Escape cancels. Clearing a field temporarily
    is allowed, and leaving it empty restores its previous value. Downloads
    wait until the edit is applied and the new preview is ready.
-3. Choose the two **Filament colors**. Background and Image + border remain
-   separate aligned material parts in the 3MF.
+3. Choose **Filament colors** for the background and image. **Border color**
+   can be **Same as image** (the default), **Same as background**, or **Third
+   color**, which reveals a separate color picker. Linked borders follow changes
+   to the selected image/background color. The choice works for every border
+   profile and is saved with the workspace. Removing the border keeps the choice
+   for later, but exports no extra border material.
 4. Optionally choose no border, a raised flat border, or a raised border with
    rounded top edges. **Border width** stays visible: 0 removes the border,
    and 0.5–30 mm adds or adjusts its rim. Width and height are independent;
@@ -137,8 +150,19 @@ frontend, and Python reference dependencies. The full verification command is
    **Download N plates (ZIP)** contains a 3MF for each arranged plate, plus each
    individual piece. **Download full print pack** is always available and
    includes STLs, settings, and an assembly map. Open the 3MF as a project in
-   Bambu Studio: Background uses filament 1 and Artwork + frame uses filament 2.
-   Map those filaments to your actual AMS trays before printing.
+   Bambu Studio: Background uses filament 1, artwork uses filament 2, and an
+   independent border uses filament 3. A linked border joins its chosen material.
+   Map those logical filaments to your actual AMS trays before printing.
+
+## Save and reopen your workspace
+
+Edit the project name above the preview to change workspace and print download
+filenames. **Save workspace** (Ctrl/Cmd+S) downloads a `.print-workspace` file
+with the original artwork, all settings, colors, and selected preview tab.
+**Open workspace** restores it in this or a fresh app tab. Enable **Restore on
+return** to also save the latest workspace in this browser and reopen it
+automatically on your next visit. All storage and processing stay on your device.
+See [workspace files](docs/workspace-files.md) for behavior and format details.
 
 ## Make a contour-shaped icon
 
@@ -165,20 +189,44 @@ frontend, and Python reference dependencies. The full verification command is
    rear keyhole placed down the centerline where enough backing supports it.
    Rear keyholes need a 5 mm backing and sufficient local width. Increase the
    image size or padding when a narrow icon cannot accommodate the recess.
-5. Download a 3MF or full print pack. Contour mode is one piece; Tiles/Puzzle
-   are disabled. Bezel, padding, and loop must all fit the usable plate. Reduce
-   the image dimensions if the app reports overflow.
+5. Choose **Plaque** for one piece, or **Tiles / Puzzle** to split the contour
+   across printable pieces. **By piece size** limits actual piece extents,
+   **Largest panels** uses the usable bed, and **Custom grid** sets the cuts.
+   The grid covers the actual expanded backing, including padding and bezel.
+   Empty cells are omitted. When a cut crosses separate arms of a concave shape,
+   each fragment becomes its own piece, named like `r01-c01-p01` and `r01-c01-p02`.
+   The 64-piece limit includes these fragments.
+6. Use **Pieces** to inspect the cuts and **Relief / Assembly** for the finished
+   arrangement. Download a 3MF or full print pack with the labeled assembly map.
+   **Tiles** has straight seams for gluing or placing panels independently;
+   set **Clearance** to 0 for matching edges. **Puzzle** adds alignment tabs
+   wherever the contour intersects the puzzle seams; very narrow edges may have
+   no tab. It does not add load-bearing connectors. Test fit and adhesive choice
+   on a small pair before assembling a large print.
 
-Disconnected shapes need enough padding or bezel width to join into one backing;
-otherwise the app reports the islands instead of silently dropping them. Select
-Rectangle when a common rectangular backing is more appropriate. Rectangular
+In Plaque mode, disconnected shapes need enough padding or bezel width to join
+into one backing; otherwise the app reports the islands. Tiles/Puzzle retain
+disconnected shapes as separately labeled pieces. Select Rectangle when a common
+rectangular backing is more appropriate. Rectangular
 corner radius and source-canvas margin controls do not affect contour mode.
-Mounting strength and Bambu Studio import still require physical/slicer checks.
+For split contours, loops go on the uppermost piece in each occupied column;
+keyholes require enough width on every piece. If a mount cannot be supported or
+overlaps a neighboring piece, change the grid or choose no hanging. Support every
+wall panel independently. Mounting strength and Bambu Studio import still require
+physical/slicer checks.
 
 ```sh
 relief generate icon.svg --shape contour --width 120 --height 180 \
   --margin 3 --frame-width 6 --frame-height 3 --frame-profile rounded \
   --hanging loops --output output/contour-icon
+```
+
+The shared native Rust engine can also reproduce a large split contour:
+
+```sh
+cargo run --release --bin relief-native -- \
+  --input tests/fixtures/contour-fork.svg \
+  --settings examples/contour-panels.json --output output/contour-panels.zip
 ```
 
 ## Make tiles or a random puzzle
@@ -187,12 +235,14 @@ Choose **Tiles** or **Puzzle** under **Print format**. Both now split even artwo
 that already fits the printer: the 180 mm sample defaults to four tiles or nine
 puzzle pieces. **Pieces** opens automatically and shows the cuts with visible
 gaps; **Relief** and **Assembly** show how the finished artwork fits together.
+These controls work with both Rectangle and Image contour backings.
 
 - **By piece size** sets a maximum width and height in millimeters, including
   puzzle tabs and hanging loops. The default is 90 mm; choosing 60 mm makes a
   16-piece sample puzzle. Actual pieces can be smaller, especially at corners.
-- **Largest panels** makes the fewest panels that fit your usable build plate,
-  with at least two pieces. Use this for large wall art and fewer assembly steps.
+- **Largest panels** chooses the coarsest grid that fits your usable build plate,
+  with at least two pieces. Concave cuts can create extra fragments. Use this
+  for large wall art and fewer assembly steps.
 - **Custom grid** sets the row/column count and overrides Max piece size.
   Actual pieces must still fit the usable bed. A 1 × 1 grid is rejected; use
   Plaque for a single object.
@@ -203,7 +253,7 @@ gaps; **Relief** and **Assembly** show how the finished artwork fits together.
 
 The print plan reports both pieces and plates. Plate exports place pieces with
 a 3 mm gap between their bounding boxes. Every piece is a separate 3MF object,
-with aligned background/artwork parts inside it. Open `plates/plate-01.3mf` from
+with aligned background/artwork parts and an optional third-color border inside it. Open `plates/plate-01.3mf` from
 the pack to see its pieces together on a plate. An individual file under
 `pieces/` intentionally contains only that one piece. `pieces.svg` labels the
 separated set; `assembly.svg` labels their final positions.
@@ -228,9 +278,10 @@ python scripts/build_starter_pack.py output/starter-collection
 
 Output directories must be new: existing files are never replaced. Use
 `--settings project.json` to reuse exported settings with the same source image.
-The browser retains its current project in worker memory and creates download
-bytes only on an explicit export. Reloading clears the source and preview; keep
-downloaded packs in durable storage. Source images are not copied into packs.
+The browser creates print download bytes only on an explicit export. Save a
+workspace file to retain source artwork and editable settings, or enable optional
+browser recovery across reloads. Keep downloaded files in durable storage.
+Source images are included in workspace files, but not in print packs.
 Choose a shared directory through your browser's download dialog or pass a new
 shared output path to the native CLI. The legacy starter collection includes a
 portable review `index.html` and ZIP; it is separate from the interactive app.
@@ -238,23 +289,25 @@ portable review `index.html` and ZIP; it is separate from the interactive app.
 ## Print with Bambu Studio and AMS
 
 Every pack includes arranged **plate 3MFs** and a grouped **3MF** for each piece,
-plus **background.stl**, **artwork.stl** when present, and a boolean-unioned
-**combined.stl** per piece. The pack also includes traced SVG, separated and
+plus **background.stl**, **artwork.stl** and **border.stl** when present, and a
+boolean-unioned **combined.stl** per piece. A border matching an existing material
+is included in that material's STL; an independent border gets its own STL. The pack also includes traced SVG, separated and
 assembly maps, project settings, a manifest, and `PRINTING.md`.
 
 1. **Open a plate's 3MF as a project** in Bambu Studio. The project starts with
-   P1S / 0.4 mm nozzle / 0.20 mm Standard and two Generic PLA filaments in your
-   chosen colors: **Background = filament 1**, **Artwork + frame = filament 2**.
-   Check the printer, nozzle and material profiles, then map the two filaments
-   to your actual AMS trays. Keep each named `rNN-cNN` puzzle piece as a separate
+   P1S / 0.4 mm nozzle / 0.20 mm Standard and Generic PLA filaments in your
+   chosen colors: **Background = filament 1**, **Artwork = filament 2**, and
+   **independent border = filament 3** when present. A linked border shares its
+   chosen background/artwork filament. Check the printer, nozzle and material
+   profiles, then map the logical filaments to your actual AMS trays. Keep each named `rNN-cNN` puzzle piece as a separate
    object. Open additional plate files separately; the app also offers individual
    plate links after export. Geometry-only import discards project settings.
    See [3MF compatibility](docs/3mf-compatibility.md) for the format and checks.
-2. If your slicer loses the grouping, import its background and artwork STLs
-   **together as one object with multiple parts**. Keep their coordinates;
-   moving the artwork to the bed independently destroys the height alignment.
-3. Or use combined.stl with a filament change at the first layer above the base.
-   Defaults use a 2.4 mm base and 0.8 mm raised art, compatible with 0.2 mm layers.
+2. If your slicer loses the grouping, import its background, artwork, and optional
+   border STLs **together as one object with multiple parts**. Keep their coordinates;
+   moving raised parts to the bed independently destroys their height alignment.
+3. `combined.stl` is a single-material fallback without color assignments. Use
+   the grouped parts for independent colors that occupy the same print layers.
 4. Slice and inspect the build plate, fine details, color assignments, brims,
    and prime tower. Print the small fit pairs before a large assembly.
 
@@ -284,8 +337,9 @@ including tabs and loops; your slicer still decides placement and toolpath fit.
   extents. The v1 Bambu project format had desktop import/save checks; v2 retains that
   metadata and passes independent package/mesh checks. A fresh v2 desktop slicer
   and physical print test remain to be performed, including actual AMS mapping.
-- The app does not persist browser projects across reloads; exported settings
-  can be reused through the CLI. It does not slice or send jobs to a printer.
+- Optional browser recovery keeps the latest workspace at the same app address;
+  downloaded workspace files provide portable storage independent of the browser.
+  The app does not slice or send jobs to a printer.
 
 ## Development
 

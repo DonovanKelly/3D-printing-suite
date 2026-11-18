@@ -1,6 +1,7 @@
 /*! Build validated, aligned material parts from the selected image and planar layout.
-The base and colored solid meet at base_mm; combined meshes are boolean unions,
-never overlapping shells. Mounting recesses open only through the bed-facing back. */
+The base and raised solids meet at base_mm. Borders either join an existing
+material or become a third part. Parts never overlap; combined meshes retain the
+same union regardless of color. Mounting recesses open only through the back. */
 use crate::{
     EngineError, Result,
     artwork::{self, bounds, offset},
@@ -14,6 +15,7 @@ pub struct Piece {
     pub tile: Tile,
     pub base: Mesh,
     pub artwork: Option<Mesh>,
+    pub border: Option<Mesh>,
     pub combined: Mesh,
     pub origin: [f64; 3],
     pub extents: [f64; 3],
@@ -21,7 +23,7 @@ pub struct Piece {
 pub struct Project {
     pub settings: Settings,
     pub vector: CrossSection,
-    pub raised: CrossSection,
+    pub border: CrossSection,
     pub pieces: Vec<Piece>,
     pub columns: usize,
     pub rows: usize,
@@ -75,8 +77,9 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
     let vector = traced.relief().clone();
     let mut notes = traced.warnings().to_vec();
     let (tiles, columns, rows, outer, inner) = if s.shape == Shape::Contour {
-        let (tiles, outer, inner) = layout::contour(traced.outline(), &s)?;
-        (tiles, 1, 1, outer, inner)
+        let (outer, inner) = layout::contour_outline(traced.outline(), &s)?;
+        let (tiles, c, r) = layout::choose_outline(&s, &outer)?;
+        (tiles, c, r, outer, inner)
     } else {
         let (tiles, c, r) = layout::choose(&s)?;
         (
@@ -92,7 +95,6 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
     } else {
         CrossSection::empty()
     };
-    let raised = vector.union(&frame);
     let curved = if s.frame
         && (s.frame_profile == FrameProfile::Beaded
             || (s.shape == Shape::Contour && s.frame_profile == FrameProfile::Rounded))
@@ -119,8 +121,18 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
                 s.base_mm,
             )
         };
-        let artwork = art.union(&border);
-        let combined = base.union(&artwork);
+        let combined = base.union(&art.union(&border));
+        // Give the border any shared volume before separating filaments. This
+        // keeps coincident/overlapping artwork from becoming duplicate material.
+        let (base, artwork, border) = match s.border_material {
+            BorderMaterial::Artwork => (base, art.union(&border), Manifold::empty()),
+            BorderMaterial::Background => (
+                base.union(&border),
+                art.difference(&border),
+                Manifold::empty(),
+            ),
+            BorderMaterial::Custom => (base, art.difference(&border), border),
+        };
         let bound = combined
             .bounding_box()
             .ok_or_else(|| EngineError::input("Generated empty geometry."))?;
@@ -140,10 +152,16 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
             Some(local(&artwork)?)
         };
         let combined = local(&combined)?;
+        let border = if border.is_empty() {
+            None
+        } else {
+            Some(local(&border)?)
+        };
         pieces.push(Piece {
             tile,
             base,
             artwork,
+            border,
             combined,
             origin,
             extents,
@@ -159,6 +177,12 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
         if s.frame && s.frame_profile == FrameProfile::Rounded {
             notes.push("Rounded contour bezels use height bands no taller than 0.1 mm.".into());
         }
+        if pieces.len() > 1 {
+            notes.push("Contour cuts keep the outside silhouette. Empty grid cells are omitted; separate fragments have their own piece labels. Use the assembly map to position every piece.".into());
+        }
+    }
+    if pieces.len() > 1 {
+        notes.push("For assembly, use a suitable adhesive or mount pieces individually. Puzzle tabs provide alignment, not a load-bearing connection. Physical fit, adhesive strength, and wall mounting have not been tested.".into());
     }
     if s.layout == Layout::Puzzle && pieces.len() > 1 {
         notes.push(
@@ -187,7 +211,7 @@ pub fn build(data: &[u8], s: Settings) -> Result<Project> {
     Ok(Project {
         settings: s,
         vector,
-        raised,
+        border: frame,
         pieces,
         columns,
         rows,

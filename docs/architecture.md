@@ -33,14 +33,24 @@ behavioral reference; see [its architecture](architecture-v1.md).
 - `layout.rs` / `random.rs`: rounded footprints, outward contour offsets, centered
   loops, complementary puzzle seams, internal clearance, automatic grid choice,
   and Python-compatible integer-seeded MT19937 patterns.
+  Contour grids span the expanded silhouette's actual bounds, including negative
+  coordinates from padding. Clearance is applied to internal grid seams before
+  clipping to the silhouette. Empty cells are omitted; connected fragments get
+  stable `rNN-cNN-pNN` IDs. The 64-piece limit includes all fragments. Loops attach
+  to the uppermost occupied fragment per column and cannot overlap another piece.
 - `geometry.rs` / `solids.rs`: Manifold cross-sections, extrusion, booleans,
   rectangle border lofts, contour height bands, decorative beads, rear mounting,
   and triangle validation after conversion to STL's float32 representation.
+  A border joins the artwork or background material, or becomes a third aligned
+  part. Any shared volume belongs to the border before materials are separated;
+  their union and the finished bounds are independent of the material choice.
   Closed opposite edges, finite coordinates, and positive volume are required.
 - `packing.rs`: stable shelf packing with 3 mm gaps, aligned material placement,
   and P1S front-left exclusion-zone checks.
+  Separated maps stack same-cell fragments without overlap; assembly views use
+  their original coordinates and bounds across every piece.
 - `exports.rs`: preview DTOs, maps, PNG, source hashes, manifests, aligned STL,
-  Bambu two-filament 3MF projects, and ZIP packs produced in memory.
+  Bambu two/three-filament 3MF projects, and ZIP packs produced in memory.
 - `wasm.rs`: owned-buffer ABI. JavaScript copies results before the next call;
   Rust frees project/kernel resources automatically. Export bytes transfer back
   to the UI without an additional worker-to-main-thread copy.
@@ -52,6 +62,12 @@ React rejects superseded results and disables downloads while settings are being
 edited or generated. Export IDs must identify the current Rust project. Worker
 errors/timeouts settle requests; explicit retry starts a fresh worker. Blob URLs
 are revoked on edits, replacement exports, and unmount.
+
+The UI owns a workspace document separately from the generated preview. Portable
+JSON files embed original source bytes, settings, the project name, and selected
+preview tab. Opening replaces these atomically and clears old exports. Optional
+IndexedDB recovery stores the latest workspace on this browser only. Neither
+path needs a runtime server API. See [workspace files](workspace-files.md).
 
 Rust and C++ compile together using Emscripten, avoiding JavaScript geometry or a
 second boolean kernel. The build is single-threaded inside its worker and needs
@@ -78,5 +94,7 @@ regions can differ; geometric comparisons use stated millimeter/volume bounds.
 Synthetic nested holes retain exact topology. The existing 12 MiB input, 24 MP
 raster, 5,000-region, and 64-piece limits remain. Physical joint fit, mounting
 strength, actual AMS tray assignment, and final slicing still require inspection.
+Contour Tiles/Puzzle intentionally extend the v1 single-piece restriction; its
+frozen rejection case is exercised as a successful native split and export.
 
 Build decisions and migration reference: [browser v2](browser-v2.md).

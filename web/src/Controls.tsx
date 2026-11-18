@@ -166,11 +166,6 @@ export function Controls({
               onChange={(event) => {
                 const shape = event.target.value as Settings["shape"];
                 update("shape", shape);
-                if (shape === "contour") {
-                  update("layout", "plaque");
-                  update("rows", 0);
-                  update("columns", 0);
-                }
               }}
             >
               <option value="rectangle">Rectangle</option>
@@ -250,8 +245,9 @@ export function Controls({
           {contour && (
             <p className="hint">
               The backing fills enclosed holes; the raised image keeps its
-              cutouts. Separate islands need enough padding to join into one
-              piece.
+              cutouts. {s.layout === "plaque"
+                ? "Separate islands need enough padding to join into one piece."
+                : "Separate islands and cut fragments each get their own piece label."}
             </p>
           )}
         </section>
@@ -305,9 +301,9 @@ export function Controls({
                 onChange={(value) => update("frame_height_mm", value)}
               />
               <p className="hint control-hint">
-                Border height is measured above the background. It shares the
-                image color. Set it higher than Image thickness for a recessed
-                look.
+                Border height is measured above the background. Set it higher
+                than Image thickness for a recessed look. Choose its color
+                under Filament colors.
               </p>
             </>
           )}
@@ -348,13 +344,15 @@ export function Controls({
             <p className="hint control-hint">
               {s.layout === "plaque"
                 ? "One centered loop with a 5 mm opening. Adds up to 9 mm above the backing."
+                : contour
+                  ? "One loop on the uppermost piece in each occupied column. Mount the other pieces separately."
                 : "One centered loop on each top-row panel, following its upper edge."}
             </p>
           )}
           {s.hanging === "keyholes" && (
             <p className="hint control-hint">
               {contour
-                ? "One centered rear keyhole where the backing supports it."
+                ? "One rear keyhole per piece where the backing supports it. Narrow pieces may need larger cuts or no hanging."
                 : "Recesses on the back for screw heads."}{" "}
               Requires a background at least 5 mm thick.
             </p>
@@ -378,7 +376,6 @@ export function Controls({
             ).map(({ value, label, Icon }) => (
               <button
                 key={value}
-                disabled={contour && value !== "plaque"}
                 aria-pressed={s.layout === value}
                 onClick={() => {
                   update("layout", value);
@@ -393,8 +390,9 @@ export function Controls({
           </div>
           {contour && (
             <p className="hint">
-              Image contour prints as one piece. Choose Rectangle for tiles or
-              puzzles.
+              Split the image contour into printable pieces while keeping its
+              outside shape. Tiles make straight seams for gluing or wall
+              placement; Puzzle adds alignment tabs where the shape allows.
             </p>
           )}
           {s.layout !== "plaque" && (
@@ -436,8 +434,8 @@ export function Controls({
               )}
               {!s.columns && s.split_mode === "bed" && (
                 <p className="hint control-hint">
-                  Make the fewest panels that fit your bed, with at least two
-                  pieces.
+                  Use the largest grid cells that fit your bed, with at least two
+                  pieces. Concave cuts can create extra fragments.
                 </p>
               )}
               {!!s.columns && (
@@ -511,6 +509,10 @@ export function Controls({
                 step={0.05}
                 onChange={(value) => update("clearance_mm", value)}
               />
+              <p className="hint">
+                Clearance leaves a gap at each cut. Use 0 for matching glue edges.
+                Follow the Assembly map to position pieces; support each wall panel.
+              </p>
             </div>
           )}
         </section>

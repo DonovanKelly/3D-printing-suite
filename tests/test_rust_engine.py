@@ -52,13 +52,26 @@ def corpus_results(tmp_path_factory):
 @pytest.mark.parametrize("case", CORPUS, ids=lambda c: c["name"])
 def test_reference_decisions_and_geometric_invariants(case, corpus_results):
     result, pack = corpus_results[case["name"]]
+    if case["name"] == "invalid-contour-layout":
+        # Contour splitting deliberately extends the frozen v1 contract. Keep
+        # the original boundary as a positive native regression, not a skipped case.
+        assert "error" not in result, result
+        assert pack.exists()
+        assert result["manifest"]["settings"]["shape"] == "contour"
+        assert result["manifest"]["settings"]["layout"] == "tiles"
+        assert result["manifest"]["piece_count"] > 1
+        return
     if "error" in case:
         assert "error" in result
         assert not pack.exists()
         return
     assert "error" not in result, result
     expected, actual = case["manifest"], result["manifest"]
-    assert actual["settings"] == expected["settings"]
+    assert actual["settings"] == {
+        **expected["settings"],
+        "border_material": "artwork",
+        "border_color": "#c99b48",
+    }
     for key in ("grid", "piece_count", "plate_count"):
         assert actual[key] == expected[key]
     assert actual["physically_tested"] is False
@@ -77,7 +90,9 @@ def test_reference_decisions_and_geometric_invariants(case, corpus_results):
         assert new["watertight"] is True
 
 
-@pytest.mark.parametrize("case", [c for c in CORPUS if "error" not in c], ids=lambda c: c["name"])
+@pytest.mark.parametrize("case", [
+    c for c in CORPUS if "error" not in c or c["name"] == "invalid-contour-layout"
+], ids=lambda c: c["name"])
 def test_exports_have_closed_aligned_meshes_and_bambu_metadata(case, corpus_results):
     result, pack = corpus_results[case["name"]]
     assert "error" not in result, result
