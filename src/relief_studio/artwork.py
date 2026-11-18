@@ -169,7 +169,9 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
             if len(contours[child]) >= 3:
                 holes.append(contours[child][:, 0, :])
             child = hierarchy[child][0]
-        regions.extend(polygons(make_valid(Polygon(contour[:, 0, :], holes))))
+        # OpenCV supplies shell/hole roles. Preserve those roles when pixel
+        # contours touch: linework repair can promote a hole to a filled shell.
+        regions.extend(polygons(make_valid(Polygon(contour[:, 0, :], holes), method="structure")))
     if not regions:
         raise ImageSelectionError(
             "Artwork is too thin to trace. Increase its resolution or line weight."
@@ -177,7 +179,11 @@ def trace_image(data: bytes, settings: Settings) -> tuple[Geometry, list[str]]:
     region = unary_union(regions)
     inset = settings.artwork_inset
     height, width = gray.shape
-    x0, y0, x1, y1 = region.bounds if settings.crop_to_artwork else (0, 0, width, height)
+    x0, y0, x1, y1 = (
+        region.bounds
+        if settings.crop_to_artwork or settings.shape == "contour"
+        else (0, 0, width, height)
+    )
     span_x, span_y = x1 - x0, y1 - y0
     scale = min(
         (settings.width_mm - 2 * inset) / span_x,

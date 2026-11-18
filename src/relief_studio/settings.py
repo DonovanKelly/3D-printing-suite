@@ -13,10 +13,11 @@ class Settings(BaseModel):
     height_mm: float = Field(default=180, ge=30, le=1500)
     base_mm: float = Field(default=2.4, ge=1.2, le=12)
     relief_mm: float = Field(default=0.8, ge=0.4, le=8)
+    shape: Literal["rectangle", "contour"] = "rectangle"
     frame: bool = True
     frame_width_mm: float = Field(default=4, ge=0.5, le=30)
     frame_height_mm: float = Field(default=1.6, ge=0.4, le=12)
-    frame_profile: Literal["flat", "rounded"] = "flat"
+    frame_profile: Literal["flat", "rounded", "beaded"] = "flat"
     corner_radius_mm: float = Field(default=0, ge=0, le=100)
     margin_mm: float = Field(default=3, ge=0, le=30)
     crop_to_artwork: bool = True
@@ -41,7 +42,14 @@ class Settings(BaseModel):
 
     @model_validator(mode="after")
     def compatible_dimensions(self) -> Self:
-        if self.corner_radius_mm > min(self.width_mm, self.height_mm) / 2:
+        if self.shape == "contour" and self.layout != "plaque":
+            raise ValueError(
+                "Image contour is a single piece. Choose Plaque or a rectangular shape."
+            )
+        if (
+            self.shape == "rectangle"
+            and self.corner_radius_mm > min(self.width_mm, self.height_mm) / 2
+        ):
             raise ValueError("Corner radius cannot exceed half the shorter side.")
         inset = self.artwork_inset
         if min(self.width_mm, self.height_mm) - 2 * inset < 10:
@@ -61,6 +69,8 @@ class Settings(BaseModel):
     @property
     def artwork_inset(self) -> float:
         inset = (self.frame_width_mm if self.frame else 0) + self.margin_mm
+        if self.shape == "contour":
+            return 0
         # Keep the whole artwork rectangle inside rounded corners, without clipping it.
         return inset + max(0, self.corner_radius_mm - inset) * (1 - 1 / sqrt(2))
 

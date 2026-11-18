@@ -5,6 +5,10 @@ or a self-contained SVG, tune its black-and-white conversion, then make a raised
 plaque, large tiled panels, or an interlocking puzzle. A browser workbench and
 CLI share the same geometry engine.
 
+**Image contour** makes a single icon-shaped print with an optional flat,
+rounded, or beaded bezel. Padding and bezel width expand outward around the
+image; no rectangular backing is required.
+
 Implemented: threshold/inversion, preserved negative-space holes, configurable
 dimensions and colors, raised borders, top hanging loops, rear keyhole recesses,
 size-controlled tiling, repeatable random puzzles, adjustable puzzle clearance,
@@ -112,9 +116,46 @@ versions. `web/package-lock.json` locks the frontend dependencies.
 6. When the pieces fit on one plate, click **Download 3MF**. For multiple plates,
    **Download N plates (ZIP)** contains a 3MF for each arranged plate, plus each
    individual piece. **Download full print pack** is always available and
-   includes STLs, settings, and an assembly map. Assign the named parts to your
-   chosen AMS slots in Bambu
-   Studio; the file's display colors do not automatically select slots.
+   includes STLs, settings, and an assembly map. Open the 3MF as a project in
+   Bambu Studio: Background uses filament 1 and Artwork + frame uses filament 2.
+   Map those filaments to your actual AMS trays before printing.
+
+## Make a contour-shaped icon
+
+1. Use the built-in Alpine crest or upload an image, then choose
+   **Image & background → Backing shape → Image contour**. The sample has a
+   closed curved outline, so it works even with no bezel and zero padding.
+   The backing follows the outside of the selected artwork. Enclosed holes get
+   background beneath them; the raised image keeps its cutouts and interior details.
+2. **Width / Height** limit the image itself in this mode, preserving its aspect
+   ratio and centering it. Empty canvas margins are trimmed automatically.
+   **Padding** expands the backing around the image; **Border width** expands it
+   further. Changing either leaves the image size unchanged. The canvas heading
+   reports the actual finished size, including the optional loop.
+3. Choose **No border**, **Raised · flat**, **Raised · rounded**, or **Raised · beaded**.
+   For a recessed appearance, set **Border height** above **Image thickness**;
+   for example 3 mm border with 0.8 mm image thickness. Beads scale with rim
+   width and height. Rounded contour tops approximate a curved profile with
+   height bands no taller than 0.1 mm; inspect the sliced surface finish.
+4. **Hanging** can be None, a centered top loop with a 5 mm opening, or a single
+   rear keyhole placed down the centerline where enough backing supports it.
+   Rear keyholes need a 5 mm backing and sufficient local width. Increase the
+   image size or padding when a narrow icon cannot accommodate the recess.
+5. Download a 3MF or full print pack. Contour mode is one piece; Tiles/Puzzle
+   are disabled. Bezel, padding, and loop must all fit the usable plate. Reduce
+   the image dimensions if the app reports overflow.
+
+Disconnected shapes need enough padding or bezel width to join into one backing;
+otherwise the app reports the islands instead of silently dropping them. Select
+Rectangle when a common rectangular backing is more appropriate. Rectangular
+corner radius and source-canvas margin controls do not affect contour mode.
+Mounting strength and Bambu Studio import still require physical/slicer checks.
+
+```sh
+relief generate icon.svg --shape contour --width 120 --height 180 \
+  --margin 3 --frame-width 6 --frame-height 3 --frame-profile rounded \
+  --hanging loops --output output/contour-icon
+```
 
 ## Make tiles or a random puzzle
 
@@ -180,12 +221,14 @@ plus **background.stl**, **artwork.stl** when present, and a boolean-unioned
 **combined.stl** per piece. The pack also includes traced SVG, separated and
 assembly maps, project settings, a manifest, and `PRINTING.md`.
 
-1. Import a plate's 3MF as models. Keep each named `rNN-cNN` puzzle piece as a
-   separate object; do not merge the entire plate into one object. Within each
-   piece, assign **Background** and **Artwork + frame** to your chosen AMS
-   filaments. Display colors are hints; automatic AMS slot selection is not
-   embedded. Open additional plate files separately when the pack has more
-   than one. The app also offers individual plate links after export.
+1. **Open a plate's 3MF as a project** in Bambu Studio. The project starts with
+   P1S / 0.4 mm nozzle / 0.20 mm Standard and two Generic PLA filaments in your
+   chosen colors: **Background = filament 1**, **Artwork + frame = filament 2**.
+   Check the printer, nozzle and material profiles, then map the two filaments
+   to your actual AMS trays. Keep each named `rNN-cNN` puzzle piece as a separate
+   object. Open additional plate files separately; the app also offers individual
+   plate links after export. Geometry-only import discards project settings.
+   See [3MF compatibility](docs/3mf-compatibility.md) for the format and checks.
 2. If your slicer loses the grouping, import its background and artwork STLs
    **together as one object with multiple parts**. Keep their coordinates;
    moving the artwork to the bed independently destroys the height alignment.
@@ -217,8 +260,8 @@ including tabs and loops; your slicer still decides placement and toolpath fit.
   load-rated. Rear keyholes require at least a 5 mm backing and may need support
   or bridging adjustments. No hardware screw size is assumed to be compatible.
 - Export meshes are checked for closure, winding, positive volume, and bed
-  extents. 3MF is independently reloaded in tests, but Bambu Studio import and
-  a physical print still need confirmation on the target machine.
+  extents. Bambu Studio 2.8.2 import and saved-project reload have been checked;
+  physical printing and actual AMS tray mapping still need confirmation.
 - The app does not persist browser projects across reloads; exported settings
   can be reused through the CLI. It does not slice or send jobs to a printer.
 

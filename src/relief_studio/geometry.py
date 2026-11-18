@@ -7,17 +7,18 @@ a front skin and a lip for the screw head. They are experimental print features.
 
 from dataclasses import dataclass
 
-import manifold3d
 import numpy as np
 import trimesh
 from shapely import Geometry
 from shapely.geometry import GeometryCollection, Point, box
 from shapely.ops import unary_union
 
-from .artwork import polygons, trace_image
+from .artwork import trace_image
+from .contours import contour_layout, decorated_border
 from .layout import Tile, choose_layout
 from .profiles import outline, rounded_border
 from .settings import Settings
+from .solids import check_mesh, clean_boolean, extrude
 
 
 @dataclass
@@ -40,42 +41,6 @@ class Project:
     warnings: list[str]
 
 
-def extrude(region: Geometry, height: float, z: float = 0) -> trimesh.Trimesh | None:
-    contours = []
-    for polygon in polygons(region):
-        if polygon.area < 1e-7:
-            continue
-        contours.extend(
-            np.array(ring.coords)[:-1] for ring in (polygon.exterior, *polygon.interiors)
-        )
-    if not contours:
-        return None
-    # Clipped artwork can contain point-touching holes. CrossSection normalizes
-    # those contours before triangulation instead of creating open earcut shells.
-    section = manifold3d.CrossSection(contours, manifold3d.FillRule.EvenOdd)
-    solid = section.extrude(height).to_mesh()
-    mesh = trimesh.Trimesh(
-        vertices=solid.vert_properties[:, :3], faces=solid.tri_verts, process=False
-    )
-    mesh.apply_translation([0, 0, z])
-    return mesh
-
-
-def check_mesh(mesh: trimesh.Trimesh) -> None:
-    if not (
-        mesh.is_watertight
-        and mesh.is_winding_consistent
-        and mesh.is_volume
-        and np.isfinite(mesh.vertices).all()
-        and mesh.volume > 0
-        and mesh.copy().process().is_volume
-    ):
-        raise ValueError(
-            "Generated geometry is not a closed positive-volume solid. "
-            "Try simplifying the artwork or increasing the piece size."
-        )
-
-
 def keyhole_cutters(
     tile: Tile, settings: Settings, columns: int, rows: int
 ) -> list[trimesh.Trimesh]:
@@ -85,8 +50,12 @@ def keyhole_cutters(
     left, right = tile.column * cell_width, (tile.column + 1) * cell_width
     top = settings.height_mm * (1 - tile.row / rows)
     cutters = []
-    for x in (left + (right - left) * 0.3, left + (right - left) * 0.7):
-        bottom = top - settings.height_mm / rows
+    bottom = top - settings.height_mm / rows
+    positions = (left + (right - left) * 0.3, left + (right - left) * 0.7)
+    if settings.shape == "contour":
+        left, bottom, right, top = tile.shape.bounds
+        positions = ((left + right) / 2,)
+    for x in positions:
         # Random tab sockets may occupy the preferred mounting position. Search
         # down the cell for a retaining lip fully supported by the actual piece.
         for y in np.arange(top - 16, bottom + 6, -2):
@@ -97,7 +66,10 @@ def keyhole_cutters(
             if tile.shape.buffer(-3).covers(channel):
                 break
         else:
-            raise ValueError("Piece is too small for rear keyholes. Use fewer pieces or top loops.")
+            raise ValueError(
+                "Backing is too narrow for rear keyholes. Increase the size or padding, "
+                "or choose a top loop or no hanging."
+            )
         # Open from the bed-facing back; leave a 1.2 mm retaining lip over the head channel.
         cutters.extend([extrude(opening, 3.2, -0.1), extrude(channel, 1.9, 1.2)])
     return cutters
@@ -105,18 +77,25 @@ def keyhole_cutters(
 
 def build_project(data: bytes, settings: Settings) -> Project:
     vector, notes = trace_image(data, settings)
-    tiles, columns, rows = choose_layout(settings)
-    outer = outline(settings)
-    frame = (
-        outer.difference(outline(settings, settings.frame_width_mm))
-        if settings.frame
-        else GeometryCollection()
-    )
+    if settings.shape == "contour":
+        tiles, outer, inner = contour_layout(vector, settings)
+        columns = rows = 1
+    else:
+        tiles, columns, rows = choose_layout(settings)
+        outer = outline(settings)
+        inner = outline(settings, settings.frame_width_mm)
+    frame = outer.difference(inner) if settings.frame else GeometryCollection()
     raised = unary_union([vector, frame])
-    curved_border = (
-        rounded_border(settings) if settings.frame and settings.frame_profile == "rounded" else None
-    )
+    curved_border = None
+    if settings.frame:
+        if settings.frame_profile == "beaded" or (
+            settings.shape == "contour" and settings.frame_profile == "rounded"
+        ):
+            curved_border = decorated_border(frame, outer, settings)
+        elif settings.frame_profile == "rounded":
+            curved_border = rounded_border(settings)
     if curved_border is not None:
+        clean_boolean(curved_border)
         check_mesh(curved_border)
     pieces = []
     for tile in tiles:
@@ -135,7 +114,7 @@ def build_project(data: bytes, settings: Settings) -> Project:
                     ],
                     engine="manifold",
                 )
-                if len(tiles) > 1
+                if len(tiles) > 1 or not tile.shape.covers(outer)
                 else curved_border.copy()
             )
             if border.is_empty:
@@ -159,13 +138,7 @@ def build_project(data: bytes, settings: Settings) -> Project:
         )
         for mesh in (base, artwork, combined):
             if mesh is not None:
-                # Float32 booleans can collapse a seam triangle to zero area.
-                # Weld and remove those faces before checking the exported solid.
-                if not mesh.copy().process().is_volume:
-                    mesh.merge_vertices()
-                    a, b, c = mesh.faces.T
-                    mesh.update_faces((a != b) & (b != c) & (a != c))
-                    mesh.remove_unreferenced_vertices()
+                clean_boolean(mesh)
                 check_mesh(mesh)
         origin = [float(combined.bounds[0][0]), float(combined.bounds[0][1]), 0.0]
         for mesh in (base, artwork, combined):
@@ -176,6 +149,13 @@ def build_project(data: bytes, settings: Settings) -> Project:
         ).any():
             raise ValueError("Final mesh exceeds the selected build plate.")
         pieces.append(Piece(tile, base, artwork, combined, origin))
+    if settings.shape == "contour":
+        notes.append(
+            "Width and height bound the image; padding and bezel expand outward. "
+            "The backing fills enclosed image holes; the raised artwork preserves them."
+        )
+        if settings.frame and settings.frame_profile == "rounded":
+            notes.append("Rounded contour bezels use height bands no taller than 0.1 mm.")
     if settings.layout == "puzzle" and len(pieces) > 1:
         notes.append(
             "Print a small fit pair first. Puzzle clearance is uncalibrated for your printer."

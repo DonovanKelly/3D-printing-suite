@@ -54,7 +54,7 @@ def test_plate_export_keeps_every_piece_separate_and_every_material_aligned(tmp_
             assert len(items) == len(plate)
             objects = {o.attrib["id"]: o for o in root.findall("c:resources/c:object", ns)}
             assert len({item.attrib["objectid"] for item in items}) == len(plate)
-            for item, placed in zip(items, plate, strict=True):
+            for item, placed, exported in zip(items, plate, record["pieces"], strict=True):
                 obj = objects[item.attrib["objectid"]]
                 assert obj.attrib["name"] == project.pieces[placed.piece_index].tile.name
                 components = obj.findall("c:components/c:component", ns)
@@ -62,7 +62,7 @@ def test_plate_export_keeps_every_piece_separate_and_every_material_aligned(tmp_
                 assert len(components) == expected
                 assert item.attrib["printable"] == "1"
                 assert list(map(float, item.attrib["transform"].split()))[-3:] == pytest.approx(
-                    [placed.x, placed.y, 0]
+                    exported["origin_mm"]
                 )
         scene = trimesh.load_scene(path)
         assert scene.units == "millimeter"
@@ -75,8 +75,20 @@ def test_plate_export_keeps_every_piece_separate_and_every_material_aligned(tmp_
             scene_bounds.append(mesh.bounds)
         assert np.min(scene_bounds, axis=(0, 1))[:2].min() >= -1e-5
         assert np.max(scene_bounds, axis=(0, 1))[:2] == pytest.approx(
-            np.max([b.bounds[2:] for b in rectangles], axis=0), abs=1e-5
+            np.max(
+                [
+                    np.array(p["origin_mm"][:2])
+                    + project.pieces[placed.piece_index].combined.extents[:2]
+                    for p, placed in zip(record["pieces"], plate, strict=True)
+                ],
+                axis=0,
+            ),
+            abs=1e-5,
         )
+        assert np.max(scene_bounds, axis=(0, 1))[:2].max() <= 256 + 1e-5
+        exported_rectangles = [box(*np.r_[bounds[0, :2], bounds[1, :2]]) for bounds in scene_bounds]
+        exclusion = box(0, 0, 18, 28)
+        assert all(rect.distance(exclusion) >= 5 - 1e-5 for rect in exported_rectangles)
 
 
 def test_default_puzzle_fits_one_plate_with_nine_build_objects(tmp_path):

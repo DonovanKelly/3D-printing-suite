@@ -1,4 +1,7 @@
-/** Render the exported material meshes with orbit controls; 2D modes use generated safe SVGs. */
+/** Render exported meshes when the camera changes; 2D modes use generated safe SVGs.
+ * Dense reliefs keep a fixed light/model shadow map. Idle frames only update
+ * orbit damping, so software/mobile rendering does not monopolize the controls.
+ */
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -35,6 +38,8 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.autoUpdate = false;
+    renderer.shadowMap.needsUpdate = true;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     target.appendChild(renderer.domElement);
     renderer.domElement.setAttribute(
@@ -44,12 +49,15 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
     const scene = new THREE.Scene();
     const settings = preview.manifest.settings;
     const separated = view === "pieces";
-    const width = separated
-      ? preview.manifest.separated_extents_mm[0]
-      : settings.width_mm;
-    const height = separated
-      ? preview.manifest.separated_extents_mm[1]
-      : settings.height_mm;
+    const contour = settings.shape === "contour";
+    const width =
+      separated || contour
+        ? preview.manifest.separated_extents_mm[0]
+        : settings.width_mm;
+    const height =
+      separated || contour
+        ? preview.manifest.separated_extents_mm[1]
+        : settings.height_mm;
     const size = Math.max(width, height);
     const camera = new THREE.OrthographicCamera(
       -size,
@@ -91,10 +99,11 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         flatShading: true,
       });
       const mesh = new THREE.Mesh(geometry, material);
-      const origin = separated
-        ? preview.manifest.pieces.find((piece) => piece.id === data.piece)!
-            .separated_origin_mm
-        : data.origin;
+      const origin =
+        separated || contour
+          ? preview.manifest.pieces.find((piece) => piece.id === data.piece)!
+              .separated_origin_mm
+          : data.origin;
       mesh.position.set(origin[0] - width / 2, origin[1] - height / 2, 0);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
@@ -124,6 +133,10 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
     floor.receiveShadow = true;
     scene.add(floor);
 
+    let needsRender = true;
+    controls.addEventListener("change", () => {
+      needsRender = true;
+    });
     function resize() {
       const w = target.clientWidth,
         h = target.clientHeight;
@@ -136,6 +149,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
       camera.top = halfHeight;
       camera.bottom = -halfHeight;
       camera.updateProjectionMatrix();
+      needsRender = true;
     }
     const observer = new ResizeObserver(resize);
     observer.observe(target);
@@ -144,6 +158,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
       zoom: (factor) => {
         camera.zoom = Math.min(5, Math.max(0.35, camera.zoom * factor));
         camera.updateProjectionMatrix();
+        needsRender = true;
       },
       reset: () => {
         camera.position.copy(initial);
@@ -153,6 +168,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         controls.autoRotate = false;
         camera.updateProjectionMatrix();
         controls.update();
+        needsRender = true;
         setRotating(false);
       },
       rotate: () => {
@@ -165,13 +181,16 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         controls.target.set(0, 0, 0);
         controls.autoRotate = false;
         controls.update();
+        needsRender = true;
         setRotating(false);
       },
     };
     let frame: number;
     const render = () => {
-      controls.update();
-      renderer.render(scene, camera);
+      if (controls.update() || needsRender) {
+        renderer.render(scene, camera);
+        needsRender = false;
+      }
       frame = requestAnimationFrame(render);
     };
     render();
@@ -189,6 +208,7 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         }
       });
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     };
   }, [preview, view]);
