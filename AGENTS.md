@@ -1,6 +1,6 @@
 # 3D Printing Suite
 
-Build tools that turn images into two-color printable reliefs, framed wall art,
+Build tools that turn images into multicolor printable reliefs, framed wall art,
 build-plate-sized panels, and interlocking puzzles. The initial target is PLA on
 a Bambu Lab P1S with AMS. Keep colors configurable.
 

@@ -305,9 +305,9 @@ export function Controls({
                 onChange={(value) => update("frame_height_mm", value)}
               />
               <p className="hint control-hint">
-                Border height is measured above the background. It shares the
-                image color. Set it higher than Image thickness for a recessed
-                look.
+                Border height is measured above the background. Set it higher
+                than Image thickness for a recessed look. Choose its color
+                under Filament colors.
               </p>
             </>
           )}

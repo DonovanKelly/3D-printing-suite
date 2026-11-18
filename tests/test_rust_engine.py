@@ -58,7 +58,11 @@ def test_reference_decisions_and_geometric_invariants(case, corpus_results):
         return
     assert "error" not in result, result
     expected, actual = case["manifest"], result["manifest"]
-    assert actual["settings"] == expected["settings"]
+    assert actual["settings"] == {
+        **expected["settings"],
+        "border_material": "artwork",
+        "border_color": "#c99b48",
+    }
     for key in ("grid", "piece_count", "plate_count"):
         assert actual[key] == expected[key]
     assert actual["physically_tested"] is False

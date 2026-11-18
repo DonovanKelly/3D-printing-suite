@@ -17,6 +17,13 @@ pub enum FrameProfile {
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+pub enum BorderMaterial {
+    Artwork,
+    Background,
+    Custom,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Foreground {
     Auto,
     Dark,
@@ -88,6 +95,8 @@ pub struct RawSettings {
     pub hanging: Hanging,
     pub background_color: String,
     pub artwork_color: String,
+    pub border_material: BorderMaterial,
+    pub border_color: String,
 }
 impl Default for RawSettings {
     fn default() -> Self {
@@ -122,6 +131,8 @@ impl Default for RawSettings {
             hanging: Hanging::None,
             background_color: "#fcfcfa".into(),
             artwork_color: "#252b28".into(),
+            border_material: BorderMaterial::Artwork,
+            border_color: "#c99b48".into(),
         }
     }
 }
@@ -235,7 +246,7 @@ impl Settings {
                 "Bed height (mm): must be between 60 and 256.",
             ));
         }
-        for color in [&s.background_color, &s.artwork_color] {
+        for color in [&s.background_color, &s.artwork_color, &s.border_color] {
             if color.len() != 7
                 || !color.starts_with('#')
                 || !color[1..].bytes().all(|b| b.is_ascii_hexdigit())
@@ -268,6 +279,13 @@ impl Settings {
             return Err(EngineError::settings(error));
         }
         Ok(s)
+    }
+    pub fn resolved_border_color(&self) -> &str {
+        match self.border_material {
+            BorderMaterial::Artwork => &self.artwork_color,
+            BorderMaterial::Background => &self.background_color,
+            BorderMaterial::Custom => &self.border_color,
+        }
     }
     pub fn artwork_inset(&self) -> f64 {
         if self.shape == Shape::Contour {

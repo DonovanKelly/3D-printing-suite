@@ -93,7 +93,9 @@ export function Viewer({ preview, view }: { preview: Preview; view: View }) {
         color:
           data.material === "background"
             ? settings.background_color
-            : settings.artwork_color,
+            : data.material === "border"
+              ? settings.border_color
+              : settings.artwork_color,
         roughness: 0.84,
         metalness: 0,
         flatShading: true,
