@@ -108,6 +108,14 @@ frontend, and Python reference dependencies. The full verification command is
    **Reset image selection** recovers from an empty selection without changing
    your dimensions, border, or hanging settings. Automatic SVG selection also
    normalizes faint opacity and low contrast.
+   If a black-and-white SVG has a white backing inside a transparent canvas,
+   Automatic includes that backing and can show a solid silhouette instead of
+   the interior design. Choose **Image selection → Foreground → Dark pixels**,
+   or remove the SVG's white backing so its negative spaces are transparent.
+   This selection issue can occur even when every SVG path is closed.
+   Very thin closed rims can also break into disconnected pieces when traced.
+   Use **Fine** detail or strengthen the source rim; Padding or Border width
+   can join nearby pieces when making an Image contour backing.
 2. Under **Image & background**, set finished width/height, **Image thickness**
    (height above the backing), **Background thickness**, and **Padding** (the
    minimum space inside the border). **Trim empty image space** starts enabled;
